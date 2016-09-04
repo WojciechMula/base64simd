@@ -13,7 +13,6 @@ namespace base64 {
 
         namespace precalc {
 
-            static uint8_t valid[256];
             static uint32_t lookup_0[256];
             static uint32_t lookup_1[256];
             static uint32_t lookup_2[256];
@@ -29,13 +28,11 @@ namespace base64 {
                 lookup_1[i] = 0x80000000;
                 lookup_2[i] = 0x80000000;
                 lookup_3[i] = 0x80000000;
-                valid[i] = 0;
             }
 
             for (int i=0; i < 64; i++) {
                 const uint32_t val = static_cast<uint8_t>(base64::lookup[i]);
 
-                valid[val] = 1;
                 lookup_0[val] = i;
                 lookup_1[val] = i << 1*6;
                 lookup_2[val] = i << 2*6;
@@ -43,35 +40,8 @@ namespace base64 {
             }
         }
 
-        void dump(__m512i v) {
-            static uint8_t buf[64];
 
-            _mm512_storeu_si512(reinterpret_cast<__m512i*>(buf), v);
-        
-            for (int i=0; i < 64; i++) {
-                printf("%02x ", buf[i]);
-            }
-
-            putchar('\n');
-        }
-
-
-        void report_exception(const __m512i erroneous_input) {
-
-            // an error occurs just once, peformance is not cruical
-
-            uint8_t tmp[64];
-            _mm512_storeu_si512(reinterpret_cast<__m512*>(tmp), erroneous_input);
-
-            for (unsigned i=0; i < 64; i++) {
-                if (!precalc::valid[tmp[i]]) {
-                    throw invalid_input(i, tmp[i]);
-                }
-            }
-        }
-
-
-        __m512i lookup_gather(const __m512i input) {
+        __m512i lookup_gather(const __m512i input, __mmask16& error) {
 
             const __m512i b0 = _mm512_and_si512(input, packed_dword(0x000000ff));
             const __m512i b1 = _mm512_and_si512(_mm512_srli_epi32(input, 1*8), packed_dword(0x000000ff));
@@ -87,10 +57,7 @@ namespace base64 {
                                        _mm512_or_si512(r1,
                                        _mm512_or_si512(r2, r3)));
 
-            const uint16_t mask = _mm512_cmplt_epi32_mask(translated, _mm512_set1_epi32(0));
-            if (mask) {
-                report_exception(input);
-            }
+            error = _mm512_cmplt_epi32_mask(translated, _mm512_set1_epi32(0));
 
             return translated;
         }
@@ -151,7 +118,7 @@ namespace base64 {
         }
 
 
-        __m512i lookup_comparisons(const __m512i input) {
+        __m512i lookup_comparisons(const __m512i input, __mmask16& error) {
 
             // we operate on lower 7 bits, as all values with 8th bit set are invalid
             const __m512i in = _mm512_and_si512(input, packed_byte(0x7f));
@@ -240,10 +207,7 @@ namespace base64 {
             // 7th bit marks error - either shift is zero or byte outside standard ASCII
             const __m512i valid = _mm512_or_si512(input, _mm512_xor_si512(non_zero, packed_byte(0x80)));
 #endif
-            const __mmask16 mask = _mm512_test_epi32_mask(valid, packed_byte(0x80));
-            if (mask) {
-                report_exception(input);
-            }
+            error = _mm512_test_epi32_mask(valid, packed_byte(0x80));
 
             return result;
         }
