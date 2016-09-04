@@ -41,21 +41,24 @@ namespace base64 {
         }
 
 
+        const uint8_t OR_ALL = 0xfe;
+
+
         __m512i lookup_gather(const __m512i input, __mmask16& error) {
 
             const __m512i b0 = _mm512_and_si512(input, packed_dword(0x000000ff));
             const __m512i b1 = _mm512_and_si512(_mm512_srli_epi32(input, 1*8), packed_dword(0x000000ff));
             const __m512i b2 = _mm512_and_si512(_mm512_srli_epi32(input, 2*8), packed_dword(0x000000ff));
-            const __m512i b3 = _mm512_and_si512(_mm512_srli_epi32(input, 3*8), packed_dword(0x000000ff));
+            const __m512i b3 = _mm512_srli_epi32(input, 3*8);
 
             // do lookup
             const __m512i r0 = _mm512_i32gather_epi32(b0, (const int*)precalc::lookup_0, 4);
             const __m512i r1 = _mm512_i32gather_epi32(b1, (const int*)precalc::lookup_1, 4);
             const __m512i r2 = _mm512_i32gather_epi32(b2, (const int*)precalc::lookup_2, 4);
             const __m512i r3 = _mm512_i32gather_epi32(b3, (const int*)precalc::lookup_3, 4);
-            const __m512i translated = _mm512_or_si512(r0,
-                                       _mm512_or_si512(r1,
-                                       _mm512_or_si512(r2, r3)));
+
+            // r0 | r1 | r2 | r3
+            const __m512i translated = _mm512_or_si512(r0, _mm512_ternarylogic_epi32(r1, r2, r3, OR_ALL));
 
             error = _mm512_cmplt_epi32_mask(translated, _mm512_set1_epi32(0));
 
