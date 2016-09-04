@@ -1,1 +1,1 @@
-../../../../scripts/cpuflags.py
+../../scripts/cpuflags.py

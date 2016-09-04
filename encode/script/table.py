@@ -1,1 +1,1 @@
-../../../../scripts/table.py
+../../scripts/table.py
