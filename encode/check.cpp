@@ -4,9 +4,9 @@
 #include <memory>
 
 #include "config.h"
-#include "../../gettime.cpp"
-#include "../../cmdline.cpp"
-#include "../../fnv32.cpp"
+#include "../gettime.cpp"
+#include "../cmdline.cpp"
+#include "../fnv32.cpp"
 
 #include "encode.scalar.cpp"
 #include "lookup.sse.cpp"
@@ -40,10 +40,6 @@ public:
 
         uint32_t valid;
         valid = check("scalar32", base64::scalar::encode32, 0);
-        check("AVX512 (incremental arithmetic)", avx512_swar_arith, valid);
-        check("AVX512 (incremental logic)", avx512_swar_logic, valid);
-        check("AVX512 (gather)", avx512_gathers, valid);
-        return 0;
 
         check("scalar64", base64::scalar::encode64, valid);
         check("SSE (naive)", sse_naive, valid);

@@ -13,7 +13,7 @@ FLAGS_AVX2=$(FLAGS_BASE) -mavx2 -DHAVE_AVX2_INSTRUCTIONS
 FLAGS_AVX512=$(FLAGS_BASE) -mavx512f -DHAVE_AVX512_INSTRUCTIONS
 FLAGS_AVX512BW=$(FLAGS_BASE) -mavx512vbmi -DHAVE_AVX512BW_INSTRUCTIONS
 
-EXT_DEPS=../../fnv32.cpp ../../bmi2.cpp ../../gettime.cpp
+EXT_DEPS=../fnv32.cpp ../bmi2.cpp ../gettime.cpp
 
 ALL=verify speed check
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2

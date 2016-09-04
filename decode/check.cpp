@@ -4,9 +4,9 @@
 #include <memory>
 
 #include "config.h"
-#include "../../cmdline.cpp"
-#include "../../fnv32.cpp"
-#include "../../bmi2.cpp"
+#include "../cmdline.cpp"
+#include "../fnv32.cpp"
+#include "../bmi2.cpp"
 
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"

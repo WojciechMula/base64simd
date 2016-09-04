@@ -51,8 +51,8 @@ run_avx512bw: $(ALL_AVX512BW)
 	$(SDE) -- ./check_avx512bw
 
 VERIFY_DEPS=verify.cpp $(DEPS)
-SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../../cmdline.cpp ../../bmi2.cpp ../../gettime.cpp
-CHECK_DEPS=check.cpp $(DEPS) application.cpp ../../cmdline.cpp ../../bmi2.cpp ../../fnv32.cpp
+SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../bmi2.cpp ../gettime.cpp
+CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../bmi2.cpp ../fnv32.cpp
 
 verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) verify.cpp -o $@
