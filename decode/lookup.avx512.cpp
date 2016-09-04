@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <cassert>
+#include <stdexcept>
 
 #include <immintrin.h>
 #include <x86intrin.h>
@@ -56,6 +57,21 @@ namespace base64 {
                     throw invalid_input(i, tmp[i]);
                 }
             }
+
+            putchar('\n');
+            printf("input: ");
+            for (unsigned i=0; i < 64; i++) {
+                printf("%02x", tmp[i]);
+            }
+            putchar('\n');
+
+            printf("ASCII: ");
+            for (unsigned i=0; i < 64; i++) {
+                printf("%c", tmp[i]);
+            }
+            putchar('\n');
+
+            throw std::logic_error("the lookup procedure claims there's an error, but the input looks OK");
         }
 
 
@@ -174,27 +190,9 @@ namespace base64 {
             // shift for character '/'
             const __m512i char_slash = GET_RANGE_SHIFT_7BIT(16, '/', '/' + 1);
 
-            // merge partial results
-            /*
-                a b c a|b|c
-                0 0 0   0
-                0 0 1   1
-                0 1 0   1
-                0 1 1   1
-                1 0 0   1
-                1 0 1   1
-                1 1 0   1
-                1 1 1   1
-            */
-#if 0
-            const __m512i shift = _mm512_or_si512(range_AZ,
-                                  _mm512_or_si512(range_az,
-                                  _mm512_or_si512(range_09,
-                                  _mm512_or_si512(char_plus, char_slash))));
-#else
-            const __m512i tmp   = _mm512_ternarylogic_epi32(range_AZ, range_az, range_09, 0xfe);
-            const __m512i shift = _mm512_ternarylogic_epi32(char_plus, char_slash, tmp, 0xfe);
-#endif
+            // shift = range_AZ | range_az | range_09 | char_plus | char_slash
+            const __m512i tmp   = _mm512_ternarylogic_epi32(range_AZ, range_az, range_09, OR_ALL);
+            const __m512i shift = _mm512_ternarylogic_epi32(char_plus, char_slash, tmp,   OR_ALL);
 
             // a paddb equivalent
             const __m512i shift06 = _mm512_and_si512(shift, packed_byte(0x7f));
@@ -203,35 +201,28 @@ namespace base64 {
 
             // validation
             const __m512i non_zero_7lower = _mm512_add_epi32(shift06, packed_byte(0x7f));
-#if 1
+
             /*  7 lower bits of shift are non-zero
                 | 7th bit of shift is non-zero
-                | | 7th bit of inoput is non-zero (extended ASCII)
+                | | 7th bit of input is non-zero (extended ASCII)
                 | | |
                 a b c r
-                0 0 0 1
-                0 0 1 1
-                0 1 0 0
-                0 1 1 1
-                1 0 0 0
-                1 0 1 1
-                1 1 0 0
-                1 1 1 1
+                0 0 0 0
+                0 0 1 0
+                0 1 0 1
+                0 1 1 0
+                1 0 0 1
+                1 0 1 0
+                1 1 0 1
+                1 1 1 0
 
-                expression = ~(a | b) | c
-
+                expression = (a | b) & ~c
             */
-            // we're use 7th bit of each byte
-            const __m512i valid = _mm512_ternarylogic_epi32(in, shift, non_zero_7lower, 0xab);
-            
-#else       // a reference implementation
-            // non-zero byte in shift -- 7th bit is set
-            const __m512i non_zero = _mm512_or_si512(shift, non_zero_7lower);
+            // we're using 7th bit of each byte
+            const __m512i MSB = packed_byte(0x80);
+            const __m512i valid = _mm512_ternarylogic_epi32(non_zero_7lower, shift, input, 0x54);
 
-            // 7th bit marks error - either shift is zero or byte outside standard ASCII
-            const __m512i valid = _mm512_or_si512(input, _mm512_xor_si512(non_zero, packed_byte(0x80)));
-#endif
-            const __mmask16 mask = _mm512_test_epi32_mask(valid, packed_byte(0x80));
+            const auto mask = _mm512_cmpneq_epi32_mask(MSB, _mm512_and_si512(valid, MSB));
             if (mask) {
                 report_exception(input);
             }
@@ -239,7 +230,7 @@ namespace base64 {
             return result;
         }
 
-    } // namespace avx512bw
+    } // namespace avx512
 
 } // namespace base64
 
