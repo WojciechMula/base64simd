@@ -60,45 +60,6 @@ namespace base64 {
         }
 
 
-        __m512i lookup_incremental_arithmetic(const __m512i in) {
-
-            __m512i shift = packed_byte('A');
-            __m512i c;
-            const __m512i MSB = packed_byte(0x80);
-            
-            // shift += cmp(i >= 26) & 6;
-            c = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 26)), MSB);
-            c = _mm512_sub_epi32(c, _mm512_srli_epi32(c, 7));
-            c = _mm512_and_si512(c, packed_byte(6));
-
-            shift = _mm512_add_epi32(shift, c);
-
-            // shift -= cmp(i >= 52) & 75;
-            c = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 52)), MSB);
-            c = _mm512_sub_epi32(c, _mm512_srli_epi32(c, 7));
-            c = _mm512_and_si512(c, packed_byte(75));
-
-            shift = _mm512_sub_epi32(shift, c);
-
-            // shift -= cmp(i >= 62) & 15;
-            c = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 62)), MSB);
-            c = _mm512_sub_epi32(c, _mm512_srli_epi32(c, 7));
-            c = _mm512_and_si512(c, packed_byte(15));
-
-            shift = _mm512_sub_epi32(shift, c);
-
-            // shift -= cmp(i >= 63) & 12;
-            c = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 63)), MSB);
-            c = _mm512_sub_epi32(c, _mm512_srli_epi32(c, 7));
-            c = _mm512_and_si512(c, packed_byte(3));
-
-            shift = _mm512_add_epi32(shift, c);
-
-            // produce the result
-            return _mm512_add_epi32(in, shift);
-        }
-
-
         const uint8_t XOR_ALL = 0x96;
 
 

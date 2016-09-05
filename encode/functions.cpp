@@ -88,11 +88,6 @@ auto avx512_gathers = [](uint8_t* input, size_t bytes, uint8_t* output) {
     encode(lookup_gather, unpack_identity, input, bytes, output);
 };
 
-auto avx512_swar_arith= [](uint8_t* input, size_t bytes, uint8_t* output) {
-    using namespace base64::avx512;
-    encode(lookup_incremental_arithmetic, unpack_improved, input, bytes, output);
-};
-
 auto avx512_swar_logic = [](uint8_t* input, size_t bytes, uint8_t* output) {
     using namespace base64::avx512;
     encode(lookup_incremental_logic, unpack_improved, input, bytes, output);

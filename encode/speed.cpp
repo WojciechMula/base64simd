@@ -122,10 +122,6 @@ public:
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("avx512/arith")) {
-            measure("AVX512 (incremental arithmetic)", avx512_swar_arith);
-        }
-
         if (cmd.empty() || cmd.has("avx512/logic")) {
             measure("AVX512 (incremental logic)", avx512_swar_logic);
         }

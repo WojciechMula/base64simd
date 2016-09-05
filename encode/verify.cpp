@@ -305,15 +305,6 @@ int test() {
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
     printf("AVX512F lookup:\n");
-    printf("AVX512F (incremental arithmetic)... ");
-    fflush(stdout);
-
-    if (test_avx512(base64::avx512::lookup_incremental_arithmetic)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
     printf("AVX512F (incremental logic)... ");
     fflush(stdout);
 
