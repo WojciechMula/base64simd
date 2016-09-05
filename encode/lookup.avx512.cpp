@@ -99,6 +99,9 @@ namespace base64 {
         }
 
 
+        const uint8_t XOR_ALL = 0x96;
+
+
         __m512i lookup_incremental_logic(const __m512i in) {
 
             __m512i shift = packed_byte('A');
@@ -126,8 +129,8 @@ namespace base64 {
             c3 = _mm512_sub_epi32(c3, _mm512_srli_epi32(c3, 7));
             c3 = _mm512_and_si512(c3, packed_byte(29));
 
-            shift = _mm512_ternarylogic_epi32(shift, c0, c1, 0x96);
-            shift = _mm512_ternarylogic_epi32(shift, c2, c3, 0x96);
+            shift = _mm512_ternarylogic_epi32(shift, c0, c1, XOR_ALL);
+            shift = _mm512_ternarylogic_epi32(shift, c2, c3, XOR_ALL);
 
             // produce the result
             return _mm512_xor_si512(_mm512_add_epi32(in, shift), c1msb);
