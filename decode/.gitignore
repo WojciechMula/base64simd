@@ -9,4 +9,3 @@ check_avx512
 speed_avx512
 verify_avx512bw
 check_avx512bw
-*.txt
