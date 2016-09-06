@@ -7,6 +7,7 @@
 #include "../gettime.cpp"
 #include "../cmdline.cpp"
 #include "../fnv32.cpp"
+#include "../bmi2.cpp"
 
 #include "encode.scalar.cpp"
 #include "lookup.sse.cpp"
