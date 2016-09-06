@@ -110,24 +110,10 @@ namespace base64 {
             const __m512i L = _mm512_add_epi32(a, lo);
             const __m512i H = _mm512_add_epi32(a, hi);
 
-            /*
-                MSB  H   L  |  R
-                 0   0   0  |  0
-                 0   0   1  |  0
-                 0   1   0  |  0
-                 0   1   1  |  0
-                 1   0   0  |  0
-                 1   0   1  |  1
-                 1   1   0  |  0
-                 1   1   1  |  0
-            */
-
-#if 0
-            const __m512i MSB = _mm512_and_epi32(_mm512_andnot_epi32(H, L), packed_byte(0x80));
-#else
+            // L & ~H & 0x80
             const __m512i MSB = _mm512_ternarylogic_epi32(packed_byte(0x80), H, L, 0x20);
-#endif
-            // MSB | (MSB - (MSB >> 7))
+
+            //  (MSB - (MSB >> 7)
             return _mm512_sub_epi32(MSB, _mm512_srli_epi32(MSB, 7));
         }
 
@@ -206,17 +192,16 @@ namespace base64 {
                 | 7th bit of shift is non-zero
                 | | 7th bit of input is non-zero (extended ASCII)
                 | | |
-                a b c r
-                0 0 0 0
-                0 0 1 0
-                0 1 0 1
-                0 1 1 0
-                1 0 0 1
-                1 0 1 0
-                1 1 0 1
-                1 1 1 0
-
-                expression = (a | b) & ~c
+                a b c | expression = (a | b) & ~c
+                ------+---------------------------
+                0 0 0 | 0
+                0 0 1 | 0
+                0 1 0 | 1
+                0 1 1 | 0
+                1 0 0 | 1
+                1 0 1 | 0
+                1 1 0 | 1
+                1 1 1 | 0
             */
             // we're using 7th bit of each byte
             const __m512i MSB = packed_byte(0x80);
