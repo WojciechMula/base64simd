@@ -21,15 +21,15 @@ ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw
 
-all: run
+all: $(ALL)
 
-sse: run
+sse: $(ALL)
 
-avx2: run_avx2
+avx2: $(ALL_AVX2)
 
-avx512: run_avx512
+avx512: $(ALL_AVX512)
 
-avx512bw: run_avx512bw
+avx512bw: $(ALL_AVX512BW)
 
 run: $(ALL)
 	./verify

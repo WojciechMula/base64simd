@@ -22,13 +22,29 @@ ALL_AVX512BW=check_avx512bw
 
 all: $(ALL)
 
+sse: $(ALL)
+
 avx2: $(ALL_AVX2)
 
 avx512: $(ALL_AVX512)
+
+avx512bw: $(ALL_AVX512BW)
+
+run: $(ALL)
+	./verify
+	./check
+	./speed
+
+run_avx2: $(ALL_AVX2)
+	./verify_avx2
+	./check_avx2
+	./speed_avx2
+
+run_avx512: $(ALL_AVX512)
 	$(SDE) -- ./verify_avx512
 	$(SDE) -- ./check_avx512
 
-avx512bw: $(ALL_AVX512BW)
+run_avx512bw: $(ALL_AVX512BW)
 	$(SDE) -- ./check_avx512bw
 
 VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.avx512.cpp
