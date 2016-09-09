@@ -49,7 +49,7 @@ public:
         }
 
         if (cmd.empty() || cmd.has("swar")) {
-            measure("SWAR (64 bit)", base64::scalar::encode64);
+            measure("SWAR (64 bit)", base64::swar::encode);
         }
 
         if (cmd.empty() || cmd.has("sse")) {
