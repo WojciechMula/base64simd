@@ -10,6 +10,8 @@
 #include "../bmi2.cpp"
 
 #include "encode.scalar.cpp"
+#include "lookup.swar.cpp"
+#include "encode.swar.cpp"
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
@@ -43,6 +45,7 @@ public:
         valid = check("scalar32", base64::scalar::encode32, 0);
 
         check("scalar64", base64::scalar::encode64, valid);
+        check("SWAR (64 bit)", base64::swar::encode, valid);
         check("SSE (naive)", sse_naive, valid);
         check("SSE (optimized v1)", sse_optimized1, valid);
         check("SSE (optimized v2)", sse_optimized2, valid);

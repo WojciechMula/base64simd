@@ -10,6 +10,8 @@
 #include "../bmi2.cpp"
 
 #include "encode.scalar.cpp"
+#include "lookup.swar.cpp"
+#include "encode.swar.cpp"
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
@@ -44,6 +46,10 @@ public:
 
         if (cmd.empty() || cmd.has("scalar64")) {
             measure("scalar (64 bit)", base64::scalar::encode64);
+        }
+
+        if (cmd.empty() || cmd.has("swar")) {
+            measure("SWAR (64 bit)", base64::scalar::encode64);
         }
 
         if (cmd.empty() || cmd.has("sse")) {

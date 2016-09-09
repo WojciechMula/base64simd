@@ -5,6 +5,7 @@
 #include "config.h"
 #include "lookup.reference.cpp"
 #include "lookup.sse.cpp"
+#include "lookup.swar.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
 #endif
@@ -25,6 +26,52 @@ bool test_scalar(LOOKUP_FN fn) {
 
             printf("failed at %d (%d != %d)\n", i, ref, lookup[i]);
             return false;
+        }
+    }
+
+    return true;
+}
+
+
+template<typename LOOKUP_FN>
+bool test_swar(LOOKUP_FN fn) {
+
+    uint8_t input[8];
+    uint8_t output[8];
+
+    for (unsigned byte=0; byte < 8; byte++) {
+
+        for (unsigned j=0; j < 8; j++) {
+            input[j] = 0;
+        }
+
+        for (unsigned i=0; i < 64; i++) {
+
+            input[byte] = i;
+
+            uint64_t in;
+            uint64_t out;
+
+            memcpy(&in, input, 8);
+
+            out = fn(in);
+
+            memcpy(output, &out, 8);
+
+            for (unsigned j=0; j < 8; j++) {
+
+                if (j == byte) {
+                    if (output[j] != lookup[i]) {
+                        printf("failed at %d, byte %d - wrong result\n", i, byte);
+                        return false;
+                    }
+                } else {
+                    if (output[j] != lookup[0]) {
+                        printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
+                        return false;
+                    }
+                }
+            }
         }
     }
 
@@ -232,6 +279,14 @@ int test() {
     printf("reference branchless (optimized)... ");
     fflush(stdout);
     if (test_scalar(reference::lookup_version1)) {
+        puts("OK");
+    } else {
+        return 1;
+    }
+
+    printf("SWAR (64 bit)... ");
+    fflush(stdout);
+    if (test_swar(base64::swar::lookup_incremental_logic)) {
         puts("OK");
     } else {
         return 1;
