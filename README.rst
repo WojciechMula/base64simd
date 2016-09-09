@@ -35,10 +35,10 @@ Project organization
 --------------------------------------------------
 
 There are separate subdirectories for both algorithms, however both have
-the same structure. Each projects has builds three programs:
+the same structure. Each projects contains three programs:
 
 * ``verify`` --- makes simple validation of particular parts of algorithms,
-* ``check`` --- validates procedures,
+* ``check`` --- validates whole procedures,
 * ``speed`` --- compares speed of different variants of procedures.
 
 
@@ -60,12 +60,13 @@ Type ``make avx512BW`` to build ``verify_avx512BW``, ``check_avx512BW`` and
 Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
 to run all programs.
 
+BMI2 presence is determined based on ``/proc/cpuinfo``.
 
 AVX512
 --------------------------------------------------
 
 To compile AVX512 versions of the programs at least GCC 5.3 is required.
-GCC 4.9.2 haven't got AVX512 support.
+GCC 4.9.2 hasn't got AVX512 support.
 
 Please download `Intel Software Development Emulator`__ in order to run AVX512
 variants via ``make run_avx512`` or ``run_avx512bw``.  The emulator path should
