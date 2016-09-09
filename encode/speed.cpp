@@ -133,6 +133,10 @@ public:
             measure("AVX512 (incremental logic)", avx512_swar_logic);
         }
 
+        if (cmd.empty() || cmd.has("avx512/binsearch")) {
+            measure("AVX512 (binary search)", avx512_bin_search);
+        }
+
         if (cmd.empty() || cmd.has("avx512/gather")) {
             measure("AVX512 (gather)", avx512_gathers);
         }

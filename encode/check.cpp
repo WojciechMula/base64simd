@@ -73,8 +73,9 @@ public:
         check("AVX512BW (faster splitting)", avx512bw_faster, valid);
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-        check("AVX512 (incremental logic)", avx512_swar_logic, valid);
         check("AVX512 (gather)", avx512_gathers, valid);
+        check("AVX512 (incremental logic)", avx512_swar_logic, valid);
+        check("AVX512 (binary search)", avx512_bin_search, valid);
 #endif
 
         return 0;

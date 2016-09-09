@@ -369,6 +369,15 @@ int test() {
         return 1;
     }
 
+    printf("AVX512F (binary search)... ");
+    fflush(stdout);
+
+    if (test_avx512(base64::avx512::lookup_binary_search)) {
+        puts("OK");
+    } else {
+        return 1;
+    }
+
     printf("AVX512F unpack:\n");
     printf("AVX512F (default)... ");
     fflush(stdout);
