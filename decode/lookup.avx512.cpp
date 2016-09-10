@@ -141,10 +141,10 @@ namespace base64 {
             const __m512i tmp   = _mm512_ternarylogic_epi32(range_AZ, range_az, range_09, OR_ALL);
             const __m512i shift = _mm512_ternarylogic_epi32(char_plus, char_slash, tmp,   OR_ALL);
 
-            // a paddb equivalent
+            // a paddb equivalent: see ../avx512_swar.cpp:_mm512_add_epu8
+            const __m512i MSB = packed_byte(0x80);
             const __m512i shift06 = _mm512_and_si512(shift, packed_byte(0x7f));
-            const __m512i shift7  = _mm512_and_si512(shift, packed_byte(0x80));
-            const __m512i result  = _mm512_xor_si512(_mm512_add_epi32(in, shift06), shift7);
+            const __m512i result  = _mm512_ternarylogic_epi32(MSB, shift, _mm512_add_epi32(in, shift06), 0x6a);
 
             // validation
             const __m512i non_zero_7lower = _mm512_add_epi32(shift06, packed_byte(0x7f));
@@ -165,7 +165,6 @@ namespace base64 {
                 1 1 1 | 0
             */
             // we're using 7th bit of each byte
-            const __m512i MSB = packed_byte(0x80);
             const __m512i valid = _mm512_ternarylogic_epi32(non_zero_7lower, shift, input, 0x54);
 
             const auto mask = _mm512_cmpneq_epi32_mask(MSB, _mm512_and_si512(valid, MSB));

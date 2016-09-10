@@ -34,7 +34,7 @@ namespace avx512f_swar {
 
         // merge the 7th bit of b with sum
         /*
-            MSB   b sum | result = (MSB & (b_7 ^ sum)) | (~MSB & sum)
+            MSB  b  sum | result = (MSB & (b_7 ^ sum)) | (~MSB & sum)
             ------------+--------
              0   0   0  |   0
              0   0   1  |   1

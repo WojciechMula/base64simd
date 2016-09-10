@@ -66,13 +66,14 @@ namespace base64 {
 
         __m512i lookup_incremental_logic(const __m512i in) {
 
+            using namespace avx512f_swar;
+
             __m512i shift = packed_byte('A');
             __m512i c0, c1, c2, c3;
             const __m512i MSB = packed_byte(0x80);
             
             // shift ^= cmp(i >= 26) & 6;
-            c0 = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 26)), MSB);
-            c0 = _mm512_sub_epi32(c0, _mm512_srli_epi32(c0, 7));
+            c0 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 26));
             c0 = _mm512_and_si512(c0, packed_byte(6));
 
             // shift ^= cmp(i >= 52) & 187;
@@ -82,13 +83,11 @@ namespace base64 {
             c1 = _mm512_and_si512(c1, packed_byte(187 & 0x7f));
 
             // shift ^= cmp(i >= 62) & 17;
-            c2 = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 62)), MSB);
-            c2 = _mm512_sub_epi32(c2, _mm512_srli_epi32(c2, 7));
+            c2 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 62));
             c2 = _mm512_and_si512(c2, packed_byte(17));
 
             // shift ^= cmp(i >= 63) & 29;
-            c3 = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 63)), MSB);
-            c3 = _mm512_sub_epi32(c3, _mm512_srli_epi32(c3, 7));
+            c3 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 63));
             c3 = _mm512_and_si512(c3, packed_byte(29));
 
             shift = _mm512_ternarylogic_epi32(shift, c0, c1, XOR_ALL);
@@ -105,48 +104,48 @@ namespace base64 {
 
         __m512i lookup_binary_search(const __m512i in) {
 
-            const __m512i MSB = packed_byte(0x80);
+            using namespace avx512f_swar;
+
             __m512i cmp1_mask;
             __m512i shift;
             __m512i shift_step2;
             __m512i cmp2_mask;
             __m512i cmp2_value;
             __m512i cmp_63_mask;
-            __m512i cmp_63_value;
             
             // cmp1_mask    = cmp(i >= 52)
-            cmp1_mask = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 52)), MSB);
-            cmp1_mask = _mm512_or_si512(cmp1_mask, _mm512_sub_epi32(cmp1_mask, _mm512_srli_epi32(cmp1_mask, 7)));
+            cmp1_mask = _mm512_cmpge_mask8bit(in, packed_byte(0x80 - 52));
 
             // shift        = bit_merge(cmp1_mask, '0' - 52, 'A')
-            shift       = _mm512_ternarylogic_epi32(cmp1_mask, packed_byte('0' - 52), packed_byte('A'), BIT_MERGE);
+            shift           = _mm512_ternarylogic_epi32(cmp1_mask, packed_byte('0' - 52), packed_byte('A'), BIT_MERGE);
             // cmp2_value   = bit_merge(cmp1_mask, 62, 26)
-            cmp2_value  = _mm512_ternarylogic_epi32(cmp1_mask, packed_byte(0x80 - 62), packed_byte(0x80 - 26), BIT_MERGE);
+            cmp2_value     = _mm512_ternarylogic_epi32(cmp1_mask, packed_byte(0x80 - 62), packed_byte(0x80 - 26), BIT_MERGE);
             // shift_step2  = bit_merge(cmp1_mask, '+' - 62, 'a' - 26)
             shift_step2 = _mm512_ternarylogic_epi32(cmp1_mask, packed_byte('+' - 62), packed_byte('a' - 26), BIT_MERGE);
 
 
             // cmp2_mask    = cmp(i >= cmp_value)
-            cmp2_mask = _mm512_and_si512(_mm512_add_epi32(in, cmp2_value), MSB);
-            cmp2_mask = _mm512_or_si512(cmp2_mask, _mm512_sub_epi32(cmp2_mask, _mm512_srli_epi32(cmp2_mask, 7)));
-            // shift        = bit_merge(cmp2_mask, shift, shift_step2)
+            cmp2_mask = _mm512_cmpge_mask8bit(in, cmp2_value);
 
+            // shift        = bit_merge(cmp2_mask, shift, shift_step2)
             shift = _mm512_ternarylogic_epi32(cmp2_mask, shift_step2, shift, BIT_MERGE);
 
             // cmp_63_mask  = cmp(i >= 63)
             // cmp_63_value = cmp_63_mask & 29
             // shift        = shift ^ cmp_63_value
+            // with ternary logic:
+            // shift        = shift ^ (cmp_63_mask & 29)
 
-            cmp_63_mask  = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 63)), MSB);
-            cmp_63_value = _mm512_and_si512(packed_byte(29), _mm512_sub_epi32(cmp_63_mask, _mm512_srli_epi32(cmp_63_mask, 7)));
-
+            cmp_63_mask  = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 63));
+#if 1
+            shift = _mm512_ternarylogic_epi32(shift, cmp_63_mask, packed_byte(29), 0x78);
+#else
+            const __m512i cmp_63_value = _mm512_and_si512(packed_byte(29), cmp_63_mask);
             shift = _mm512_xor_si512(shift, cmp_63_value);
+#endif
 
             // add modulo 256
-            __m512i shift06 = _mm512_and_si512(shift, packed_byte(0x7f));
-            __m512i shift7  = _mm512_and_si512(shift, MSB);
-
-            return _mm512_xor_si512(_mm512_add_epi32(in, shift06), shift7);
+            return _mm512_add_epu8(in, shift);
         }
 
 

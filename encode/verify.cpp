@@ -10,6 +10,7 @@
 #   include "lookup.avx2.cpp"
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
+#   include "../avx512_swar.cpp"
 #   include "lookup.avx512.cpp"
 #   include "unpack.avx512.cpp"
 #endif
