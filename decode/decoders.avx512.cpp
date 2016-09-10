@@ -1,3 +1,4 @@
+#include "../avx512_swar.cpp"
 #include "pack.avx512.cpp"
 #include "lookup.avx512.cpp"
 #include "decode.avx512.cpp"

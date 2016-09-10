@@ -103,48 +103,9 @@ namespace base64 {
         }
 
 
-        // returns packed (a[i] >= lo and a[i] <= hi) ? 0x7f : 0x00;
-        // assertion a[i] < 0x80
-        __m512i _mm512_range_mask_7bit(const __m512i a, const __m512i lo, const __m512i hi) {
-
-            const __m512i L = _mm512_add_epi32(a, lo);
-            const __m512i H = _mm512_add_epi32(a, hi);
-
-            // L & ~H & 0x80
-            const __m512i MSB = _mm512_ternarylogic_epi32(packed_byte(0x80), H, L, 0x20);
-
-            //  (MSB - (MSB >> 7)
-            return _mm512_sub_epi32(MSB, _mm512_srli_epi32(MSB, 7));
-        }
-
-        // returns packed (a[i] >= lo and a[i] <= hi) ? 0xff : 0x00;
-        // assertion a[i] < 0x80
-        __m512i _mm512_range_mask_8bit(const __m512i a, const __m512i lo, const __m512i hi) {
-
-            const __m512i L = _mm512_add_epi32(a, lo);
-            const __m512i H = _mm512_add_epi32(a, hi);
-
-            const __m512i MSB = _mm512_ternarylogic_epi32(packed_byte(0x80), H, L, 0x20);
-
-            // MSB | (MSB - (MSB >> 7))
-            return _mm512_or_si512(MSB, _mm512_sub_epi32(MSB, _mm512_srli_epi32(MSB, 7)));
-        }
-
-
-        // returns packed (a[i] >= lo and a[i] <= hi) ? 0x04 : 0x00;
-        // assertion a[i] < 0x80
-        __m512i _mm512_range_3rd_bit(const __m512i a, const __m512i lo, const __m512i hi) {
-
-            const __m512i L = _mm512_add_epi32(a, lo);
-            const __m512i H = _mm512_add_epi32(a, hi);
-
-            const __m512i MSB = _mm512_ternarylogic_epi32(packed_byte(0x80), H, L, 0x20);
-
-            return _mm512_srli_epi32(MSB, 5);
-        }
-
-
         __m512i lookup_comparisons(const __m512i input) {
+
+            using namespace avx512f_swar;
 
             // we operate on lower 7 bits, as all values with 8th bit set are invalid
             const __m512i in = _mm512_and_si512(input, packed_byte(0x7f));
