@@ -64,10 +64,10 @@ SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp appl
 speed: $(SPEED_DEPS)
 	$(CXX) $(FLAGS) speed.cpp -o $@
 
-speed_avx2: $(SPEED_DEPS) lookup.avx2.cpp
+speed_avx2: $(SPEED_DEPS) *.avx2.cpp
 	$(CXX) $(FLAGS_AVX2) speed.cpp -o $@
 
-speed_avx512: $(SPEED_DEPS) lookup.avx2.cpp
+speed_avx512: $(SPEED_DEPS) *.avx512.cpp
 	$(CXX) $(FLAGS_AVX512) speed.cpp -o $@
 
 
@@ -76,10 +76,10 @@ CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp appl
 check: $(CHECK_DEPS)
 	$(CXX) $(FLAGS) check.cpp -o $@
 
-check_avx2: $(CHECK_DEPS)
+check_avx2: $(CHECK_DEPS) *.avx2.cpp
 	$(CXX) $(FLAGS_AVX2) check.cpp -o $@
 
-check_avx512: $(CHECK_DEPS)
+check_avx512: $(CHECK_DEPS) *.avx512.cpp
 	$(CXX) $(FLAGS_AVX512) check.cpp -o $@
 
 check_avx512bw: $(CHECK_DEPS)
