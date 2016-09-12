@@ -20,6 +20,7 @@
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
+#   include "../avx512_swar.cpp"
 #   include "unpack.avx512.cpp"
 #   include "lookup.avx512.cpp"
 #   include "encode.avx512.cpp"
@@ -75,6 +76,7 @@ public:
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         check("AVX512 (gather)", avx512_gathers, valid);
         check("AVX512 (incremental logic)", avx512_swar_logic, valid);
+        check("AVX512 (incremental logic improved)", avx512_swar_logic_improved, valid);
         check("AVX512 (binary search)", avx512_bin_search, valid);
 #endif
 

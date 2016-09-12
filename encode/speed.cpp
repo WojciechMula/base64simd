@@ -19,6 +19,7 @@
 #   include "encode.avx2.cpp"
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
+#   include "../avx512_swar.cpp"
 #   include "unpack.avx512.cpp"
 #   include "lookup.avx512.cpp"
 #   include "encode.avx512.cpp"
@@ -131,6 +132,10 @@ public:
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("avx512/logic")) {
             measure("AVX512 (incremental logic)", avx512_swar_logic);
+        }
+
+        if (cmd.empty() || cmd.has("avx512/logic/improved")) {
+            measure("AVX512 (incremental logic improved)", avx512_swar_logic_improved);
         }
 
         if (cmd.empty() || cmd.has("avx512/binsearch")) {

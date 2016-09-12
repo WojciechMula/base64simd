@@ -370,6 +370,15 @@ int test() {
         return 1;
     }
 
+    printf("AVX512F (incremental logic improved)... ");
+    fflush(stdout);
+
+    if (test_avx512(base64::avx512::lookup_incremental_logic_improved)) {
+        puts("OK");
+    } else {
+        return 1;
+    }
+
     printf("AVX512F (binary search)... ");
     fflush(stdout);
 

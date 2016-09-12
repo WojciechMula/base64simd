@@ -98,6 +98,54 @@ namespace base64 {
         }
 
 
+        __m512i lookup_incremental_logic_improved(const __m512i in) {
+
+            using namespace avx512f_swar;
+
+            __m512i shift;
+            __m512i c0, c1, c2, c3;
+            const __m512i MSB = packed_byte(0x80);
+
+            // Note: an expression like shift ^= cmp(...) & const
+            //       might be expressed with ternary logic
+            /*
+                s m c | shift ^ (mask & constant)
+                ------+--------------------------
+                0 0 0 | 0
+                0 0 1 | 0
+                0 1 0 | 0
+                0 1 1 | 1
+                1 0 0 | 1
+                1 0 1 | 1
+                1 1 0 | 1
+                1 1 1 | 0 -> 0x78
+            */
+            const uint8_t XOR_AND = 0x78;
+
+            // shift ^= cmp(i >= 26) & 6;
+            c0 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 26));
+            shift = _mm512_ternarylogic_epi32(packed_byte('A'), c0, packed_byte(6), XOR_AND);
+
+            // shift ^= cmp(i >= 52) & 187;
+            c1 = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 52)), MSB);
+            const __m512i c1msb = c1;
+            c1 = _mm512_sub_epi32(c1, _mm512_srli_epi32(c1, 7));
+
+            shift = _mm512_ternarylogic_epi32(shift, c1, packed_byte(187 & 0x7f), XOR_AND);
+
+            // shift ^= cmp(i >= 62) & 17;
+            c2 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 62));
+            shift = _mm512_ternarylogic_epi32(shift, c2, packed_byte(17), XOR_AND);
+
+            // shift ^= cmp(i >= 63) & 29;
+            c3 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 63));
+            shift = _mm512_ternarylogic_epi32(shift, c3, packed_byte(29), XOR_AND);
+
+            // produce the result
+            return _mm512_xor_si512(_mm512_add_epi32(in, shift), c1msb);
+        }
+
+
         const uint8_t BIT_MERGE = 0xca;
 
 
