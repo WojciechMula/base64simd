@@ -54,10 +54,7 @@ namespace base64 {
             const __m512i r2 = _mm512_i32gather_epi32(b2, (const int*)lookup_2, 4);
             const __m512i r3 = _mm512_i32gather_epi32(b3, (const int*)lookup_3, 4);
 
-            return _mm512_or_si512(r0,
-                   _mm512_or_si512(r1,
-                   _mm512_or_si512(r2, r3)));
-
+            return _mm512_or_si512(r0, _mm512_ternarylogic_epi32(r1, r2, r3, 0xfe));
         }
 
 
@@ -123,22 +120,20 @@ namespace base64 {
             const uint8_t XOR_AND = 0x78;
 
             // shift ^= cmp(i >= 26) & 6;
-            c0 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 26));
-            shift = _mm512_ternarylogic_epi32(packed_byte('A'), c0, packed_byte(6), XOR_AND);
-
             // shift ^= cmp(i >= 52) & 187;
+            // shift ^= cmp(i >= 62) & 17;
+            // shift ^= cmp(i >= 63) & 29;
+
+            c0 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 26));
             c1 = _mm512_and_si512(_mm512_add_epi32(in, packed_byte(0x80 - 52)), MSB);
             const __m512i c1msb = c1;
             c1 = _mm512_sub_epi32(c1, _mm512_srli_epi32(c1, 7));
-
-            shift = _mm512_ternarylogic_epi32(shift, c1, packed_byte(187 & 0x7f), XOR_AND);
-
-            // shift ^= cmp(i >= 62) & 17;
             c2 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 62));
-            shift = _mm512_ternarylogic_epi32(shift, c2, packed_byte(17), XOR_AND);
-
-            // shift ^= cmp(i >= 63) & 29;
             c3 = _mm512_cmpge_mask7bit(in, packed_byte(0x80 - 63));
+
+            shift = _mm512_ternarylogic_epi32(packed_byte('A'), c0, packed_byte(6), XOR_AND);
+            shift = _mm512_ternarylogic_epi32(shift, c1, packed_byte(187 & 0x7f), XOR_AND);
+            shift = _mm512_ternarylogic_epi32(shift, c2, packed_byte(17), XOR_AND);
             shift = _mm512_ternarylogic_epi32(shift, c3, packed_byte(29), XOR_AND);
 
             // produce the result
@@ -147,7 +142,6 @@ namespace base64 {
 
 
         const uint8_t BIT_MERGE = 0xca;
-
 
 
         __m512i lookup_binary_search(const __m512i in) {
