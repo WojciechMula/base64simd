@@ -2,7 +2,6 @@
 #include <x86intrin.h>
 
 #include <cstdint>
-#include "../debug_dump.cpp"
 
 //#define GATHER_ASSISTED_LOAD
 
@@ -16,19 +15,17 @@ namespace base64 {
             uint8_t* out = output;
 
 #ifdef GATHER_ASSISTED_LOAD
-            static const uint32_t input_offsets[16] = {
+            const __m512i input_offsets = _mm512_setr_epi32(
                  0*3,  1*3,  2*3,  3*3,
                  4*3,  5*3,  6*3,  7*3,
                  8*3,  9*3, 10*3, 11*3,
                 12*3, 13*3, 14*3, 15*3
-            };
-
-            const __m512i input_gather = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(input_offsets));
+            );
 #endif
             for (size_t i = 0; i < bytes; i += 4 * 12) {
                 // load bytes
 #ifdef GATHER_ASSISTED_LOAD
-                const __m512i in = _mm512_i32gather_epi32(input_gather, (const int*)(input + i), 1);
+                const __m512i in = _mm512_i32gather_epi32(input_offsets, (const int*)(input + i), 1);
 #else
                 const __m512i tmp1 = _mm512_loadu_si512(input + i);
                 const __m512i tmp2 = _mm512_permutexvar_epi32(

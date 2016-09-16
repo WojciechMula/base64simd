@@ -4,30 +4,11 @@
 #include <immintrin.h>
 #include <x86intrin.h>
 
-#include "../debug_dump.cpp"
-
 //#define SCATTER_ASSISTED_STORE
 
 namespace base64 {
 
     namespace avx512 {
-
-        namespace precalc {
-
-            static __m512i scatter_offsets;
-        }
-
-        void initalize_decode() {
-
-            uint32_t lookup[16];
-
-            for (int i=0; i < 16; i++) {
-                lookup[i] = i * 3;
-            }
-
-            precalc::scatter_offsets = _mm512_loadu_si512(reinterpret_cast<__m512i*>(lookup));
-        }
-
 
         template <typename FN_LOOKUP, typename FN_PACK>
         void decode(FN_LOOKUP lookup, FN_PACK pack, const uint8_t* input, size_t size, uint8_t* output) {
@@ -36,6 +17,14 @@ namespace base64 {
 
             uint8_t* out = output;
 
+#ifdef SCATTER_ASSISTED_STORE
+            const __m512i store_offsets = _mm512_setr_epi32(
+                 0*3,  1*3,  2*3,  3*3,
+                 4*3,  5*3,  6*3,  7*3,
+                 8*3,  9*3, 10*3, 11*3,
+                12*3, 13*3, 14*3, 15*3
+            );
+#endif
             for (size_t i=0; i < size; i += 64) {
 
                 __m512i in = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(input + i));
@@ -52,7 +41,7 @@ namespace base64 {
                 const __m512i packed = pack(values);
 
 #ifdef SCATTER_ASSISTED_STORE
-                _mm512_i32scatter_epi32(reinterpret_cast<int*>(out), precalc::scatter_offsets, packed, 1);
+                _mm512_i32scatter_epi32(reinterpret_cast<int*>(out), store_offsets, packed, 1);
 #else
                 //                 |  32 bits  |
                 // packed        = [.. D2 D1 D0|.. C2 C1 C0|.. B2 B1 B0|.. A2 A1 A0] x 4 (four 128-bit lanes)
@@ -97,8 +86,9 @@ namespace base64 {
 
                 const __m512i t6 = _mm512_permutexvar_epi32(s6, t5);
 
-                //_mm512_storeu_si512(reinterpret_cast<__m512i*>(out), t7);
-                _mm512_mask_storeu_epi32(reinterpret_cast<__m512i*>(out), 0x0fff, t6);
+                // Note: overwritting is faster than masked stored
+                _mm512_storeu_si512(reinterpret_cast<__m512i*>(out), t6);
+                //_mm512_mask_storeu_epi32(reinterpret_cast<__m512i*>(out), 0x0fff, t6);
 #endif
                 out += 48;
             }

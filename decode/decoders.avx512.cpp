@@ -10,7 +10,6 @@ namespace base64 {
         void prepare_lookups() {
 
             initalize_lookup();
-            initalize_decode();
         }
 
     } // namespace avx512
