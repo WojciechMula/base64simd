@@ -98,6 +98,11 @@ auto avx512_swar_logic_improved = [](uint8_t* input, size_t bytes, uint8_t* outp
     encode(lookup_incremental_logic_improved, unpack_improved, input, bytes, output);
 };
 
+auto avx512_swar_logic_improved_load_gather = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    using namespace base64::avx512;
+    encode_load_gather(lookup_incremental_logic_improved, unpack_improved, input, bytes, output);
+};
+
 auto avx512_bin_search = [](uint8_t* input, size_t bytes, uint8_t* output) {
     using namespace base64::avx512;
     encode(lookup_binary_search, unpack_improved, input, bytes, output);

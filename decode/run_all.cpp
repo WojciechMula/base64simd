@@ -87,8 +87,9 @@ RUN_SSE_TEMPLATE2("sse/pshufb/madd",                 decode, lookup_pshufb, pack
     {
     using namespace base64::avx512;
 
-    RUN_AVX2_TEMPLATE2("avx512/gather",      decode, lookup_gather,      pack_identity);
-    RUN_AVX2_TEMPLATE2("avx512/comparisons", decode, lookup_comparisons, pack_improved);
+    RUN_AVX2_TEMPLATE2("avx512/gather",              decode, lookup_gather,      pack_identity);
+    RUN_AVX2_TEMPLATE2("avx512/comparisons",         decode, lookup_comparisons, pack_improved);
+    RUN_AVX2_TEMPLATE2("avx512/comparisons/scatter", decode_store_scatter, lookup_comparisons, pack_improved);
     }
 #endif // HAVE_AVX512_INSTRUCTIONS
 
