@@ -78,7 +78,7 @@ namespace base64 {
         const uint8_t OR_ALL = 0xfe;
 
 
-        __m512i lookup_gather(const __m512i input) {
+        __m512i inline __attribute__((always_inline)) lookup_gather(const __m512i input) {
 
             const __m512i b0 = _mm512_and_si512(input, packed_dword(0x000000ff));
             const __m512i b1 = _mm512_and_si512(_mm512_srli_epi32(input, 1*8), packed_dword(0x000000ff));
@@ -103,7 +103,7 @@ namespace base64 {
         }
 
 
-        __m512i lookup_comparisons(const __m512i input) {
+        __m512i inline __attribute__((always_inline)) lookup_comparisons(const __m512i input) {
 
             using namespace avx512f_swar;
 
