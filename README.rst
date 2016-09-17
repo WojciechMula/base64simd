@@ -22,10 +22,12 @@ Vectorization approaches were described in a series of articles:
 * `Base64 encoding with SIMD instructions`__,
 * `Base64 decoding with SIMD instructions`__,
 * `Base64 encoding & decoding using AVX512 instructions`__ (only AVX512BW)
+* `AVX512F base64 coding and decoding`__
 
-__ ../notesen/2016-01-12-sse-base64-encoding.html
-__ ../notesen/2016-01-17-sse-base64-decoding.html
-__ ../notesen/2016-04-03-avx512-base64.html
+__ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
+__ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
+__ http://0x80.pl/notesen/2016-04-03-avx512-base64.html
+__ http://0x80.pl/articles/avx512-foundation-base64.html
 
 Performance results from various machines are located
 in subdirectories ``results``.
