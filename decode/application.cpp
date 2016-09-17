@@ -36,7 +36,7 @@ protected:
 #endif // HAVE_AVX512BW_INSTRUCTIONS
 
         input.reset (new uint8_t[get_input_size()]);
-        output.reset(new uint8_t[get_output_size()]);
+        output.reset(new uint8_t[get_output_size() + 64]);
 
         if (!quiet) {
             printf("input size: %lu\n", get_input_size());
