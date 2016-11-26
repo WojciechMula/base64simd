@@ -1,4 +1,8 @@
 import errno
+import platform
+import subprocess
+
+MACOS=(platform.system()=='Darwin')
 
 class CPUFlags:
     def __init__(self):
@@ -20,27 +24,26 @@ class CPUFlags:
     def __parse_cpuinfo(self):
 
         def get_flags():
-            with open('/proc/cpuinfo', 'r') as f:
-                for line in f:
-                    if line.startswith('flags'):
-                        return line
-
-        line = get_flags().split()
-        del line[:2] # remove tokens "flags", ":"
-
-        return set(line)
+            if MACOS:
+                return subprocess.Popen("sysctl -n machdep.cpu ".split(),  stdout=subprocess.PIPE).communicate()[0].decode("utf-8").lower().split()
+            else :
+                with open('/proc/cpuinfo', 'r') as f:
+                    for line in f:
+                        if line.startswith('flags'):
+                            return line.split()[2:]
+        return set(get_flags())
 
 
 def main():
-    
+
     import sys
-    
+
     flags = CPUFlags()
 
     if len(sys.argv) == 2:
         if sys.argv[1] in flags:
-            print "present"
-    
+            print ("present")
+
 
 if __name__ == '__main__':
     main()
