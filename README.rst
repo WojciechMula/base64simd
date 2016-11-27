@@ -15,14 +15,14 @@ There are several versions of procedures utilizing following instructions sets:
 * AVX2,
 * AVX512F,
 * AVX512BW, and
-* BMI2
+* BMI2.
 
 Vectorization approaches were described in a series of articles:
 
 * `Base64 encoding with SIMD instructions`__,
 * `Base64 decoding with SIMD instructions`__,
-* `Base64 encoding & decoding using AVX512BW instructions`__
-* `AVX512F base64 coding and decoding`__
+* `Base64 encoding & decoding using AVX512BW instructions`__,
+* `AVX512F base64 coding and decoding`__.
 
 __ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
 __ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
@@ -62,7 +62,8 @@ Type ``make avx512BW`` to build ``verify_avx512BW``, ``check_avx512BW`` and
 Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
 to run all programs.
 
-BMI2 presence is determined based on ``/proc/cpuinfo``.
+BMI2 presence is determined based on ``/proc/cpuinfo`` or counterpart.
+
 
 AVX512
 --------------------------------------------------
