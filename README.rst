@@ -21,7 +21,7 @@ Vectorization approaches were described in a series of articles:
 
 * `Base64 encoding with SIMD instructions`__,
 * `Base64 decoding with SIMD instructions`__,
-* `Base64 encoding & decoding using AVX512 instructions`__ (only AVX512BW)
+* `Base64 encoding & decoding using AVX512BW instructions`__
 * `AVX512F base64 coding and decoding`__
 
 __ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
@@ -37,9 +37,9 @@ Project organization
 --------------------------------------------------
 
 There are separate subdirectories for both algorithms, however both have
-the same structure. Each projects contains three programs:
+the same structure. Each project contains three programs:
 
-* ``verify`` --- makes simple validation of particular parts of algorithms,
+* ``verify`` --- does simple validation of particular parts of algorithms,
 * ``check`` --- validates whole procedures,
 * ``speed`` --- compares speed of different variants of procedures.
 
