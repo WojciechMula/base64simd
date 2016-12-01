@@ -259,10 +259,10 @@ namespace base64 {
             );
 
             const __m128i shift_LUT = _mm_setr_epi8(
-                /* 0 */ 0x00, /* 1 */ 0x00, /* 2 */ 0x3e, /* 3 */ 0x34,
-                /* 4 */ 0x00, /* 5 */ 0x0f, /* 6 */ 0x1a, /* 7 */ 0x29,
-                /* 8 */ 0x00, /* 9 */ 0x00, /* a */ 0x00, /* b */ 0x00,
-                /* c */ 0x00, /* d */ 0x00, /* e */ 0x00, /* f */ 0x00
+                /* 0 */ 0x00,        /* 1 */ 0x00,        /* 2 */ 0x3e - 0x2b, /* 3 */ 0x34 - 0x30,
+                /* 4 */ 0x00 - 0x41, /* 5 */ 0x0f - 0x50, /* 6 */ 0x1a - 0x61, /* 7 */ 0x29 - 0x70,
+                /* 8 */ 0x00,        /* 9 */ 0x00,        /* a */ 0x00,        /* b */ 0x00,
+                /* c */ 0x00,        /* d */ 0x00,        /* e */ 0x00,        /* f */ 0x00
             );
 
             const __m128i upper_bound = _mm_shuffle_epi8(upper_bound_LUT, higher_nibble);
@@ -286,10 +286,9 @@ namespace base64 {
                 }
             }
 
-            __m128i shift  = _mm_shuffle_epi8(shift_LUT, higher_nibble);
-            __m128i result = _mm_sub_epi8(input, lower_bound);
-            result = _mm_add_epi8(result, shift);
-            result = _mm_add_epi8(result, _mm_and_si128(eq_2f, packed_byte(-3)));
+            const __m128i shift  = _mm_shuffle_epi8(shift_LUT, higher_nibble);
+            const __m128i t0     = _mm_add_epi8(input, shift);
+            const __m128i result = _mm_add_epi8(t0, _mm_and_si128(eq_2f, packed_byte(-3)));
 
             return result;
 #undef packed_byte
