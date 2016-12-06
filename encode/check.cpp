@@ -14,18 +14,19 @@
 #include "encode.swar.cpp"
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
+#if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "lookup.xop.cpp"
+#endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
 #   include "encode.avx2.cpp"
 #endif
-
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 #   include "../avx512_swar.cpp"
 #   include "unpack.avx512.cpp"
 #   include "lookup.avx512.cpp"
 #   include "encode.avx512.cpp"
 #endif
-
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "encode.avx512bw.cpp"
 #endif
@@ -60,6 +61,9 @@ public:
 #if defined(HAVE_BMI2_INSTRUCTIONS)
         check("SSE & BMI2 (naive)", sse_bmi2_naive, valid);
         check("SSE & BMI2 (optimized)", sse_bmi2_optimized, valid);
+#endif
+#if defined(HAVE_XOP_INSTRUCTIONS)
+        check("XOP", xop_vperm, valid);
 #endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
         check("AVX2 (optimized v2)",                avx2_optimized2, valid);

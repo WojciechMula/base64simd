@@ -12,6 +12,7 @@ FLAGS=$(FLAGS_BASE) -msse4
 FLAGS_AVX2=$(FLAGS_BASE) -mavx2 -DHAVE_AVX2_INSTRUCTIONS
 FLAGS_AVX512=$(FLAGS_BASE) -mavx512f -DHAVE_AVX512_INSTRUCTIONS
 FLAGS_AVX512BW=$(FLAGS_BASE) -mavx512vbmi -DHAVE_AVX512_INSTRUCTIONS -DHAVE_AVX512BW_INSTRUCTIONS
+FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
 
 EXT_DEPS=../fnv32.cpp ../bmi2.cpp ../gettime.cpp
 
@@ -19,6 +20,7 @@ ALL=verify speed check
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
 ALL_AVX512BW=check_avx512bw
+ALL_XOP=verify_xop speed_xop check_xop
 
 all: $(ALL)
 
@@ -29,6 +31,8 @@ avx2: $(ALL_AVX2)
 avx512: $(ALL_AVX512)
 
 avx512bw: $(ALL_AVX512BW)
+
+xop: $(ALL_XOP)
 
 run: $(ALL)
 	./verify
@@ -47,6 +51,11 @@ run_avx512: $(ALL_AVX512)
 run_avx512bw: $(ALL_AVX512BW)
 	$(SDE) -- ./check_avx512bw
 
+run_xop: $(ALL_XOP)
+	./verify_xop
+	./check_xop
+	./speed_xop
+
 VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.avx512.cpp
 
 verify: $(VERIFY_DEPS)
@@ -57,6 +66,9 @@ verify_avx2: $(VERIFY_DEPS)
 
 verify_avx512: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_AVX512) verify.cpp -o $@
+
+verify_xop: $(VERIFY_DEPS)
+	$(CXX) $(FLAGS_XOP) verify.cpp -o $@
 
 
 SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
@@ -69,6 +81,9 @@ speed_avx2: $(SPEED_DEPS) *.avx2.cpp
 
 speed_avx512: $(SPEED_DEPS) *.avx512.cpp
 	$(CXX) $(FLAGS_AVX512) speed.cpp -o $@
+
+speed_xop: $(SPEED_DEPS) *.xop.cpp
+	$(CXX) $(FLAGS_XOP) speed.cpp -o $@
 
 
 CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
@@ -85,6 +100,9 @@ check_avx512: $(CHECK_DEPS) *.avx512.cpp
 check_avx512bw: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_AVX512BW) check.cpp -o $@
 
+check_xop: $(CHECK_DEPS) *.xop.cpp
+	$(CXX) $(FLAGS_XOP) check.cpp -o $@
+
 clean:
-	rm -f $(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW)
+	rm -f $(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_XOP)
 

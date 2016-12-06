@@ -14,6 +14,9 @@
 #include "encode.swar.cpp"
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
+#if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "lookup.xop.cpp"
+#endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
 #   include "encode.avx2.cpp"
@@ -100,6 +103,12 @@ public:
 
         if (cmd.empty() || cmd.has("bmi2")) {
             measure("SSE & BMI2 (lookup: improved)", sse_bmi2_optimized);
+        }
+#endif
+
+#if defined(HAVE_XOP_INSTRUCTIONS)
+        if (cmd.empty() || cmd.has("xop")) {
+            measure("XOP", xop_vperm);
         }
 #endif
 

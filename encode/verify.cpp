@@ -14,6 +14,9 @@
 #   include "lookup.avx512.cpp"
 #   include "unpack.avx512.cpp"
 #endif
+#if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "lookup.xop.cpp"
+#endif
 
 const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -332,6 +335,16 @@ int test() {
     } else {
         return 1;
     }
+
+#if defined(HAVE_XOP_INSTRUCTIONS)
+    printf("XOP implementation... ");
+    fflush(stdout);
+    if (test_sse(base64::xop::lookup)) {
+        puts("OK");
+    } else {
+        return 1;
+    }
+#endif
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
     printf("AVX2 implementation of optimized algorithm... ");

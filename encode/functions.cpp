@@ -46,6 +46,12 @@ auto sse_bmi2_optimized = [](uint8_t* input, size_t bytes, uint8_t* output) {
 };
 #endif
 
+#if defined(HAVE_XOP_INSTRUCTIONS)
+auto xop_vperm = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    base64::sse::encode(base64::xop::lookup, input, bytes, output);
+};
+#endif
+
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 auto avx2_optimized2 = [](uint8_t* input, size_t bytes, uint8_t* output) {
     base64::avx2::encode(base64::avx2::lookup_version2, input, bytes, output);
