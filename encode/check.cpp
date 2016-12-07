@@ -15,6 +15,7 @@
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
 #if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "encode.xop.cpp"
 #   include "lookup.xop.cpp"
 #endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
@@ -63,7 +64,8 @@ public:
         check("SSE & BMI2 (optimized)", sse_bmi2_optimized, valid);
 #endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
-        check("XOP", xop_vperm, valid);
+        check("XOP (vpermb)", xop_vperm, valid);
+        check("XOP (pshufb improved)", xop_pshufb, valid);
 #endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
         check("AVX2 (optimized v2)",                avx2_optimized2, valid);

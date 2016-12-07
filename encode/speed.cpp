@@ -15,6 +15,7 @@
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
 #if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "encode.xop.cpp"
 #   include "lookup.xop.cpp"
 #endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
@@ -107,8 +108,12 @@ public:
 #endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("xop")) {
-            measure("XOP", xop_vperm);
+        if (cmd.empty() || cmd.has("xop/vpermb")) {
+            measure("XOP (vpermb)", xop_vperm);
+        }
+
+        if (cmd.empty() || cmd.has("xop/pshufb")) {
+            measure("XOP (pshufb improved)", xop_pshufb);
         }
 #endif
 

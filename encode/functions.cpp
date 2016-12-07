@@ -48,7 +48,11 @@ auto sse_bmi2_optimized = [](uint8_t* input, size_t bytes, uint8_t* output) {
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
 auto xop_vperm = [](uint8_t* input, size_t bytes, uint8_t* output) {
-    base64::sse::encode(base64::xop::lookup, input, bytes, output);
+    base64::xop::encode(base64::xop::lookup, input, bytes, output);
+};
+
+auto xop_pshufb = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    base64::xop::encode(base64::sse::lookup_pshufb_improved, input, bytes, output);
 };
 #endif
 
