@@ -7,7 +7,6 @@ namespace base64 {
 
 #define packed_dword(x) _mm_set1_epi32(x)
 #define packed_word(x) _mm_set1_epi16(x)
-#define packed_byte(x) _mm_set1_epi8(char(x))
 
         template <typename LOOKUP_FN>
         void encode(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
@@ -36,17 +35,17 @@ namespace base64 {
                 // t0   = [0000_dddd|ddcc_cccc|cccc_bbbb|bbaa_aaaa] -- shift odd words
                 //                     ^^^^^^^             ^^^^^^^
                 //                a and c are on the correct positions
-                const __m128i t0 = _mm_shl_epi16(in, packed_word(0x0400));
+                const __m128i t0 = _mm_shl_epi16(in, packed_dword(0xfffc0000));
 
-                // t1   = [00dd_dddd|cccc_cc00|ccbb_bbbb| aaaa_aa00]
+                // t1   = [0000_0000|00cc_cccc|0000_0000|00aa_aaaa] -- left a and c fields
+                const __m128i t1 = _mm_and_si128(t0, packed_word(0x003f));
+
+                // t2   = [00dd_dddd|cccc_cc00|ccbb_bbbb| aaaa_aa00]
                 //           ^^^^^^^             ^^^^^^^
-                const __m128i t1 = _mm_srli_epi16(t0, 4);
+                const __m128i t2 = _mm_slli_epi16(t0, 2);
 
-                // t2   = [??dd_dddd|??cc_cccc|??bb_bbbb|??aa_aaaa] -- '?' denotes "garbage"
-                const __m128i t2 = _mm_cmov_si128(t1, t0, packed_word(0x1f00));
-
-                // t3   = [00dd_dddd|00cc_cccc|00bb_bbbb|00aa_aaaa] -- filter out garbage
-                const __m128i t3 = _mm_and_si128(t2, packed_word(0x1f1f));
+                // t3   = [00dd_dddd|00cc_cccc|00bb_bbbb|00aa_aaaa]
+                const __m128i t3 = _mm_cmov_si128(t2, t1, packed_word(0x3f00));
 
                 const auto result = lookup(t3);
 
@@ -55,9 +54,8 @@ namespace base64 {
             }
         }
 
-
     #undef packed_dword
-    #undef packed_byte
+    #undef packed_word
 
     } // namespace xop
 
