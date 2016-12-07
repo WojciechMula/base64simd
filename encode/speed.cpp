@@ -145,6 +145,12 @@ public:
         if (cmd.empty() || cmd.has("avx2/pshufb/improved/unrolled")) {
             measure("AVX2 (lookup: pshufb unrolled improved)", avx2_pshufb_improved_unrolled);
         }
+
+    #if defined(HAVE_BMI2_INSTRUCTIONS)
+        if (cmd.empty() || cmd.has("avx2/pshufb/improved/unrolled")) {
+            measure("AVX2 & BMI (lookup: pshufb improved)", avx2_bmi2_pshufb_improved);
+        }
+    #endif
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)

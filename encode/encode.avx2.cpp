@@ -173,6 +173,48 @@ namespace base64 {
             }
         }
 
+
+#if defined(HAVE_BMI2_INSTRUCTIONS)
+        template <typename LOOKUP_FN>
+        void encode_bmi2(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+
+            uint8_t* out = output;
+
+            uint64_t d0 = *reinterpret_cast<const uint64_t*>(input + 0 + 0*6);
+            uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + 0 + 1*6);
+            uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + 0 + 2*6);
+            uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + 0 + 3*6);
+            uint64_t expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
+
+            for (size_t i = 0; i < bytes; i += 4*6) {
+
+                const __m256i indices = _mm256_set_epi64x(
+                    expanded_3,
+                    expanded_2,
+                    expanded_1,
+                    expanded_0
+                );
+
+                d0 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 0*6);
+                d1 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 1*6);
+                d2 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 2*6);
+                d3 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 3*6);
+                expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
+                expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
+                expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
+                expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
+
+                const auto result = lookup(indices);
+
+                _mm256_storeu_si256(reinterpret_cast<__m256i*>(out), result);
+                out += 32;
+            }
+        }
+#endif
+
     #undef packed_dword
 
     } // namespace avx2

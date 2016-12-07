@@ -75,6 +75,9 @@ public:
         check("AVX2 (pshufb-based unrolled)",       avx2_pshufb_unrolled, valid);
         check("AVX2 (pshufb improved)",             avx2_pshufb_improved, valid);
         check("AVX2 (pshufb improved unrolled)",    avx2_pshufb_improved_unrolled, valid);
+    #if defined(HAVE_BMI2_INSTRUCTIONS)
+        check("AVX2 & BMI2 (pshufb improved)",      avx2_bmi2_pshufb_improved, valid);
+    #endif
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
         check("AVX512BW (improved splitting)", avx512bw, valid);

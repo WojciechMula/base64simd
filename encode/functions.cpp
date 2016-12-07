@@ -84,6 +84,12 @@ auto avx2_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
 auto avx2_pshufb_improved_unrolled = [](uint8_t* input, size_t bytes, uint8_t* output) {
     base64::avx2::encode_unrolled(base64::avx2::lookup_pshufb_improved, input, bytes, output);
 };
+
+    #if defined(HAVE_AVX2_INSTRUCTIONS)
+        auto avx2_bmi2_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::avx2::encode_bmi2(base64::avx2::lookup_pshufb_improved, input, bytes, output);
+        };
+    #endif
 #endif
 
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
