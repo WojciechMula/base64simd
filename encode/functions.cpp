@@ -44,6 +44,10 @@ auto sse_bmi2_naive = [](uint8_t* input, size_t bytes, uint8_t* output) {
 auto sse_bmi2_optimized = [](uint8_t* input, size_t bytes, uint8_t* output) {
     base64::sse::encode_bmi2(base64::sse::lookup_version1, input, bytes, output);
 };
+
+auto sse_bmi2_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    base64::sse::encode_bmi2(base64::sse::lookup_pshufb_improved, input, bytes, output);
+};
 #endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)

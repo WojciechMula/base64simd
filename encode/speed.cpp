@@ -105,6 +105,10 @@ public:
         if (cmd.empty() || cmd.has("bmi2")) {
             measure("SSE & BMI2 (lookup: improved)", sse_bmi2_optimized);
         }
+
+        if (cmd.empty() || cmd.has("bmi3")) {
+            measure("SSE & BMI2 (lookup: pshufb improved)", sse_bmi2_pshufb_improved);
+        }
 #endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)

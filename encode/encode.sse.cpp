@@ -273,13 +273,12 @@ namespace base64 {
 
             uint8_t* out = output;
 
+            uint64_t lo = *reinterpret_cast<const uint64_t*>(input + 0);
+            uint64_t hi = *reinterpret_cast<const uint64_t*>(input + 0 + 6);
+            uint64_t expanded_lo = pdep(lo, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_hi = pdep(hi, 0x3f3f3f3f3f3f3f3flu);
+
             for (size_t i = 0; i < bytes; i += 2*6) {
-
-                const uint64_t lo = *reinterpret_cast<const uint64_t*>(input + i);
-                const uint64_t hi = *reinterpret_cast<const uint64_t*>(input + i + 6);
-
-                const uint64_t expanded_lo = pdep(lo, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_hi = pdep(hi, 0x3f3f3f3f3f3f3f3flu);
 #if 1
                 __m128i indices;
 
@@ -288,6 +287,10 @@ namespace base64 {
 #else
                 const __m128i indices = _mm_set_epi64x(expanded_hi, expanded_lo);
 #endif
+                lo = *reinterpret_cast<const uint64_t*>(input + i + 12);
+                hi = *reinterpret_cast<const uint64_t*>(input + i + 12 + 6);
+                expanded_lo = pdep(lo, 0x3f3f3f3f3f3f3f3flu);
+                expanded_hi = pdep(hi, 0x3f3f3f3f3f3f3f3flu);
 
                 const auto result = lookup(indices);
 

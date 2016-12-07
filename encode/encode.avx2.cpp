@@ -46,7 +46,7 @@ namespace base64 {
 
                 const __m256i data = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(input + i - 4));
                 // data = [????|HHHG|GGFF|FEEE|DDDC|CCBB|BAAA|????]
-                              256-bit lane    |   256-bit lane
+                //            256-bit lane    |   256-bit lane
 
                 // bytes from groups A...G are placed in separate 32-bit lanes
                 // in = [0HHH|0GGG|0FFF|0EEE|0DDD|0CCC|0BBB|0AAA]

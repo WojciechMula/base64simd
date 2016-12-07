@@ -62,6 +62,7 @@ public:
 #if defined(HAVE_BMI2_INSTRUCTIONS)
         check("SSE & BMI2 (naive)", sse_bmi2_naive, valid);
         check("SSE & BMI2 (optimized)", sse_bmi2_optimized, valid);
+        check("SSE & BMI2 (pshufb improved)", sse_bmi2_pshufb_improved, valid);
 #endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
         check("XOP (vpermb)", xop_vperm, valid);
