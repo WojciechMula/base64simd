@@ -180,32 +180,26 @@ namespace base64 {
 
             uint8_t* out = output;
 
-            uint64_t d0 = *reinterpret_cast<const uint64_t*>(input + 0 + 0*6);
-            uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + 0 + 1*6);
-            uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + 0 + 2*6);
-            uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + 0 + 3*6);
-            uint64_t expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
-            uint64_t expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
-            uint64_t expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
-            uint64_t expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
-
             for (size_t i = 0; i < bytes; i += 4*6) {
 
-                const __m256i indices = _mm256_set_epi64x(
-                    expanded_3,
-                    expanded_2,
-                    expanded_1,
-                    expanded_0
-                );
+                const uint64_t d0 = *reinterpret_cast<const uint64_t*>(input + i + 0*6);
+                const uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + i + 1*6);
+                const uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + i + 2*6);
+                const uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + i + 3*6);
+                const uint64_t expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
 
-                d0 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 0*6);
-                d1 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 1*6);
-                d2 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 2*6);
-                d3 = *reinterpret_cast<const uint64_t*>(input + i + 4*6 + 3*6);
-                expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
-                expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
-                expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
-                expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
+                __m256i indices;
+                __m128i lo, hi;
+                lo = _mm_insert_epi64(lo, expanded_0, 0);
+                lo = _mm_insert_epi64(lo, expanded_1, 1);
+                hi = _mm_insert_epi64(hi, expanded_2, 0);
+                hi = _mm_insert_epi64(hi, expanded_3, 1);
+
+                indices = _mm256_inserti128_si256(indices, lo, 0);
+                indices = _mm256_inserti128_si256(indices, hi, 1);
 
                 const auto result = lookup(indices);
 
