@@ -20,6 +20,7 @@ ALL=verify speed check
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw
+ALL_TARGETS=$(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW)
 
 all: $(ALL)
 
@@ -87,5 +88,13 @@ check_avx512: $(CHECK_DEPS)
 check_avx512bw: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_AVX512BW) check.cpp -o $@
 
+build_all: $(ALL_TARGETS)
+verify_all: verify verify_avx2 verify_avx512 verify_avx512bw
+	# only Intel targets
+	sde -cnl -- ./verify
+	sde -cnl -- ./verify_avx2
+	sde -cnl -- ./verify_avx512
+	sde -cnl -- ./verify_avx512bw
+
 clean:
-	rm -f $(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW)
+	rm -f $(ALL_TARGETS)
