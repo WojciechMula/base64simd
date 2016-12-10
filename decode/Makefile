@@ -10,9 +10,9 @@ ifeq ($(HAVE_BMI2),present)
 endif
 
 FLAGS=$(FLAGS_BASE) -msse4
-FLAGS_AVX2=$(FLAGS_BASE) -mavx2 -DHAVE_AVX2_INSTRUCTIONS
-FLAGS_AVX512=$(FLAGS_BASE) -mavx512f -DHAVE_AVX512_INSTRUCTIONS
-FLAGS_AVX512BW=$(FLAGS_BASE) -mavx512vbmi -DHAVE_AVX512BW_INSTRUCTIONS
+FLAGS_AVX2=$(FLAGS_BASE) -mavx2 -mbmi2 -DHAVE_AVX2_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
+FLAGS_AVX512=$(FLAGS_BASE) -mavx512f -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
+FLAGS_AVX512BW=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512BW_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS 
 
 DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp config.h
 
@@ -51,8 +51,8 @@ run_avx512bw: $(ALL_AVX512BW)
 	$(SDE) -- ./check_avx512bw
 
 VERIFY_DEPS=verify.cpp $(DEPS)
-SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../bmi2.cpp ../gettime.cpp
-CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../bmi2.cpp ../fnv32.cpp
+SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../gettime.cpp
+CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../fnv32.cpp
 
 verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) verify.cpp -o $@

@@ -275,8 +275,8 @@ namespace base64 {
 
             uint64_t lo = *reinterpret_cast<const uint64_t*>(input + 0);
             uint64_t hi = *reinterpret_cast<const uint64_t*>(input + 0 + 6);
-            uint64_t expanded_lo = pdep(lo, 0x3f3f3f3f3f3f3f3flu);
-            uint64_t expanded_hi = pdep(hi, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_lo = _pdep_u64(lo, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_hi = _pdep_u64(hi, 0x3f3f3f3f3f3f3f3flu);
 
             for (size_t i = 0; i < bytes; i += 2*6) {
 #if 1
@@ -289,8 +289,8 @@ namespace base64 {
 #endif
                 lo = *reinterpret_cast<const uint64_t*>(input + i + 12);
                 hi = *reinterpret_cast<const uint64_t*>(input + i + 12 + 6);
-                expanded_lo = pdep(lo, 0x3f3f3f3f3f3f3f3flu);
-                expanded_hi = pdep(hi, 0x3f3f3f3f3f3f3f3flu);
+                expanded_lo = _pdep_u64(lo, 0x3f3f3f3f3f3f3f3flu);
+                expanded_hi = _pdep_u64(hi, 0x3f3f3f3f3f3f3f3flu);
 
                 const auto result = lookup(indices);
 

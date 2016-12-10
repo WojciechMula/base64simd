@@ -186,10 +186,10 @@ namespace base64 {
                 const uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + i + 1*6);
                 const uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + i + 2*6);
                 const uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + i + 3*6);
-                const uint64_t expanded_0 = pdep(d0, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_1 = pdep(d1, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_2 = pdep(d2, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_3 = pdep(d3, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_0 = _pdep_u64(d0, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_1 = _pdep_u64(d1, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_2 = _pdep_u64(d2, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_3 = _pdep_u64(d3, 0x3f3f3f3f3f3f3f3flu);
 
                 __m256i indices;
                 __m128i lo, hi;

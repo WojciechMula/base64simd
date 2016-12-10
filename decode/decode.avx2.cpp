@@ -85,10 +85,10 @@ namespace base64 {
                 const __m128i lane0 = _mm256_extracti128_si256(values, 0);
                 const __m128i lane1 = _mm256_extracti128_si256(values, 1);
 
-                const uint64_t t0 = pext(_mm_extract_epi64(lane0, 0), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t1 = pext(_mm_extract_epi64(lane0, 1), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t2 = pext(_mm_extract_epi64(lane1, 0), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t3 = pext(_mm_extract_epi64(lane1, 1), 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t0 = _pext_u64(_mm_extract_epi64(lane0, 0), 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t1 = _pext_u64(_mm_extract_epi64(lane0, 1), 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t2 = _pext_u64(_mm_extract_epi64(lane1, 0), 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t3 = _pext_u64(_mm_extract_epi64(lane1, 1), 0x3f3f3f3f3f3f3f3f);
 
 #if 0 // naive store
                 *reinterpret_cast<uint64_t*>(out + 0*0) = t0;

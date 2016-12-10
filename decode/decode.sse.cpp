@@ -91,8 +91,8 @@ namespace base64 {
                 const uint64_t lo = _mm_extract_epi64(values, 0);
                 const uint64_t hi = _mm_extract_epi64(values, 1);
 
-                const uint64_t t0 = pext(lo, 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t1 = pext(hi, 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t0 = _pext_u64(lo, 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t1 = _pext_u64(hi, 0x3f3f3f3f3f3f3f3f);
 
                 *reinterpret_cast<uint64_t*>(out + 0) = t0;
                 *reinterpret_cast<uint64_t*>(out + 6) = t1;

@@ -2,12 +2,12 @@
 #include <cstdio>
 #include <cstdint>
 #include <memory>
+#include <immintrin.h>
 
 #include "config.h"
 #include "../gettime.cpp"
 #include "../cmdline.cpp"
 #include "../fnv32.cpp"
-#include "../bmi2.cpp"
 
 #include "encode.scalar.cpp"
 #include "lookup.swar.cpp"

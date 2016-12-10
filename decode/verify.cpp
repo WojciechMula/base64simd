@@ -1,8 +1,8 @@
 #include <cstdio>
 #include <cstring>
+#include <immintrin.h>
 
 #include "config.h"
-#include "../bmi2.cpp"
 
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"

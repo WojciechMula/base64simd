@@ -17,7 +17,7 @@ namespace base64 {
 
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
-                const uint64_t indices = pdep(*reinterpret_cast<uint64_t*>(input + i), 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t indices = _pdep_u64(*reinterpret_cast<uint64_t*>(input + i), 0x3f3f3f3f3f3f3f3flu);
 #else
                 const uint64_t dword   = *reinterpret_cast<uint64_t*>(input + i);
 
