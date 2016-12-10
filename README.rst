@@ -63,6 +63,7 @@ Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw
 to run all programs.
 
 BMI2 presence is determined based on ``/proc/cpuinfo`` or counterpart.
+When an AVX2 or AVX512 target is used then BMI2 is enabled by default.
 
 
 AVX512
@@ -77,3 +78,32 @@ be added to the ``PATH``.
 
 __ https://software.intel.com/en-us/articles/intel-software-development-emulator
 
+
+Known problems
+--------------------------------------------------
+
+Both encoding and decoding don't match the base64 specification:
+
+* I didn't care about endianess, while big-endian is required.
+* There is no processing of data tail, i.e. encoder never
+  produces '=' chars at the end, and decoder doesn't handle
+  them at all.
+
+All these shortcoming are not present in a brilliant library
+by Alfred Klomp: https://github.com/aklomp/base64.
+
+* XOP procedures haven't been described yet
+  (commits b98151990b39a0a1d4afb6fe10731e75391fb33e,
+  69f82b4eeffd0d12f571b3b54dbd5ed7662cd962 and
+  3e65e4804b60c2ef48ac277c5c8268308b4d7a99).
+
+* SSE/AVX2 variants using BMI2 haven't been measured yet
+  (commits 8e890abbd377046c8035ebc48b6c098b419f8cea and
+  99181d55a715c1f8353d73e14f2ec88d475df21b).
+
+
+See also
+--------------------------------------------------
+
+* Daniel's benchmarks and comparison with state of the art solutions
+  https://github.com/lemire/fastbase64
