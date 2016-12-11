@@ -23,9 +23,9 @@ namespace base64 {
 
             uint8_t output = 0;
             for (int i=0; i < 16; i++) {
-                lookup[i*3 + 0] = output + 0;
+                lookup[i*3 + 0] = output + 2;
                 lookup[i*3 + 1] = output + 1;
-                lookup[i*3 + 2] = output + 2;
+                lookup[i*3 + 2] = output + 0;
                 output += 4;
             }
 

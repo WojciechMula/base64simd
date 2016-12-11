@@ -9,9 +9,9 @@ namespace base64 {
 
         __m512i pack_madd(const __m512i values) {
 
-            const __m512i merge_ab_and_bc = _mm512_maddubs_epi16(values, packed_dword(0x40014001));
+            const __m512i merge_ab_and_bc = _mm512_maddubs_epi16(values, packed_dword(0x01400140));
 
-            return _mm512_madd_epi16(merge_ab_and_bc, packed_dword(0x10000001));
+            return _mm512_madd_epi16(merge_ab_and_bc, packed_dword(0x00011000));
          }
 
 #undef packed_dword
