@@ -1,5 +1,5 @@
-#include <cstdint>
 #include <cassert>
+#include <x86intrin.h>
 
 namespace base64 {
 
@@ -173,8 +173,8 @@ namespace base64 {
                 // input:  [00dddddd|00cccccc|00bbbbbb|00aaaaaa]
                 // output: [00000000|ddddddcc|ccccbbbb|bbaaaaaa]
 
-                const uint32_t combined = (b3 << (3*8)) | (b2 << (2*8)) | (b1 << (1*8)) | (b0);
-                const uint32_t dword = _pext_u32(combined, 0x3f3f3f3f);
+                const uint32_t combined = (b0 << (3*8)) | (b1 << (2*8)) | (b2 << (1*8)) | (b3);
+                const uint32_t dword = _bswap(_pext_u32(combined, 0x3f3f3f3f) << 8);
 
                 *reinterpret_cast<uint32_t*>(out) = dword;
                 out += 3;

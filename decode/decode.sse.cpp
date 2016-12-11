@@ -65,6 +65,15 @@ namespace base64 {
 
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
+        __m128i bswap_si128(const __m128i in) {
+            return _mm_shuffle_epi8(in, _mm_setr_epi8(
+                         3,  2,  1,  0,
+                         7,  6,  5,  4,
+                        11, 10,  9,  8,
+                        15, 14, 13, 12
+                   ));
+        }
+
         template <typename FN>
         void decode_bmi2(FN lookup, const uint8_t* input, size_t size, uint8_t* output) {
 
@@ -78,7 +87,7 @@ namespace base64 {
                 __m128i values;
 
                 try {
-                    values = lookup(in);
+                    values = bswap_si128(lookup(in));
                 } catch (invalid_input& e) {
 
                     const auto shift = e.offset;
@@ -91,11 +100,23 @@ namespace base64 {
                 const uint64_t lo = _mm_extract_epi64(values, 0);
                 const uint64_t hi = _mm_extract_epi64(values, 1);
 
-                const uint64_t t0 = _pext_u64(lo, 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t1 = _pext_u64(hi, 0x3f3f3f3f3f3f3f3f);
+                uint64_t t0 = _pext_u64(lo, 0x3f3f3f3f3f3f3f3f);
+                uint64_t t1 = _pext_u64(hi, 0x3f3f3f3f3f3f3f3f);
 
-                *reinterpret_cast<uint64_t*>(out + 0) = t0;
-                *reinterpret_cast<uint64_t*>(out + 6) = t1;
+                uint64_t b0, b1, b2;
+
+                b0 = t0 & 0x0000ff0000ff;
+                b1 = t0 & 0x00ff0000ff00;
+                b2 = t0 & 0xff0000ff0000;
+                t0 = (b0 << 16) | b1 | (b2 >> 16);
+
+                b0 = t1 & 0x0000ff0000ff;
+                b1 = t1 & 0x00ff0000ff00;
+                b2 = t1 & 0xff0000ff0000;
+                t1 = (b0 << 16) | b1 | (b2 >> 16);
+
+                *reinterpret_cast<uint64_t*>(out + 0)  = t0;
+                *reinterpret_cast<uint64_t*>(out + 6)  = t1;
                 out += 12;
             }
         }
