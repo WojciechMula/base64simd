@@ -49,6 +49,7 @@ namespace base64 {
         }
 
 #undef packed_dword
+#undef masked
 
     } // namespace sse
 

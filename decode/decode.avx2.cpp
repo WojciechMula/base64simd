@@ -36,15 +36,15 @@ namespace base64 {
                 // merged = packed_byte([0XXX|0YYY|0ZZZ|0WWW])
 
                 const __m256i shuf = _mm256_setr_epi8(
-                       0,  1,  2,
-                       4,  5,  6,
-                       8,  9, 10,
-                      12, 13, 14,
+                       2,  1,  0,
+                       6,  5,  4,
+                      10,  9,  8,
+                      14, 13, 12,
                       char(0xff), char(0xff), char(0xff), char(0xff),
-                       0,  1,  2,
-                       4,  5,  6,
-                       8,  9, 10,
-                      12, 13, 14,
+                       2,  1,  0,
+                       6,  5,  4,
+                      10,  9,  8,
+                      14, 13, 12,
                       char(0xff), char(0xff), char(0xff), char(0xff)
                 );
 
