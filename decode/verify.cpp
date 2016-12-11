@@ -48,6 +48,37 @@ public:
 public:
     template <typename FN>
     bool run(FN fn) {
+        return check(fn, "AAEC", "\x00\x01\x02")
+            && check(fn, "PwAA", "\x3f\x00\x00")
+            && check(fn, "wA8A", "\xc0\x0f\x00")
+            && check(fn, "AA+A", "\x00\x0f\x80")
+            && validate(fn);
+    }
+
+private:
+    template <typename FN>
+    bool check(FN fn, const char* in, const char* out) {
+        clear_input();
+
+        input[0] = in[0];
+        input[1] = in[1];
+        input[2] = in[2];
+        input[3] = in[3];
+
+        fn(input, bytes, output);
+
+        if (output[0] != uint8_t(out[0]) || output[1] != uint8_t(out[1]) || output[2] != uint8_t(out[2])) {
+            printf("\ninvalid output %02x %02x %02x, expected %02x %02x %02x\n",
+                        output[0], output[1], output[2],
+                        uint8_t(out[0]), uint8_t(out[1]), uint8_t(out[2]));
+            return false;
+        }
+
+        return true;
+    }
+
+    template <typename FN>
+    bool validate(FN fn) {
 
         for (current=0; current < bytes; current++) {
 
@@ -142,22 +173,35 @@ private:
             printf("%02x", input[i]);
         }
 
+        putchar(' ');
+
+        for (unsigned i=0; i < bytes; i++) {
+            printf("%c", input[i]);
+        }
+
         putchar('\n');
     }
 
     uint8_t get_6bit_word(unsigned i) {
 
-        const unsigned pos   = i * 6;
-        const unsigned idx   = pos / 8;
-        const unsigned shift = pos % 8;
+        const unsigned triplet = 3 * (i/4);
+        switch (i % 4) {
+            case 0: // a
+                return output[triplet + 0] >> 2;
 
-        if (shift == 0) {
-            return output[idx] & 0x3f;
-        } else {
-            const uint8_t b0 = output[idx];
-            const uint8_t b1 = output[idx + 1];
+            case 1: // b
+                return ((output[triplet + 0] & 0x03) << 4)
+                     | ((output[triplet + 1] & 0xf0) >> 4);
 
-            return ((b0 >> shift) | (b1 << (8 - shift))) & 0x3f;
+            case 2: // c
+                return ((output[triplet + 1] & 0x0f) << 2)
+                     | ((output[triplet + 2] & 0xc0) >> 6);
+
+            case 3: // d
+                return output[triplet + 2] & 0x3f;
+
+            default:
+                return -1;
         }
     }
 };
@@ -251,16 +295,6 @@ int test() {
     RUN_SSE_TEMPLATE2("sse/blend/naive",                 decode, lookup_byte_blend,  pack_naive);
     RUN_SSE_TEMPLATE2("sse/incremental/naive",           decode, lookup_incremental, pack_naive);
     RUN_SSE_TEMPLATE2("sse/pshufb/naive",                decode, lookup_pshufb,      pack_naive);
-
-    RUN_SSE_TEMPLATE2("sse/base/improved",               decode, lookup_base,        pack_improved);
-    RUN_SSE_TEMPLATE2("sse/blend/improved",              decode, lookup_byte_blend,  pack_improved);
-    RUN_SSE_TEMPLATE2("sse/incremental/improved",        decode, lookup_incremental, pack_improved);
-    RUN_SSE_TEMPLATE2("sse/pshufb/improved",             decode, lookup_pshufb, pack_improved);
-
-    RUN_SSE_TEMPLATE2("sse/base/madd_improved",          decode, lookup_base,        pack_madd_improved);
-    RUN_SSE_TEMPLATE2("sse/blend/madd_improved",         decode, lookup_byte_blend,  pack_madd_improved);
-    RUN_SSE_TEMPLATE2("sse/incremental/madd_improved",   decode, lookup_incremental, pack_madd_improved);
-    RUN_SSE_TEMPLATE2("sse/pshufb/madd_improved",        decode, lookup_pshufb, pack_madd_improved);
 
     RUN_SSE_TEMPLATE2("sse/base/madd",                   decode, lookup_base,        pack_madd);
     RUN_SSE_TEMPLATE2("sse/blend/madd",                  decode, lookup_byte_blend,  pack_madd);

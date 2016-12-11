@@ -79,16 +79,6 @@ void FunctionRegistry::build() {
     add("sse/incremental/naive",            "SSE",              "incremental",  "naive");
     add("sse/pshufb/naive",                 "SSE",              "pshufb",       "naive");
 
-    add("sse/base/improved",                "SSE",              "base",         "improved");
-    add("sse/blend/improved",               "SSE",              "byte blend",   "improved");
-    add("sse/incremental/improved",         "SSE",              "incremental",  "improved");
-    add("sse/pshufb/improved",              "SSE",              "pshufb",       "improved");
-
-    add("sse/base/madd_improved",           "SSE",              "base",         "improved + mult-add");
-    add("sse/blend/madd_improved",          "SSE",              "byte blend",   "improved + mult-add");
-    add("sse/incremental/madd_improved",    "SSE",              "incremental",  "improved + mult-add");
-    add("sse/pshufb/madd_improved",         "SSE",              "pshufb",       "improved + mult-add");
-
     add("sse/base/madd",                    "SSE",              "base",         "multiply-add");
     add("sse/blend/madd",                   "SSE",              "byte blend",   "multiply-add");
     add("sse/incremental/madd",             "SSE",              "incremental",  "multiply-add");

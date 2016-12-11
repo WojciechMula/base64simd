@@ -26,16 +26,6 @@ RUN_SSE_TEMPLATE2("sse/blend/naive",                 decode, lookup_byte_blend, 
 RUN_SSE_TEMPLATE2("sse/incremental/naive",           decode, lookup_incremental, pack_naive);
 RUN_SSE_TEMPLATE2("sse/pshufb/naive",                decode, lookup_pshufb, pack_naive);
 
-RUN_SSE_TEMPLATE2("sse/base/improved",               decode, lookup_base,        pack_improved);
-RUN_SSE_TEMPLATE2("sse/blend/improved",              decode, lookup_byte_blend,  pack_improved);
-RUN_SSE_TEMPLATE2("sse/incremental/improved",        decode, lookup_incremental, pack_improved);
-RUN_SSE_TEMPLATE2("sse/pshufb/improved",             decode, lookup_pshufb, pack_improved);
-
-RUN_SSE_TEMPLATE2("sse/base/madd_improved",          decode, lookup_base,        pack_madd_improved);
-RUN_SSE_TEMPLATE2("sse/blend/madd_improved",         decode, lookup_byte_blend,  pack_madd_improved);
-RUN_SSE_TEMPLATE2("sse/incremental/madd_improved",   decode, lookup_incremental, pack_madd_improved);
-RUN_SSE_TEMPLATE2("sse/pshufb/madd_improved",        decode, lookup_pshufb, pack_madd_improved);
-
 RUN_SSE_TEMPLATE2("sse/base/madd",                   decode, lookup_base,        pack_madd);
 RUN_SSE_TEMPLATE2("sse/blend/madd",                  decode, lookup_byte_blend,  pack_madd);
 RUN_SSE_TEMPLATE2("sse/incremental/madd",            decode, lookup_incremental, pack_madd);

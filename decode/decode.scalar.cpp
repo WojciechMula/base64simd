@@ -52,11 +52,11 @@ namespace base64 {
                 // Note: character '=' is not handled here.
 
                 // input:  [00dddddd|00cccccc|00bbbbbb|00aaaaaa]
-                // output: [00000000|ddddddcc|ccccbbbb|bbaaaaaa]
+                // output: [00000000|ccdddddd|bbbbcccc|aaaaaabb]
 
-                *out++ = b0 | (b1 << 6);
-                *out++ = (b1 >> 2) | (b2 << 4);
-                *out++ = (b2 >> 4) | (b3 << 2);
+                *out++ = (b1 >> 4) | (b0 << 2);
+                *out++ = (b2 >> 2) | (b1 << 4);
+                *out++ = b3 | (b2 << 6);
             }
         }
 
@@ -85,10 +85,29 @@ namespace base64 {
                     lookup32[j][i] = invalid;
                 }
 
+                // output: [00000000|ccdddddd|bbbbcccc|aaaaaabb]
                 for (unsigned i=0; i < 64; i++) {
 
                     const uint8_t c = static_cast<uint8_t>(base64::lookup[i]);
-                    lookup32[j][c] = i << (j*6);
+                    uint32_t value;
+                    switch (j) {
+                        case 0: // a
+                            value = i << 2;
+                            break;
+                        
+                        case 1: // b
+                            value = (i >> 4) | ((i & 0x0f) << 12);
+                            break;
+
+                        case 2: // c
+                            value = ((i & 0x3) << 22) | ((i & 0x3c) << 6);
+                            break;
+
+                        case 3: // d
+                            value = (i << 16);
+                            break;
+                    }
+                    lookup32[j][c] = value;
                 }
             }
 
