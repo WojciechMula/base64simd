@@ -111,6 +111,9 @@ verify_all: verify verify_avx2 verify_avx512
 	sde -cnl -- ./verify_avx2
 	sde -cnl -- ./verify_avx512
 
+unpack_test: unpack_bigendian.cpp
+	$(CXX) $(FLAGS) $^ -o $@
+
 clean:
 	rm -f $(ALL_TARGETS)
 

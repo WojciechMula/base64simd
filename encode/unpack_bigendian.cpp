@@ -37,34 +37,53 @@
 #include <cstdint>
 #include <immintrin.h>
 
+
 __m128i unpack_with_bswap(const __m128i input) {
 
     // input = 24 bytes, a single 32-bit lane:
-    //       = [????????|ddddddcc|ccccbbbb|bbaaaaaa]
+    //       = [????????|ccdddddd|bbbbcccc|aaaaaabb]
     //           byte 3   byte 2   byte 1   byte 0    -- byte 3 comes from the next triplet
 
-    // in    = [ccccbbbb|bbaaaaaa|ddddddcc|ccccbbbb] - order 1, 2, 0, 1
-    const __m128i in = _mm_shuffle_epi8(input, _mm_setr_epi8(
-         1,  2, 0,  1,
-         4,  5, 3,  4,
+    // in    = [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc] - order 1, 0, 2, 1
+    //              ^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^
+    //                     processed bits
+    const __m128i in = _mm_shuffle_epi8(input, _mm_set_epi8(
+        10, 11, 9, 10,
          7,  8, 6,  7,
-        10, 11, 9, 10
+         4,  5, 3,  4,
+         1,  2, 0,  1
     ));
 
-    // t0    = [00000000|00aaaaaa|000000cc|cccc0000]
-    const __m128i t0 = _mm_and_si128(in, _mm_set1_epi32(0x003f03f0));
-    // t1    = [00aaaaaa|00000000|00cccccc|00000000]
-    //          (a * (1 << 8), c * (1 << 4))
-    const __m128i t1 = _mm_mullo_epi16(t0, _mm_set1_epi32(0x01000010));
+    // t0    = [0000cccc|cc000000|aaaaaa00|00000000]
+    const __m128i t0 = _mm_and_si128(in, _mm_set1_epi32(0x0fc0fc00));
+    // t1    = [00000000|00cccccc|00000000|00aaaaaa]
+    //          (c * (1 << 10), a * (1 << 6)) >> 16 (note: an unsigned multiplication)
+    const __m128i t1 = _mm_mulhi_epu16(t0, _mm_set1_epi32(0x04000040));
 
-    // t2    = [0000bbbb|bb000000|dddddd00|00000000]
-    const __m128i t2 = _mm_and_si128(in, _mm_set1_epi32(0x0fc0fc00));
-    // t3    = [00000000|00bbbbbb|00000000|00dddddd](
-    //          (b * (1 << 10), d * (1 << 6)) >> 16 (note: an unsigned multiplication)
-    const __m128i t3 = _mm_mulhi_epu16(t2, _mm_set1_epi32(0x04000040));
+    // t2    = [00000000|00dddddd|000000bb|bbbb0000]
+    const __m128i t2 = _mm_and_si128(in, _mm_set1_epi32(0x003f03f0));
+    // t3    = [00dddddd|00000000|00bbbbbb|00000000](
+    //          (d * (1 << 8), b * (1 << 4))
+    const __m128i t3 = _mm_mullo_epi16(t2, _mm_set1_epi32(0x01000010));
 
-    // res   = [00aaaaaa|00bbbbbb|00cccccc|00dddddd] = t1 | t3
+    // res   = [00dddddd|00cccccc|00bbbbbb|00aaaaaa] = t1 | t3
     return _mm_or_si128(t1, t3);
+}
+
+
+uint32_t build_word(uint8_t a, uint8_t b, uint8_t c, uint8_t d) {
+
+    union {
+        uint8_t byte[4];
+        uint32_t dword;
+    };
+
+    byte[0] = (a << 2) | (b >> 4);
+    byte[1] = (b << 4) | (c >> 2);
+    byte[2] = (d) | (c << 6);
+    byte[3] = 0;
+
+    return dword;
 }
 
 
@@ -79,16 +98,16 @@ bool validate() {
         for (b=0; b < 64; b++) {
             for (c=0; c < 64; c++) {
                 for (d=0; d < 64; d++) {
-                    in = a | (b << 6) | (c << 12) | (d << 18);
-                    const __m128i  v  = _mm_set1_epi32(in);
-                    const __m128i  r  = unpack_with_bswap(v);
+                    in = build_word(a, b, c, d);
+                    const __m128i v = _mm_set1_epi32(in);
+                    const __m128i r = unpack_with_bswap(v);
 
                     _mm_storeu_si128((__m128i*)tmp, r);
 
-                    if (tmp[3] != a) goto error;
-                    if (tmp[2] != b) goto error;
-                    if (tmp[1] != c) goto error;
-                    if (tmp[0] != d) goto error;
+                    if (tmp[0] != a) goto error;
+                    if (tmp[1] != b) goto error;
+                    if (tmp[2] != c) goto error;
+                    if (tmp[3] != d) goto error;
                 }
             }
         }

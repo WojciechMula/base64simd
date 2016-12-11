@@ -14,6 +14,8 @@ check_xop
 check_avx512
 check_avx512bw
 
+unpack_test
+
 tmp.txt
 results.txt
 table.txt
