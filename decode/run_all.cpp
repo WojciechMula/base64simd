@@ -50,14 +50,6 @@ RUN_SSE_TEMPLATE2("sse/pshufb/madd",                 decode, lookup_pshufb, pack
     RUN_AVX2_TEMPLATE2("avx2/blend/naive",           decode, lookup_byte_blend,  pack_naive);
     RUN_AVX2_TEMPLATE2("avx2/pshufb/naive",          decode, lookup_pshufb,      pack_naive);
 
-    RUN_AVX2_TEMPLATE2("avx2/base/improved",         decode, lookup_base,        pack_improved);
-    RUN_AVX2_TEMPLATE2("avx2/blend/improved",        decode, lookup_byte_blend,  pack_improved);
-    RUN_AVX2_TEMPLATE2("avx2/pshufb/improved",       decode, lookup_pshufb,      pack_improved);
-
-    RUN_AVX2_TEMPLATE2("avx2/base/madd_improved",    decode, lookup_base,        pack_madd_improved);
-    RUN_AVX2_TEMPLATE2("avx2/blend/madd_improved",   decode, lookup_byte_blend,  pack_madd_improved);
-    RUN_AVX2_TEMPLATE2("avx2/pshufb/madd_improved",  decode, lookup_pshufb,      pack_madd_improved);
-
     RUN_AVX2_TEMPLATE2("avx2/base/madd",             decode, lookup_base,        pack_madd);
     RUN_AVX2_TEMPLATE2("avx2/blend/madd",            decode, lookup_byte_blend,  pack_madd);
     RUN_AVX2_TEMPLATE2("avx2/pshufb/madd",           decode, lookup_pshufb,      pack_madd);
