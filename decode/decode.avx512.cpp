@@ -65,8 +65,6 @@ namespace base64 {
 
                 const __m512i packed = pack(values);
 
-                const uint32_t BIT_MERGE = 0xca;
-
                 //                 |  32 bits  |
                 // packed        = [.. D2 D1 D0|.. C2 C1 C0|.. B2 B1 B0|.. A2 A1 A0] x 4 (four 128-bit lanes)
                 // index            3           2           1           0
@@ -92,13 +90,9 @@ namespace base64 {
                 const __m512i t4 = _mm512_maskz_slli_epi32(0x2222, t3, 8);
 
                 // t5            = [.. .. .. ..|D2 D1 D0 C2|C1 C0 B2 B1|B0 A2 A1 A0] x 4
-                const __m512i m5 = _mm512_setr_epi32(
-                    0x00000000, 0xffff0000, 0x00000000, 0x00000000, 
-                    0x00000000, 0xffff0000, 0x00000000, 0x00000000, 
-                    0x00000000, 0xffff0000, 0x00000000, 0x00000000, 
-                    0x00000000, 0xffff0000, 0x00000000, 0x00000000);
-
-                const __m512i t5 = _mm512_ternarylogic_epi32(m5, t4, t2, BIT_MERGE);
+                //
+                // this works providing that the pack step zeroes 3rd bytes of packed vector
+                const __m512i t5 = _mm512_or_si512(t4, t2);
 
                 // shuffle bytes
                 const __m512i s6 = _mm512_setr_epi32(

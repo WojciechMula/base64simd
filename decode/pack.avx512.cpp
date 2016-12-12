@@ -8,8 +8,6 @@ namespace base64 {
 #define packed_dword(x) _mm512_set1_epi32(x)
 #define masked(x, mask) _mm512_and_si512(x, packed_dword(mask))
 
-        const uint8_t MERGE_BITS = 0xac;
-
 #define insert_shifted_right(trg, src, amount, mask)    \
         _mm512_ternarylogic_epi32(                      \
             packed_dword(mask),                         \
