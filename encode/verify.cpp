@@ -12,6 +12,7 @@
 #include "encode.swar.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
+#   include "encode.avx2.cpp"
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 #   include "../avx512_swar.cpp"
@@ -467,6 +468,14 @@ void validate_encoding() {
 
     validate_encoding("SSE", sse);
     validate_encoding("SWAR", base64::swar::encode);
+
+#ifdef HAVE_AVX2_INSTRUCTIONS
+    auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::avx2::encode(base64::avx2::lookup_pshufb, input, bytes, output);
+    };
+
+    validate_encoding("AVX2", avx2);
+#endif
 }
 
 

@@ -15,7 +15,7 @@ namespace base64 {
 #define packed_dword(x) _mm256_set1_epi32(x)
 
         template <typename LOOKUP_FN>
-        void encode(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 
@@ -28,16 +28,16 @@ namespace base64 {
 
                 // bytes from groups A, B and C are needed in separate 32-bit lanes
                 // in = [0HHH|0GGG|0FFF|0EEE[0DDD|0CCC|0BBB|0AAA]
-                const __m256i shuf = _mm256_setr_epi8(
-                    0x00, 0x01, 0x02, char(0xff),
-                    0x03, 0x04, 0x05, char(0xff),
-                    0x06, 0x07, 0x08, char(0xff),
-                    0x09, 0x0a, 0x0b, char(0xff),
+                const __m256i shuf = _mm256_set_epi8(
+                    10, 11, 9, 10,
+                     7,  8, 6,  7,
+                     4,  5, 3,  4,
+                     1,  2, 0,  1,
 
-                    0x00, 0x01, 0x02, char(0xff),
-                    0x03, 0x04, 0x05, char(0xff),
-                    0x06, 0x07, 0x08, char(0xff),
-                    0x09, 0x0a, 0x0b, char(0xff)
+                    10, 11, 9, 10,
+                     7,  8, 6,  7,
+                     4,  5, 3,  4,
+                     1,  2, 0,  1
                 );
 
                 __m256i in = _mm256_shuffle_epi8(_mm256_set_m128i(hi, lo), shuf);
@@ -65,13 +65,13 @@ namespace base64 {
                 __m256i in = _mm256_shuffle_epi8(data, shuf);
 #endif
 
-                // this is "improved version" well commented in encode.sse.cpp
-                const __m256i indice_ab = _mm256_and_si256(in, packed_dword(0x00000fff));
-                const __m256i indice_cd = _mm256_and_si256(_mm256_slli_epi32(in, 4), packed_dword(0x0fff0000));
-                in = _mm256_or_si256(indice_ab, indice_cd);
-                const __m256i indice_ac = _mm256_and_si256(in, packed_dword(0x003f003f));
-                const __m256i indice_db = _mm256_and_si256(_mm256_slli_epi32(in, 2), packed_dword(0x3f003f00));
-                const __m256i indices = _mm256_or_si256(indice_ac, indice_db);
+                // this part is well commented in encode.sse.cpp
+
+                const __m256i t0 = _mm256_and_si256(in, _mm256_set1_epi32(0x0fc0fc00));
+                const __m256i t1 = _mm256_mulhi_epu16(t0, _mm256_set1_epi32(0x04000040));
+                const __m256i t2 = _mm256_and_si256(in, _mm256_set1_epi32(0x003f03f0));
+                const __m256i t3 = _mm256_mullo_epi16(t2, _mm256_set1_epi32(0x01000010));
+                const __m256i indices = _mm256_or_si256(t1, t3);
 
                 const auto result = lookup(indices);
 
