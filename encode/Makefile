@@ -19,7 +19,7 @@ EXT_DEPS=../fnv32.cpp ../gettime.cpp
 ALL=verify speed check
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
-ALL_AVX512BW=check_avx512bw
+ALL_AVX512BW=verify_avx512bw check_avx512bw
 ALL_XOP=verify_xop speed_xop check_xop
 ALL_TARGETS=$(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_XOP)
 
