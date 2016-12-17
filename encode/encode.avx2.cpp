@@ -169,7 +169,7 @@ namespace base64 {
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
         template <typename LOOKUP_FN>
-        void encode_bmi2(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode_bmi2(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 
@@ -179,20 +179,25 @@ namespace base64 {
                 const uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + i + 1*6);
                 const uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + i + 2*6);
                 const uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + i + 3*6);
-                const uint64_t expanded_0 = _pdep_u64(d0, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_1 = _pdep_u64(d1, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_2 = _pdep_u64(d2, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_3 = _pdep_u64(d3, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t t0 = __builtin_bswap64(d0) >> 16;
+                const uint64_t t1 = __builtin_bswap64(d1) >> 16;
+                const uint64_t t2 = __builtin_bswap64(d2) >> 16;
+                const uint64_t t3 = __builtin_bswap64(d3) >> 16;
+                const uint64_t expanded_0 = _pdep_u64(t0, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_1 = _pdep_u64(t1, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_2 = _pdep_u64(t2, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_3 = _pdep_u64(t3, 0x3f3f3f3f3f3f3f3flu);
 
-                __m256i indices;
-                __m128i lo, hi;
-                lo = _mm_insert_epi64(lo, expanded_0, 0);
-                lo = _mm_insert_epi64(lo, expanded_1, 1);
-                hi = _mm_insert_epi64(hi, expanded_2, 0);
-                hi = _mm_insert_epi64(hi, expanded_3, 1);
-
-                indices = _mm256_inserti128_si256(indices, lo, 0);
-                indices = _mm256_inserti128_si256(indices, hi, 1);
+                const __m256i indices = _mm256_setr_epi32(
+                    __builtin_bswap32(expanded_0 >> 32),
+                    __builtin_bswap32(uint32_t(expanded_0)),
+                    __builtin_bswap32(expanded_1 >> 32),
+                    __builtin_bswap32(uint32_t(expanded_1)),
+                    __builtin_bswap32(expanded_2 >> 32),
+                    __builtin_bswap32(uint32_t(expanded_2)),
+                    __builtin_bswap32(expanded_3 >> 32),
+                    __builtin_bswap32(uint32_t(expanded_3))
+                );
 
                 const auto result = lookup(indices);
 

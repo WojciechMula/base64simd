@@ -335,6 +335,13 @@ void validate_encoding() {
 
     validate_encoding("AVX2", avx2);
     validate_encoding("AVX2 (unrolled)", avx2_unrolled);
+    #ifdef HAVE_BMI2_INSTRUCTIONS
+        auto avx2_bmi2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::avx2::encode_bmi2(base64::avx2::lookup_pshufb, input, bytes, output);
+        };
+
+        validate_encoding("AVX2 + BMI2", avx2_bmi2);
+    #endif
 #endif
 
 #ifdef HAVE_AVX512_INSTRUCTIONS
