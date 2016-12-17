@@ -36,15 +36,15 @@ namespace base64 {
                 // merged = packed_byte([0XXX|0YYY|0ZZZ|0WWW])
 
                 const __m256i shuf = _mm256_setr_epi8(
-                       0,  1,  2,
-                       4,  5,  6,
-                       8,  9, 10,
-                      12, 13, 14,
+                       2,  1,  0,
+                       6,  5,  4,
+                      10,  9,  8,
+                      14, 13, 12,
                       char(0xff), char(0xff), char(0xff), char(0xff),
-                       0,  1,  2,
-                       4,  5,  6,
-                       8,  9, 10,
-                      12, 13, 14,
+                       2,  1,  0,
+                       6,  5,  4,
+                      10,  9,  8,
+                      14, 13, 12,
                       char(0xff), char(0xff), char(0xff), char(0xff)
                 );
 
@@ -59,6 +59,30 @@ namespace base64 {
 
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
+        __m256i bswap_si256(const __m256i in) {
+            return _mm256_shuffle_epi8(in, _mm256_setr_epi8(
+                         3,  2,  1,  0,
+                         7,  6,  5,  4,
+                        11, 10,  9,  8,
+                        15, 14, 13, 12,
+                         3,  2,  1,  0,
+                         7,  6,  5,  4,
+                        11, 10,  9,  8,
+                        15, 14, 13, 12
+                   ));
+        }
+
+        uint64_t pack_bytes(uint64_t v) {
+
+                const uint64_t p  = _pext_u64(v, 0x3f3f3f3f3f3f3f3f);
+
+                const uint64_t b0 = p & 0x0000ff0000ff;
+                const uint64_t b1 = p & 0x00ff0000ff00;
+                const uint64_t b2 = p & 0xff0000ff0000;
+
+                return (b0 << 16) | b1 | (b2 >> 16);
+        }
+
         template <typename FN>
         void decode_bmi2(FN lookup, const uint8_t* input, size_t size, uint8_t* output) {
 
@@ -72,7 +96,7 @@ namespace base64 {
                 __m256i values;
 
                 try {
-                    values = lookup(in);
+                    values = bswap_si256(lookup(in));
                 } catch (invalid_input& e) {
 
                     const auto shift = e.offset;
@@ -85,10 +109,10 @@ namespace base64 {
                 const __m128i lane0 = _mm256_extracti128_si256(values, 0);
                 const __m128i lane1 = _mm256_extracti128_si256(values, 1);
 
-                const uint64_t t0 = _pext_u64(_mm_extract_epi64(lane0, 0), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t1 = _pext_u64(_mm_extract_epi64(lane0, 1), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t2 = _pext_u64(_mm_extract_epi64(lane1, 0), 0x3f3f3f3f3f3f3f3f);
-                const uint64_t t3 = _pext_u64(_mm_extract_epi64(lane1, 1), 0x3f3f3f3f3f3f3f3f);
+                const uint64_t t0 = pack_bytes(_mm_extract_epi64(lane0, 0));
+                const uint64_t t1 = pack_bytes(_mm_extract_epi64(lane0, 1));
+                const uint64_t t2 = pack_bytes(_mm_extract_epi64(lane1, 0));
+                const uint64_t t3 = pack_bytes(_mm_extract_epi64(lane1, 1));
 
 #if 0 // naive store
                 *reinterpret_cast<uint64_t*>(out + 0*0) = t0;

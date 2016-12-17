@@ -5,44 +5,48 @@ namespace base64 {
 
     namespace avx512 {
 
+            const static uint8_t MERGE_BITS = 0xac;
+
 #define packed_dword(x) _mm512_set1_epi32(x)
+#define masked(x, mask) _mm512_and_si512(x, packed_dword(mask))
 
-        // please refer to pack.avx2.cpp for comments
-        __m512i pack_improved_basic(const __m512i values) {
+#define insert_shifted_right(trg, src, amount, mask)    \
+        _mm512_ternarylogic_epi32(                      \
+            packed_dword(mask),                         \
+            trg,                                        \
+            _mm512_srli_epi32(src, amount),             \
+            MERGE_BITS)
 
-            const __m512i bits_ac = _mm512_and_si512(values, packed_dword(0x003f003f));
-            const __m512i bits_bd = _mm512_and_si512(values, packed_dword(0x3f003f00));
-            const __m512i tmp     = _mm512_or_si512(bits_ac, _mm512_srli_epi32(bits_bd, 2));
-            const __m512i bits_cd = _mm512_and_si512(tmp, packed_dword(0x0fff0000));
-            const __m512i bits_ab = _mm512_and_si512(tmp, packed_dword(0x00000fff));
+#define insert_shifted_left(trg, src, amount, mask)     \
+        _mm512_ternarylogic_epi32(                      \
+            packed_dword(mask),                         \
+            trg,                                        \
+            _mm512_slli_epi32(src, amount),             \
+            MERGE_BITS)
 
-            return _mm512_or_si512(bits_ab, _mm512_srli_epi32(bits_cd, 4));
-        }
-
-
-        const uint8_t MERGE_BITS = 0xac;
-
-
-        // the improved version using ternary logic instructions
         __m512i pack_improved(const __m512i in) {
 
-            // a1 = 00aaaaaa|00bbbbbb|00cccccc|00dddddd
-            // b1 = 0000AAAA|AA00BBBB|BB00CCCC|CC00DDDD
-            // m1 = 0000AAAA|AAbbbbbb|????CCCC|CCdddddd
+            // in = |00dddddd|00cccccc|00bbbbbb|00aaaaaa|
 
-            const __m512i a1 = in;
-            const __m512i b1 = _mm512_srli_epi32(in, 2);
-            const __m512i m1 = _mm512_ternarylogic_epi32(packed_dword(0x0fc00fc0), a1, b1, MERGE_BITS);
-            
-            // a2 = 0000aaaa|aabbbbbb|????cccc|ccdddddd
-            // b2 = 00000000|AAAAAABB|BBBB????|CCCCCCDD
-            // m2 = 00000000|AAAAAABB|BBBBcccc|ccdddddd
+            // t0 = |00000000|00000000|00000000|aaaaaa00|
+            const __m512i t0 = _mm512_slli_epi32(masked(in, 0x0000003f), 2);
 
-            const __m512i a2 = m1;
-            const __m512i b2 = _mm512_srli_epi32(m1, 4);
-            const __m512i m2 = _mm512_ternarylogic_epi32(packed_dword(0x00fff000), a2, b2, MERGE_BITS);
+            // t1 = |00000000|00000000|00000000|aaaaaabb|
+            const __m512i t1 = insert_shifted_right(t0, in, 12, 0x00000003);
 
-            return m2;
+            // t2 = |00000000|00000000|bbbb0000|aaaaaabb|
+            const __m512i t2 = insert_shifted_left (t1, in,  4, 0x0000f000);
+
+            // t3 = |00000000|00000000|bbbbcccc|aaaaaabb|
+            const __m512i t3 = insert_shifted_right(t2, in, 10, 0x00000f00);
+
+            // t4 = |00000000|cc000000|bbbbcccc|aaaaaabb|
+            const __m512i t4 = insert_shifted_left (t3, in,  6, 0x00c00000);
+
+            // t5 = |00000000|ccdddddd|bbbbcccc|aaaaaabb|
+            const __m512i t5 = insert_shifted_right(t4, in,  8, 0x003f0000);
+
+            return t5;
         }
 
 
@@ -51,6 +55,7 @@ namespace base64 {
         }
 
 #undef packed_dword
+#undef masked
 
     } // namespace avx512
 

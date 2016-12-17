@@ -37,10 +37,10 @@ namespace base64 {
                 const uint32_t val = static_cast<uint8_t>(base64::lookup[i]);
 
                 valid[val] = 1;
-                lookup_0[val] = i;
-                lookup_1[val] = i << 1*6;
-                lookup_2[val] = i << 2*6;
-                lookup_3[val] = i << 3*6;
+                lookup_0[val] = i << 2;
+                lookup_1[val] = (i >> 4) | ((i & 0x0f) << 12);
+                lookup_2[val] = ((i & 0x3) << 22) | ((i & 0x3c) << 6);
+                lookup_3[val] = (i << 16);
             }
         }
 
