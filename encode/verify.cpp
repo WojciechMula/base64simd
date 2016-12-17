@@ -1,8 +1,10 @@
 #include <cstdio>
 #include <cstring>
+#include <cstdint>
 #include <cassert>
 
 #include "config.h"
+#include "encode.scalar.cpp"
 #include "lookup.reference.cpp"
 #include "lookup.sse.cpp"
 #include "lookup.swar.cpp"
@@ -424,7 +426,48 @@ int test() {
 }
 
 
+template <typename ENC>
+void validate_encoding(const char* name, ENC encode) {
+    
+    const char*  input    = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f";
+    const size_t len      = 48;
+    const char*  expected = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v";
+    const size_t outlen   = strlen(expected);
+    uint8_t output[256];
+
+    printf("%s... ", name);
+    fflush(stdout);
+
+    encode(reinterpret_cast<const uint8_t*>(input), len, output);
+
+    if (memcmp(expected, output, outlen) != 0) {
+        puts("FAILED");
+        printf("expected: '%s'\n", expected);
+        printf("result:   '%s'\n", output);
+        exit(1);
+    }
+
+    puts("OK");
+}
+
+
+void validate_encoding() {
+ 
+    puts("Validate encoding");
+    validate_encoding("scalar (32-bit)", base64::scalar::encode32);
+    validate_encoding("scalar (64-bit)", base64::scalar::encode64);
+}
+
+
 int main() {
 
-    return test();
+    /*if (!test()) {
+        return EXIT_FAILURE;
+    }*/
+
+    validate_encoding();
+
+    return EXIT_SUCCESS;
 }

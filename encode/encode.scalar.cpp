@@ -8,7 +8,7 @@ namespace base64 {
                   single step is 3 bytes. The method is not intended
                   to be production-ready. Sorry for that.
         */
-        void encode32(uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode32(const uint8_t* input, size_t bytes, uint8_t* output) {
 
             static const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -16,12 +16,19 @@ namespace base64 {
 
             for (size_t i = 0; i < bytes; i += 3) {
 
-                const uint32_t dword = *reinterpret_cast<uint32_t*>(input + i);
+                // [????????|ccdddddd|bbbbcccc|aaaaaabb]
+                //           ^^       ^^^^^^^^       ^^
+                //           lo        lo  hi        hi
 
-                const auto a = dword & 0x3f;
-                const auto b = (dword >> 1*6) & 0x3f;
-                const auto c = (dword >> 2*6) & 0x3f;
-                const auto d = (dword >> 3*6) & 0x3f;
+                const uint32_t dword   = *reinterpret_cast<const uint32_t*>(input + i);
+
+                // [aaaaaabb|bbbbcccc|ccdddddd|????????]
+                const uint32_t swapped = __builtin_bswap32(dword);
+
+                const auto a = (swapped >> 26) & 0x3f;
+                const auto b = (swapped >> 20) & 0x3f;
+                const auto c = (swapped >> 14) & 0x3f;
+                const auto d = (swapped >>  8) & 0x3f;
 
                 *out++ = lookup[a];
                 *out++ = lookup[b];
@@ -30,7 +37,7 @@ namespace base64 {
             }
         }
 
-        void encode64(uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode64(const uint8_t* input, size_t bytes, uint8_t* output) {
 
             static const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -38,16 +45,17 @@ namespace base64 {
 
             for (size_t i = 0; i < bytes; i += 6) {
 
-                const uint64_t dword = *reinterpret_cast<uint64_t*>(input + i);
+                const uint64_t dword = *reinterpret_cast<const uint64_t*>(input + i);
+                const uint64_t swapped = __builtin_bswap64(dword);
 
-                const auto a = dword & 0x3f;
-                const auto b = (dword >> 1*6) & 0x3f;
-                const auto c = (dword >> 2*6) & 0x3f;
-                const auto d = (dword >> 3*6) & 0x3f;
-                const auto e = (dword >> 4*6) & 0x3f;
-                const auto f = (dword >> 5*6) & 0x3f;
-                const auto g = (dword >> 6*6) & 0x3f;
-                const auto h = (dword >> 7*6) & 0x3f;
+                const auto a = (swapped >> (26 + 4*8)) & 0x3f;
+                const auto b = (swapped >> (20 + 4*8)) & 0x3f;
+                const auto c = (swapped >> (14 + 4*8)) & 0x3f;
+                const auto d = (swapped >> ( 8 + 4*8)) & 0x3f;
+                const auto e = (swapped >> (26 + 1*8)) & 0x3f;
+                const auto f = (swapped >> (20 + 1*8)) & 0x3f;
+                const auto g = (swapped >> (14 + 1*8)) & 0x3f;
+                const auto h = (swapped >> ( 8 + 1*8)) & 0x3f;
 
                 *out++ = lookup[a];
                 *out++ = lookup[b];

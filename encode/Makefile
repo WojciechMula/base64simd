@@ -57,7 +57,7 @@ run_xop: $(ALL_XOP)
 	./check_xop
 	./speed_xop
 
-VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.avx512.cpp
+VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.scalar.cpp encode.avx512.cpp
 
 verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) verify.cpp -o $@
