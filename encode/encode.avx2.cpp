@@ -50,16 +50,16 @@ namespace base64 {
 
                 // bytes from groups A...G are placed in separate 32-bit lanes
                 // in = [0HHH|0GGG|0FFF|0EEE|0DDD|0CCC|0BBB|0AAA]
-                const __m256i shuf = _mm256_setr_epi8(
-                    4 + 0x00, 4 + 0x01, 4 + 0x02, char(0xff),
-                    4 + 0x03, 4 + 0x04, 4 + 0x05, char(0xff),
-                    4 + 0x06, 4 + 0x07, 4 + 0x08, char(0xff),
-                    4 + 0x09, 4 + 0x0a, 4 + 0x0b, char(0xff),
+                const __m256i shuf = _mm256_set_epi8(
+                    10, 11, 9, 10,
+                     7,  8, 6,  7,
+                     4,  5, 3,  4,
+                     1,  2, 0,  1,
 
-                        0x00,     0x01,     0x02, char(0xff),
-                        0x03,     0x04,     0x05, char(0xff),
-                        0x06,     0x07,     0x08, char(0xff),
-                        0x09,     0x0a,     0x0b, char(0xff)
+                    14, 15, 13, 14,
+                    11, 12, 10, 11,
+                     8,  9,  7,  8,
+                     5,  6,  4,  4
                 );
 
                 __m256i in = _mm256_shuffle_epi8(data, shuf);
