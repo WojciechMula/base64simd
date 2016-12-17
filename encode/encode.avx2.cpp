@@ -82,9 +82,21 @@ namespace base64 {
 
 
         template <typename LOOKUP_FN>
-        void encode_unrolled(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode_unrolled(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
+
+            const __m256i shuf = _mm256_set_epi8(
+                10, 11, 9, 10,
+                 7,  8, 6,  7,
+                 4,  5, 3,  4,
+                 1,  2, 0,  1,
+
+                10, 11, 9, 10,
+                 7,  8, 6,  7,
+                 4,  5, 3,  4,
+                 1,  2, 0,  1
+            );
 
             for (size_t i = 0; i < bytes; i += 2*4*3 * 4) {
 
@@ -97,54 +109,35 @@ namespace base64 {
                 const __m128i lo3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input + i + 4*3*6));
                 const __m128i hi3 = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input + i + 4*3*7));
 
-                // bytes from groups A, B and C are needed in separate 32-bit lanes
-                // in = [0HHH|0GGG|0FFF|0EEE[0DDD|0CCC|0BBB|0AAA]
-                const __m256i shuf = _mm256_setr_epi8(
-                    0x00, 0x01, 0x02, char(0xff),
-                    0x03, 0x04, 0x05, char(0xff),
-                    0x06, 0x07, 0x08, char(0xff),
-                    0x09, 0x0a, 0x0b, char(0xff),
-
-                    0x00, 0x01, 0x02, char(0xff),
-                    0x03, 0x04, 0x05, char(0xff),
-                    0x06, 0x07, 0x08, char(0xff),
-                    0x09, 0x0a, 0x0b, char(0xff)
-                );
-
                 __m256i in0 = _mm256_shuffle_epi8(_mm256_set_m128i(hi0, lo0), shuf);
                 __m256i in1 = _mm256_shuffle_epi8(_mm256_set_m128i(hi1, lo1), shuf);
                 __m256i in2 = _mm256_shuffle_epi8(_mm256_set_m128i(hi2, lo2), shuf);
                 __m256i in3 = _mm256_shuffle_epi8(_mm256_set_m128i(hi3, lo3), shuf);
 
-                const __m256i indice_ab0 = _mm256_and_si256(in0, packed_dword(0x00000fff));
-                const __m256i indice_ab1 = _mm256_and_si256(in1, packed_dword(0x00000fff));
-                const __m256i indice_ab2 = _mm256_and_si256(in2, packed_dword(0x00000fff));
-                const __m256i indice_ab3 = _mm256_and_si256(in3, packed_dword(0x00000fff));
+                const __m256i t0_0 = _mm256_and_si256(in0, _mm256_set1_epi32(0x0fc0fc00));
+                const __m256i t0_1 = _mm256_and_si256(in1, _mm256_set1_epi32(0x0fc0fc00));
+                const __m256i t0_2 = _mm256_and_si256(in2, _mm256_set1_epi32(0x0fc0fc00));
+                const __m256i t0_3 = _mm256_and_si256(in3, _mm256_set1_epi32(0x0fc0fc00));
 
-                const __m256i indice_cd0 = _mm256_and_si256(_mm256_slli_epi32(in0, 4), packed_dword(0x0fff0000));
-                const __m256i indice_cd1 = _mm256_and_si256(_mm256_slli_epi32(in1, 4), packed_dword(0x0fff0000));
-                const __m256i indice_cd2 = _mm256_and_si256(_mm256_slli_epi32(in2, 4), packed_dword(0x0fff0000));
-                const __m256i indice_cd3 = _mm256_and_si256(_mm256_slli_epi32(in3, 4), packed_dword(0x0fff0000));
+                const __m256i t1_0 = _mm256_mulhi_epu16(t0_0, _mm256_set1_epi32(0x04000040));
+                const __m256i t1_1 = _mm256_mulhi_epu16(t0_1, _mm256_set1_epi32(0x04000040));
+                const __m256i t1_2 = _mm256_mulhi_epu16(t0_2, _mm256_set1_epi32(0x04000040));
+                const __m256i t1_3 = _mm256_mulhi_epu16(t0_3, _mm256_set1_epi32(0x04000040));
 
-                in0 = _mm256_or_si256(indice_ab0, indice_cd0);
-                in1 = _mm256_or_si256(indice_ab1, indice_cd1);
-                in2 = _mm256_or_si256(indice_ab2, indice_cd2);
-                in3 = _mm256_or_si256(indice_ab3, indice_cd3);
+                const __m256i t2_0 = _mm256_and_si256(in0, _mm256_set1_epi32(0x003f03f0));
+                const __m256i t2_1 = _mm256_and_si256(in1, _mm256_set1_epi32(0x003f03f0));
+                const __m256i t2_2 = _mm256_and_si256(in2, _mm256_set1_epi32(0x003f03f0));
+                const __m256i t2_3 = _mm256_and_si256(in3, _mm256_set1_epi32(0x003f03f0));
 
-                const __m256i indice_ac0 = _mm256_and_si256(in0, packed_dword(0x003f003f));
-                const __m256i indice_ac1 = _mm256_and_si256(in1, packed_dword(0x003f003f));
-                const __m256i indice_ac2 = _mm256_and_si256(in2, packed_dword(0x003f003f));
-                const __m256i indice_ac3 = _mm256_and_si256(in3, packed_dword(0x003f003f));
+                const __m256i t3_0 = _mm256_mullo_epi16(t2_0, _mm256_set1_epi32(0x01000010));
+                const __m256i t3_1 = _mm256_mullo_epi16(t2_1, _mm256_set1_epi32(0x01000010));
+                const __m256i t3_2 = _mm256_mullo_epi16(t2_2, _mm256_set1_epi32(0x01000010));
+                const __m256i t3_3 = _mm256_mullo_epi16(t2_3, _mm256_set1_epi32(0x01000010));
 
-                const __m256i indice_db0 = _mm256_and_si256(_mm256_slli_epi32(in0, 2), packed_dword(0x3f003f00));
-                const __m256i indice_db1 = _mm256_and_si256(_mm256_slli_epi32(in1, 2), packed_dword(0x3f003f00));
-                const __m256i indice_db2 = _mm256_and_si256(_mm256_slli_epi32(in2, 2), packed_dword(0x3f003f00));
-                const __m256i indice_db3 = _mm256_and_si256(_mm256_slli_epi32(in3, 2), packed_dword(0x3f003f00));
-
-                const __m256i input0 = _mm256_or_si256(indice_ac0, indice_db0);
-                const __m256i input1 = _mm256_or_si256(indice_ac1, indice_db1);
-                const __m256i input2 = _mm256_or_si256(indice_ac2, indice_db2);
-                const __m256i input3 = _mm256_or_si256(indice_ac3, indice_db3);
+                const __m256i input0 = _mm256_or_si256(t1_0, t3_0);
+                const __m256i input1 = _mm256_or_si256(t1_1, t3_1);
+                const __m256i input2 = _mm256_or_si256(t1_2, t3_2);
+                const __m256i input3 = _mm256_or_si256(t1_3, t3_3);
 
                 {
                     const auto result = lookup(input0);
