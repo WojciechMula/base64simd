@@ -352,18 +352,24 @@ void validate_encoding() {
 #endif
 
 #ifdef HAVE_AVX512_INSTRUCTIONS
-    auto avx512_gather = [](const uint8_t* input, size_t bytes, uint8_t* output) {
-        using namespace base64::avx512;
-        encode(lookup_gather, unpack_identity, input, bytes, output);
-    };
-
     auto avx512 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
         using namespace base64::avx512;
         encode(lookup_incremental_logic, unpack, input, bytes, output);
     };
 
-    validate_encoding("AVX512 (gather)", avx512_gather);
+    auto avx512_lookup_gather = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        using namespace base64::avx512;
+        encode(lookup_gather, unpack_identity, input, bytes, output);
+    };
+
+    auto avx512_load_gather = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        using namespace base64::avx512;
+        encode_load_gather(lookup_incremental_logic_improved, unpack, input, bytes, output);
+    };
+
     validate_encoding("AVX512", avx512);
+    validate_encoding("AVX512 (lookup gather)", avx512_lookup_gather);
+    validate_encoding("AVX512 (load gather)", avx512_load_gather);
 #endif
 
 #ifdef HAVE_AVX512BW_INSTRUCTIONS
