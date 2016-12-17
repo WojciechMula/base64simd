@@ -25,6 +25,7 @@
 #endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "lookup.xop.cpp"
+#   include "encode.xop.cpp"
 #endif
 
 const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -374,6 +375,14 @@ void validate_encoding() {
 
 #ifdef HAVE_AVX512BW_INSTRUCTIONS
     validate_encoding("AVX512BW", base64::avx512bw::encode);
+#endif
+
+#ifdef HAVE_XOP_INSTRUCTIONS
+    auto xop = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::xop::encode(base64::xop::lookup, input, bytes, output);
+    };
+
+    validate_encoding("XOP", xop);
 #endif
 }
 
