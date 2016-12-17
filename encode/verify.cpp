@@ -311,7 +311,7 @@ void validate_encoding() {
     };
 
     validate_encoding("SSE", sse);
-    //validate_encoding("SWAR", base64::swar::encode);
+    validate_encoding("SWAR", base64::swar::encode);
 
 #ifdef HAVE_AVX2_INSTRUCTIONS
     auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
@@ -349,7 +349,7 @@ int main() {
 #endif
 
     puts("Validate lookup procedures");
-    validate_lookup();
+    //validate_lookup();
 
     puts("Validate encoding");
     validate_encoding();
