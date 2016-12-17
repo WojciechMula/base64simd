@@ -306,12 +306,19 @@ void validate_encoding() {
     validate_encoding("scalar (32-bit)", base64::scalar::encode32);
     validate_encoding("scalar (64-bit)", base64::scalar::encode64);
 
+    validate_encoding("SWAR", base64::swar::encode);
+
     auto sse = [](const uint8_t* input, size_t bytes, uint8_t* output) {
         base64::sse::encode(base64::sse::lookup_naive, input, bytes, output);
     };
 
+    auto sse_unrolled = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::sse::encode_unrolled(base64::sse::lookup_naive, input, bytes, output);
+    };
+
     validate_encoding("SSE", sse);
-    validate_encoding("SWAR", base64::swar::encode);
+    validate_encoding("SSE (unrolled)", sse_unrolled);
+    validate_encoding("SSE (fully unrolled)", base64::sse::encode_full_unrolled);
 
 #ifdef HAVE_AVX2_INSTRUCTIONS
     auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
