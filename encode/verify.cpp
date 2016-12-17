@@ -30,7 +30,10 @@
 const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 template<typename LOOKUP_FN>
-bool test_scalar(LOOKUP_FN fn) {
+void test_scalar(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
 
     for (unsigned i=0; i < 64; i++) {
 
@@ -38,16 +41,19 @@ bool test_scalar(LOOKUP_FN fn) {
         if (ref != lookup[i]) {
 
             printf("failed at %d (%d != %d)\n", i, ref, lookup[i]);
-            return false;
+            exit(1);
         }
     }
 
-    return true;
+    puts("OK");
 }
 
 
 template<typename LOOKUP_FN>
-bool test_swar(LOOKUP_FN fn) {
+void test_swar(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
 
     uint8_t input[8];
     uint8_t output[8];
@@ -76,24 +82,27 @@ bool test_swar(LOOKUP_FN fn) {
                 if (j == byte) {
                     if (output[j] != lookup[i]) {
                         printf("failed at %d, byte %d - wrong result\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 } else {
                     if (output[j] != lookup[0]) {
                         printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 }
             }
         }
     }
 
-    return true;
+    puts("OK");
 }
 
 
 template<typename LOOKUP_FN>
-bool test_sse(LOOKUP_FN fn) {
+void test_sse(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
 
     uint8_t input[16];
     uint8_t output[16];
@@ -118,25 +127,28 @@ bool test_sse(LOOKUP_FN fn) {
                 if (j == byte) {
                     if (output[j] != lookup[i]) {
                         printf("failed at %d, byte %d - wrong result\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 } else {
                     if (output[j] != lookup[0]) {
                         printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 }
             }
         }
     }
 
-    return true;
+    puts("OK");
 }
 
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 template<typename LOOKUP_FN>
-bool test_avx2(LOOKUP_FN fn) {
+void test_avx2(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
 
     uint8_t input[32];
     uint8_t output[32];
@@ -162,26 +174,29 @@ bool test_avx2(LOOKUP_FN fn) {
                     if (output[j] != lookup[i]) {
                         printf("failed at %d, byte %d - wrong result\n", i, byte);
                         printf("%02x != %02x (%c != %c)\n", output[j], lookup[i], output[j], lookup[i]);
-                        return false;
+                        exit(1);
                     }
                 } else {
                     if (output[j] != lookup[0]) {
                         printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 }
             }
         }
     }
 
-    return true;
+    puts("OK");
 }
 #endif
 
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 template<typename LOOKUP_FN>
-bool test_avx512(LOOKUP_FN fn) {
+void test_avx512(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
 
     base64::avx512::initialize();
 
@@ -209,162 +224,51 @@ bool test_avx512(LOOKUP_FN fn) {
                     if (output[j] != lookup[i]) {
                         printf("failed at %d, byte %d - wrong result\n", i, byte);
                         printf("%02x != %02x (%c != %c)\n", output[j], lookup[i], output[j], lookup[i]);
-                        return false;
+                        exit(1);
                     }
                 } else {
                     if (output[j] != lookup[0]) {
                         printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
-                        return false;
+                        exit(1);
                     }
                 }
             }
         }
     }
 
-    return true;
+    puts("OK");
 }
 #endif
 
 
-int test() {
+int validate_lookup() {
 
-    printf("reference branchless (optimized v2)... ");
-    fflush(stdout);
-    if (test_scalar(reference::lookup_version2)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
+    test_scalar("reference branchless (optimized v2)", reference::lookup_version2);
+    test_scalar("reference branchless (naive)", reference::lookup_naive);
+    test_scalar("reference branchless (optimized)", reference::lookup_version1);
 
-    printf("reference branchless (naive)... ");
-    fflush(stdout);
-    if (test_scalar(reference::lookup_naive)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
+    test_swar("SWAR (64 bit)", base64::swar::lookup_incremental_logic);
 
-    printf("reference branchless (optimized)... ");
-    fflush(stdout);
-    if (test_scalar(reference::lookup_version1)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SWAR (64 bit)... ");
-    fflush(stdout);
-    if (test_swar(base64::swar::lookup_incremental_logic)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SSE implementation of naive algorithm... ");
-    fflush(stdout);
-    if (test_sse(base64::sse::lookup_naive)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SSE implementation of optimized algorithm (ver 1)... ");
-    fflush(stdout);
-    if (test_sse(base64::sse::lookup_version1)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SSE implementation of optimized algorithm (ver 2)... ");
-    fflush(stdout);
-    if (test_sse(base64::sse::lookup_version2)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SSE pshufb-based algorithm... ");
-    fflush(stdout);
-    if (test_sse(base64::sse::lookup_pshufb)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("SSE pshufb improved algorithm... ");
-    fflush(stdout);
-    if (test_sse(base64::sse::lookup_pshufb_improved)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
+    test_sse("SSE implementation of naive algorithm", base64::sse::lookup_naive);
+    test_sse("SSE implementation of optimized algorithm (ver 1)", base64::sse::lookup_version1);
+    test_sse("SSE implementation of optimized algorithm (ver 2)", base64::sse::lookup_version2);
+    test_sse("SSE pshufb-based algorithm", base64::sse::lookup_pshufb);
+    test_sse("SSE pshufb improved algorithm", base64::sse::lookup_pshufb_improved);
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
-    printf("XOP implementation... ");
-    fflush(stdout);
-    if (test_sse(base64::xop::lookup)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
+    test_sse("XOP implementation", base64::xop::lookup);
 #endif
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
-    printf("AVX2 implementation of optimized algorithm... ");
-    fflush(stdout);
-    if (test_avx2(base64::avx2::lookup_version2)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("AVX2 implementation of pshufb-based algorithm... ");
-    fflush(stdout);
-    if (test_avx2(base64::avx2::lookup_pshufb)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("AVX2 implementation of pshufb improved algorithm... ");
-    fflush(stdout);
-    if (test_avx2(base64::avx2::lookup_pshufb_improved)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
+    test_avx2("AVX2 implementation of optimized algorithm", base64::avx2::lookup_version2);
+    test_avx2("AVX2 implementation of pshufb-based algorithm", base64::avx2::lookup_pshufb);
+    test_avx2("AVX2 implementation of pshufb improved algorithm", base64::avx2::lookup_pshufb_improved);
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-    printf("AVX512F lookup:\n");
-    printf("AVX512F (incremental logic)... ");
-    fflush(stdout);
-
-    if (test_avx512(base64::avx512::lookup_incremental_logic)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("AVX512F (incremental logic improved)... ");
-    fflush(stdout);
-
-    if (test_avx512(base64::avx512::lookup_incremental_logic_improved)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("AVX512F (binary search)... ");
-    fflush(stdout);
-
-    if (test_avx512(base64::avx512::lookup_binary_search)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
+    test_avx512("AVX512F (incremental logic)", base64::avx512::lookup_incremental_logic);
+    test_avx512("AVX512F (incremental logic improved)", base64::avx512::lookup_incremental_logic_improved);
+    test_avx512("AVX512F (binary search)", base64::avx512::lookup_binary_search);
 #endif
     return 0;
 }
@@ -444,11 +348,8 @@ int main() {
     base64::avx512::initialize();
 #endif
 
-    puts("Validate lookups");
-    /*
-    if (test()) {
-        return EXIT_FAILURE;
-    }*/
+    puts("Validate lookup procedures");
+    validate_lookup();
 
     puts("Validate encoding");
     validate_encoding();
