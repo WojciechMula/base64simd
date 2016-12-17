@@ -14,50 +14,56 @@ namespace base64 {
         }
 
 
-        __m512i unpack_default(const __m512i in) {
-            // scatter 6-bit value into separate bytes
-            const __m512i indice_ab = _mm512_and_si512(in, packed_dword(0x00000fff));
-            const __m512i indice_cd = _mm512_and_si512(_mm512_slli_epi32(in, 4), packed_dword(0x0fff0000));
-            const __m512i tmp = _mm512_or_si512(indice_ab, indice_cd);
-            const __m512i indice_ac = _mm512_and_si512(tmp, packed_dword(0x003f003f));
-            const __m512i indice_db = _mm512_and_si512(_mm512_slli_epi32(tmp, 2), packed_dword(0x3f003f00));
+        template <int shift, uint32_t mask>
+        __m512i merge(__m512i target, __m512i src) {
+            __m512i shifted;
+            if (shift > 0) {
+                shifted = _mm512_srli_epi32(src, shift);
+            } else {
+                shifted = _mm512_slli_epi32(src, -shift);
+            }
 
-            return _mm512_or_si512(indice_ac, indice_db);
+            /*
+                mask  shifted  target    res
+                 0       0       0        0
+                 0       0       1        1
+                 0       1       0        0
+                 0       1       1        1
+                 1       0       0        0
+                 1       0       1        0
+                 1       1       0        1
+                 1       1       1        1
+
+                 mask ? shifted : target
+            */
+
+            return _mm512_ternarylogic_epi32(_mm512_set1_epi32(mask), shifted, target, 0xca);
         }
 
-        /*  c b a | c ? b : a
-            0 0 0 |   0
-            0 0 1 |   0
-            0 1 0 |   1
-            0 1 1 |   1
-            1 0 0 |   0
-            1 0 1 |   1
-            1 1 0 |   0
-            1 1 1 |   1
-        */
-        const uint8_t MERGE_BITS = 0xac;
+        __m512i unpack(const __m512i in) {
+            // [????????|ccdddddd|bbbbCCCC|aaaaaaBB]
+            //           ^^       ^^^^^^^^       ^^
+            //           lo        lo  hi        hi
 
+            // [00000000|00000000|00000000|00aaaaaa]
+            __m512i indices = _mm512_and_si512(_mm512_srli_epi32(in, 2), packed_dword(0x0000003f));
 
-        __m512i unpack_improved(const __m512i in) {
-            // scatter 6-bit value into separate bytes
+            // [00000000|00000000|00BB0000|00aaaaaa]
+            indices = merge<-12, 0x00003000>(indices, in);
 
-            // a1 = 00000000|aaaaaabb|bbbbcccc|ccdddddd
-            // b1 = 0000AAAA|AABBBBBB|CCCCCCDD|DDDD0000
-            // m1 = 0000AAAA|AABBBBBB|????cccc|ccdddddd
+            // [00000000|00000000|00BBbbbb|00aaaaaa]
+            indices = merge<  4, 0x00000f00>(indices, in);
 
-            const __m512i a1 = in;
-            const __m512i b1 = _mm512_slli_epi32(in, 4);
-            const __m512i m1 = _mm512_ternarylogic_epi32(packed_dword(0x0fff0000), a1, b1, MERGE_BITS);
-            
-            // a2 = 0000aaaa|aabbbbbb|????cccc|ccdddddd
-            // b2 = 00AAAAAA|BBBBBB??|??CCCCCC|DDDDDD00
-            // m2 = 00AAAAAA|??bbbbbb|??CCCCCC|??dddddd
+            // [00000000|00CCCC00|00BBbbbb|00aaaaaa]
+            indices = merge<-10, 0x003c0000>(indices, in);
 
-            const __m512i a2 = m1;
-            const __m512i b2 = _mm512_slli_epi32(m1, 2);
-            const __m512i m2 = _mm512_ternarylogic_epi32(packed_dword(0x3f003f00), a2, b2, MERGE_BITS);
+            // [00000000|00CCCCcc|00BBbbbb|00aaaaaa]
+            indices = merge<  6, 0x00030000>(indices, in);
 
-            return _mm512_and_si512(m2, packed_dword(0x3f3f3f3f));
+            // [00dddddd|00CCCCcc|00BBbbbb|00aaaaaa]
+            indices = merge< -8, 0x3f000000>(indices, in);
+
+            return indices;
         }
 
 #undef packed_dword

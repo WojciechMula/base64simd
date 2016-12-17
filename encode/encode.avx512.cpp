@@ -8,7 +8,7 @@ namespace base64 {
     namespace avx512 {
 
         template <typename LOOKUP_FN, typename UNPACK_FN>
-        void encode_load_gather(LOOKUP_FN lookup, UNPACK_FN unpack, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode_load_gather(LOOKUP_FN lookup, UNPACK_FN unpack, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 
@@ -35,7 +35,7 @@ namespace base64 {
 
 
         template <typename LOOKUP_FN, typename UNPACK_FN>
-        void encode(LOOKUP_FN lookup, UNPACK_FN unpack, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode(LOOKUP_FN lookup, UNPACK_FN unpack, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 

@@ -18,6 +18,7 @@
 #   include "../avx512_swar.cpp"
 #   include "lookup.avx512.cpp"
 #   include "unpack.avx512.cpp"
+#   include "encode.avx512.cpp"
 #endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "lookup.xop.cpp"
@@ -219,51 +220,6 @@ bool test_avx512(LOOKUP_FN fn) {
 
     return true;
 }
-
-
-template<typename UNPACK_FN>
-bool test_avx512_unpack(UNPACK_FN unpack) {
-
-    base64::avx512::initialize();
-
-    uint8_t input[64];
-    uint8_t output[64];
-    uint64_t* first_qword = reinterpret_cast<uint64_t*>(input);
-
-    for (unsigned byte=0; byte < 4; byte++) {
-
-        for (unsigned j=0; j < 64; j++) {
-            input[j] = 0;
-        }
-
-        for (int i=0; i < 64; i++) {
-
-            *first_qword = uint64_t(i) << (byte * 6);
-
-            __m512i in  = _mm512_loadu_si512(reinterpret_cast<const __m512i*>(input));
-            __m512i out = unpack(in);
-
-            _mm512_storeu_si512(reinterpret_cast<__m512i*>(output), out);
-
-            for (unsigned j=0; j < 4; j++) {
-
-                if (j == byte) {
-                    if (output[j] != i) {
-                        printf("failed at %d, byte %d - wrong result\n", i, byte);
-                        return false;
-                    }
-                } else {
-                    if (output[j] != 0) {
-                        printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
-                        return false;
-                    }
-                }
-            }
-        }
-    }
-
-    return true;
-}
 #endif
 
 
@@ -406,24 +362,6 @@ int test() {
         return 1;
     }
 
-    printf("AVX512F unpack:\n");
-    printf("AVX512F (default)... ");
-    fflush(stdout);
-
-    if (test_avx512_unpack(base64::avx512::unpack_default)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
-
-    printf("AVX512F (improved)... ");
-    fflush(stdout);
-
-    if (test_avx512_unpack(base64::avx512::unpack_improved)) {
-        puts("OK");
-    } else {
-        return 1;
-    }
 #endif
     return 0;
 }
@@ -458,7 +396,6 @@ void validate_encoding(const char* name, ENC encode) {
 
 void validate_encoding() {
 
-    puts("Validate encoding");
     validate_encoding("scalar (32-bit)", base64::scalar::encode32);
     validate_encoding("scalar (64-bit)", base64::scalar::encode64);
 
@@ -467,7 +404,7 @@ void validate_encoding() {
     };
 
     validate_encoding("SSE", sse);
-    validate_encoding("SWAR", base64::swar::encode);
+    //validate_encoding("SWAR", base64::swar::encode);
 
 #ifdef HAVE_AVX2_INSTRUCTIONS
     auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
@@ -476,15 +413,37 @@ void validate_encoding() {
 
     validate_encoding("AVX2", avx2);
 #endif
+
+#ifdef HAVE_AVX512_INSTRUCTIONS
+    auto avx512_gather = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        using namespace base64::avx512;
+        encode(lookup_gather, unpack_identity, input, bytes, output);
+    };
+
+    auto avx512 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        using namespace base64::avx512;
+        encode(lookup_incremental_logic, unpack, input, bytes, output);
+    };
+
+    validate_encoding("AVX512 (gather)", avx512_gather);
+    validate_encoding("AVX512", avx512);
+#endif
 }
 
 
 int main() {
 
-    /*if (!test()) {
+#if defined(HAVE_AVX512_INSTRUCTIONS)
+    base64::avx512::initialize();
+#endif
+
+    puts("Validate lookups");
+    /*
+    if (test()) {
         return EXIT_FAILURE;
     }*/
 
+    puts("Validate encoding");
     validate_encoding();
 
     return EXIT_SUCCESS;

@@ -1,8 +1,6 @@
 #include <immintrin.h>
 #include <x86intrin.h>
 
-#include <cstdint>
-
 namespace base64 {
 
     namespace avx512 {
@@ -42,19 +40,34 @@ namespace base64 {
 
         __m512i lookup_gather(const __m512i in) {
 
+            // [????????|ccdddddd|bbbbCCCC|aaaaaaBB]
+            //           ^^       ^^^^^^^^       ^^
+            //           lo        lo  hi        hi
+
             // split bytes into separate vectors
-            const __m512i b0 = _mm512_and_si512(in, packed_dword(0x0000003f));
-            const __m512i b1 = _mm512_and_si512(_mm512_srli_epi32(in, 1*6), packed_dword(0x0000003f));
-            const __m512i b2 = _mm512_and_si512(_mm512_srli_epi32(in, 2*6), packed_dword(0x0000003f));
-            const __m512i b3 = _mm512_and_si512(_mm512_srli_epi32(in, 3*6), packed_dword(0x0000003f));
+            const uint8_t MERGE = 0xca;
+
+            const __m512i a = _mm512_and_si512(_mm512_srli_epi32(in, 2),   packed_dword(0x3f));
+            const __m512i d = _mm512_and_si512(_mm512_srli_epi32(in, 16),  packed_dword(0x3f));
+
+            const __m512i b0 = _mm512_and_si512(_mm512_srli_epi32(in, 12), packed_dword(0x0f));
+            const __m512i b1 = _mm512_slli_epi32(in, 4);
+            const __m512i b  = _mm512_ternarylogic_epi32(packed_dword(0x30), b1, b0, MERGE);
+
+            const __m512i c0 = _mm512_and_si512(_mm512_srli_epi32(in, 6),  packed_dword(0x3c));
+            const __m512i c1 = _mm512_srli_epi32(in, 22);
+            const __m512i c  = _mm512_ternarylogic_epi32(packed_dword(0x3), c1, c0, MERGE);
+
 
             // do lookup
-            const __m512i r0 = _mm512_i32gather_epi32(b0, (const int*)lookup_0, 4);
-            const __m512i r1 = _mm512_i32gather_epi32(b1, (const int*)lookup_1, 4);
-            const __m512i r2 = _mm512_i32gather_epi32(b2, (const int*)lookup_2, 4);
-            const __m512i r3 = _mm512_i32gather_epi32(b3, (const int*)lookup_3, 4);
+            const __m512i r0 = _mm512_i32gather_epi32(a, (const int*)lookup_0, 4);
+            const __m512i r1 = _mm512_i32gather_epi32(b, (const int*)lookup_1, 4);
+            const __m512i r2 = _mm512_i32gather_epi32(c, (const int*)lookup_2, 4);
+            const __m512i r3 = _mm512_i32gather_epi32(d, (const int*)lookup_3, 4);
 
-            return _mm512_or_si512(r0, _mm512_ternarylogic_epi32(r1, r2, r3, 0xfe));
+            const uint8_t OR_ALL = 0xfe;
+
+            return _mm512_or_si512(r0, _mm512_ternarylogic_epi32(r1, r2, r3, OR_ALL));
         }
 
 
