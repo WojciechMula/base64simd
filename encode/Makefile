@@ -3,7 +3,7 @@
 
 SDE=sde -cnl
 
-FLAGS_BASE=-Wall -pedantic -O3 -std=c++11 -Wno-unused-but-set-variable
+FLAGS_BASE=-Wall -pedantic -O3 -std=c++14 -Wno-unused-but-set-variable
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
     FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
@@ -57,7 +57,7 @@ run_xop: $(ALL_XOP)
 	./check_xop
 	./speed_xop
 
-VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.scalar.cpp encode.sse.cpp encode.avx512.cpp
+VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.*.cpp config.h
 
 verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) verify.cpp -o $@

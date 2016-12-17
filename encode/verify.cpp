@@ -9,6 +9,7 @@
 #include "lookup.sse.cpp"
 #include "encode.sse.cpp"
 #include "lookup.swar.cpp"
+#include "encode.swar.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
 #endif
@@ -465,6 +466,7 @@ void validate_encoding() {
     };
 
     validate_encoding("SSE", sse);
+    validate_encoding("SWAR", base64::swar::encode);
 }
 
 
