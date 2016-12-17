@@ -11,15 +11,15 @@ namespace base64 {
 #define packed_byte(x) _mm_set1_epi8(char(x))
 
         template <typename LOOKUP_FN>
-        void encode(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 
-            const __m128i shuf = _mm_setr_epi8(
-                0x00, 0x01, 0x02, char(0xff),
-                0x03, 0x04, 0x05, char(0xff),
-                0x06, 0x07, 0x08, char(0xff),
-                0x09, 0x0a, 0x0b, char(0xff)
+            const __m128i shuf = _mm_set_epi8(
+                10, 11, 9, 10,
+                 7,  8, 6,  7,
+                 4,  5, 3,  4,
+                 1,  2, 0,  1
             );
 
             for (size_t i = 0; i < bytes; i += 4*3) {
@@ -27,38 +27,35 @@ namespace base64 {
                 __m128i in = _mm_loadu_si128(reinterpret_cast<const __m128i*>(input + i));
 
                 // bytes from groups A, B and C are needed in separate 32-bit lanes
-                // in = [0DDD|0CCC|0BBB|0AAA]
+                // in = [DDDD|CCCC|BBBB|AAAA]
+                //
+                //      an input triplet has layout
+                //      [????????|ccdddddd|bbbbcccc|aaaaaabb]
+                //        byte 3   byte 2   byte 1   byte 0    -- byte 3 comes from the next triplet
+                //
+                //      shuffling orderes changes the oreder
+                //      [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc] - order 1, 0, 2, 1
+                //           ^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^
+                //                  processed bits
                 in = _mm_shuffle_epi8(in, shuf);
 
+                // unpacking
 
-#if 0           // reference implementation
+                // t0    = [0000cccc|cc000000|aaaaaa00|00000000]
+                const __m128i t0 = _mm_and_si128(in, _mm_set1_epi32(0x0fc0fc00));
+                // t1    = [00000000|00cccccc|00000000|00aaaaaa]
+                //          (c * (1 << 10), a * (1 << 6)) >> 16 (note: an unsigned multiplication)
+                const __m128i t1 = _mm_mulhi_epu16(t0, _mm_set1_epi32(0x04000040));
 
-                // single lane layout; a, b, c and d are bits from 6-bit groups
-                // [00000000|ddddddcc|ccccbbbb|bbaaaaaa]
-                const __m128i indices_a = _mm_and_si128(in, packed_dword(0x0000003f));
-                const __m128i indices_b = _mm_and_si128(_mm_slli_epi32(in, 2), packed_dword(0x00003f00));
-                const __m128i indices_c = _mm_and_si128(_mm_slli_epi32(in, 4), packed_dword(0x003f0000));
-                const __m128i indices_d = _mm_and_si128(_mm_slli_epi32(in, 6), packed_dword(0x3f000000));
+                // t2    = [00000000|00dddddd|000000bb|bbbb0000]
+                const __m128i t2 = _mm_and_si128(in, _mm_set1_epi32(0x003f03f0));
+                // t3    = [00dddddd|00000000|00bbbbbb|00000000](
+                //          (d * (1 << 8), b * (1 << 4))
+                const __m128i t3 = _mm_mullo_epi16(t2, _mm_set1_epi32(0x01000010));
 
-                // indices = [00dddddd|00cccccc|00bbbbbb|00aaaaaa]
-                const __m128i indices = _mm_or_si128(_mm_or_si128(_mm_or_si128(indices_a, indices_b), indices_c), indices_d);
-#else
-                // improved version
+                // res   = [00dddddd|00cccccc|00bbbbbb|00aaaaaa] = t1 | t3
+                const __m128i indices = _mm_or_si128(t1, t3);
 
-                // in        = [00000000|ddddddcc|ccccbbbb|bbaaaaaa]
-
-                // indices_ab = [00000000|00000000|0000bbbb|bbaaaaaa]
-                // indices_cd = [0000dddd|ddcccccc|00000000|00000000]
-                const __m128i indices_ab = _mm_and_si128(in, packed_dword(0x00000fff));
-                const __m128i indices_cd = _mm_and_si128(_mm_slli_epi32(in, 4), packed_dword(0x0fff0000));
-
-                // in'       = [0000dddd|ddcccccc|0000bbbb|bbaaaaaa]
-                in = _mm_or_si128(indices_ab, indices_cd);
-                const __m128i indices_ac = _mm_and_si128(in, packed_dword(0x003f003f));
-                const __m128i indices_db = _mm_and_si128(_mm_slli_epi32(in, 2), packed_dword(0x3f003f00));
-
-                const __m128i indices = _mm_or_si128(indices_ac, indices_db);
-#endif
                 const auto result = lookup(indices);
 
                 _mm_storeu_si128(reinterpret_cast<__m128i*>(out), result);
@@ -68,7 +65,7 @@ namespace base64 {
 
 
         template <typename LOOKUP_FN>
-        void encode_unrolled(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode_unrolled(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 

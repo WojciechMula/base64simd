@@ -7,6 +7,7 @@
 #include "encode.scalar.cpp"
 #include "lookup.reference.cpp"
 #include "lookup.sse.cpp"
+#include "encode.sse.cpp"
 #include "lookup.swar.cpp"
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
@@ -454,10 +455,16 @@ void validate_encoding(const char* name, ENC encode) {
 
 
 void validate_encoding() {
- 
+
     puts("Validate encoding");
     validate_encoding("scalar (32-bit)", base64::scalar::encode32);
     validate_encoding("scalar (64-bit)", base64::scalar::encode64);
+
+    auto sse = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::sse::encode(base64::sse::lookup_naive, input, bytes, output);
+    };
+
+    validate_encoding("SSE", sse);
 }
 
 
