@@ -82,12 +82,9 @@ __ https://software.intel.com/en-us/articles/intel-software-development-emulator
 Known problems
 --------------------------------------------------
 
-Both encoding and decoding don't match the base64 specification:
-
-* I didn't care about endianess, while big-endian is required.
-* There is no processing of data tail, i.e. encoder never
-  produces '=' chars at the end, and decoder doesn't handle
-  them at all.
+Both encoding and decoding don't match the base64 specification,
+there is no processing of data tail, i.e. encoder never produces
+'=' chars at the end, and decoder doesn't handle them at all.
 
 All these shortcoming are not present in a brilliant library
 by Alfred Klomp: https://github.com/aklomp/base64.
