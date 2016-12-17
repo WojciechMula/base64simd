@@ -5,6 +5,8 @@ namespace base64 {
 
     namespace avx512 {
 
+            const static uint8_t MERGE_BITS = 0xac;
+
 #define packed_dword(x) _mm512_set1_epi32(x)
 #define masked(x, mask) _mm512_and_si512(x, packed_dword(mask))
 
