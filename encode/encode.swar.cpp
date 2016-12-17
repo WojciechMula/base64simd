@@ -14,13 +14,11 @@ namespace base64 {
                 // in      = [?|?|f|e|d|c|b|a]
                 const uint64_t in      = *reinterpret_cast<const uint64_t*>(input + i);
                 // swapped = [a|b|c|d|e|f|?|?]
-                const uint64_t swapped = __builtin_bswap64(in);
-                // input   = [.|.|d|e|f|a|b|c]
-                const uint64_t input   = ((swapped << 1*8) & 0x0000ffffff000000llu)
-                                       | ((swapped >> 5*8) & 0x0000000000ffffffllu);
-                const uint64_t t0      = _pdep_u64(input, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t lo      = __builtin_bswap32(uint32_t(t0));
-                const uint64_t hi      = __builtin_bswap32(t0 >> 32);
+                const uint64_t swapped = __builtin_bswap64(in) >> 16;
+                // input   = [.|.|a|b|c|d|e|f]
+                const uint64_t t0      = _pdep_u64(swapped, 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t hi      = __builtin_bswap32(uint32_t(t0));
+                const uint64_t lo      = __builtin_bswap32(t0 >> 32);
 
                 const uint64_t indices = lo | (hi << 32);
 #else
