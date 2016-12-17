@@ -68,6 +68,9 @@ verify_avx2: $(VERIFY_DEPS)
 verify_avx512: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_AVX512) verify.cpp -o $@
 
+verify_avx512bw: $(VERIFY_DEPS)
+	$(CXX) $(FLAGS_AVX512BW) verify.cpp -o $@
+
 verify_xop: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_XOP) verify.cpp -o $@
 

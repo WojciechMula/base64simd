@@ -20,6 +20,9 @@
 #   include "unpack.avx512.cpp"
 #   include "encode.avx512.cpp"
 #endif
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+#   include "encode.avx512bw.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "lookup.xop.cpp"
 #endif
@@ -427,6 +430,10 @@ void validate_encoding() {
 
     validate_encoding("AVX512 (gather)", avx512_gather);
     validate_encoding("AVX512", avx512);
+#endif
+
+#ifdef HAVE_AVX512BW_INSTRUCTIONS
+    validate_encoding("AVX512BW", base64::avx512bw::encode);
 #endif
 }
 

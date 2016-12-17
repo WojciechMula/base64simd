@@ -33,8 +33,8 @@ namespace base64 {
                 //      [????????|ccdddddd|bbbbcccc|aaaaaabb]
                 //        byte 3   byte 2   byte 1   byte 0    -- byte 3 comes from the next triplet
                 //
-                //      shuffling orderes changes the oreder
-                //      [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc] - order 1, 0, 2, 1
+                //      shuffling changes the order of bytes: 1, 0, 2, 1
+                //      [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc]
                 //           ^^^^ ^^^^^^^^ ^^^^^^^^ ^^^^
                 //                  processed bits
                 in = _mm_shuffle_epi8(in, shuf);

@@ -1,6 +1,7 @@
 verify
 verify_avx2
 verify_avx512
+verify_avx512bw
 verify_xop
 
 speed
