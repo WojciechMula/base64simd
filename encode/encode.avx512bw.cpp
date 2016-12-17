@@ -50,7 +50,7 @@ namespace base64 {
                 const __m512i t3 = _mm512_mullo_epi16(t2, _mm512_set1_epi32(0x01000010));
                 const __m512i indices = _mm512_or_si512(t1, t3);
 #else
-                // similar to the above proc, but use variable shifts rather multiplication
+                // similar to the above proc, but uses variable shifts rather multiplication
                 // in    = [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc]
 
                 // t0    = [0000cccc|cc000000|aaaaaa00|00000000]

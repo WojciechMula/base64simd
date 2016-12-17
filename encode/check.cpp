@@ -81,7 +81,6 @@ public:
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
         check("AVX512BW (improved splitting)", avx512bw, valid);
-        check("AVX512BW (faster splitting)", avx512bw_faster, valid);
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         check("AVX512 (gather)", avx512_gathers, valid);

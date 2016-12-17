@@ -3,7 +3,7 @@
 
 SDE=sde -cnl
 
-FLAGS_BASE=-Wall -pedantic -O3 -std=c++14 -Wno-unused-but-set-variable
+FLAGS_BASE=-Wall -pedantic -O3 -std=c++11
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
     FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
