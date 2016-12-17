@@ -276,7 +276,7 @@ int validate_lookup() {
 
 template <typename ENC>
 void validate_encoding(const char* name, ENC encode) {
-    
+
     const char*  input    = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
                             "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
                             "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
@@ -323,6 +323,13 @@ void validate_encoding() {
     validate_encoding("SSE", sse);
     validate_encoding("SSE (unrolled)", sse_unrolled);
     validate_encoding("SSE (fully unrolled)", base64::sse::encode_full_unrolled);
+    #ifdef HAVE_BMI2_INSTRUCTIONS
+        auto sse_bmi2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::sse::encode_bmi2(base64::sse::lookup_naive, input, bytes, output);
+        };
+
+        validate_encoding("SSE + BMI2", sse_bmi2);
+    #endif
 
 #ifdef HAVE_AVX2_INSTRUCTIONS
     auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {

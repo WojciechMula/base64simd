@@ -255,15 +255,26 @@ namespace base64 {
 
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
+        __m128i _mm_bswap_epi32(const __m128i v) {
+            return _mm_shuffle_epi8(v, _mm_setr_epi8(
+                 7,  6,  5,  4,
+                 3,  2,  1,  0,
+                15, 14, 13, 12,
+                11, 10,  9,  8
+            ));
+        }
+
         template <typename LOOKUP_FN>
-        void encode_bmi2(LOOKUP_FN lookup, uint8_t* input, size_t bytes, uint8_t* output) {
+        void encode_bmi2(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
 
             uint8_t* out = output;
 
             uint64_t lo = *reinterpret_cast<const uint64_t*>(input + 0);
             uint64_t hi = *reinterpret_cast<const uint64_t*>(input + 0 + 6);
-            uint64_t expanded_lo = _pdep_u64(lo, 0x3f3f3f3f3f3f3f3flu);
-            uint64_t expanded_hi = _pdep_u64(hi, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t t0 = __builtin_bswap64(lo) >> 16;
+            uint64_t t1 = __builtin_bswap64(hi) >> 16;
+            uint64_t expanded_lo = _pdep_u64(t0, 0x3f3f3f3f3f3f3f3flu);
+            uint64_t expanded_hi = _pdep_u64(t1, 0x3f3f3f3f3f3f3f3flu);
 
             for (size_t i = 0; i < bytes; i += 2*6) {
 #if 1
@@ -276,10 +287,12 @@ namespace base64 {
 #endif
                 lo = *reinterpret_cast<const uint64_t*>(input + i + 12);
                 hi = *reinterpret_cast<const uint64_t*>(input + i + 12 + 6);
-                expanded_lo = _pdep_u64(lo, 0x3f3f3f3f3f3f3f3flu);
-                expanded_hi = _pdep_u64(hi, 0x3f3f3f3f3f3f3f3flu);
+                uint64_t t0 = __builtin_bswap64(lo) >> 16;
+                uint64_t t1 = __builtin_bswap64(hi) >> 16;
+                expanded_lo = _pdep_u64(t0, 0x3f3f3f3f3f3f3f3flu);
+                expanded_hi = _pdep_u64(t1, 0x3f3f3f3f3f3f3f3flu);
 
-                const auto result = lookup(indices);
+                const auto result = lookup(_mm_bswap_epi32(indices));
 
                 _mm_storeu_si128(reinterpret_cast<__m128i*>(out), result);
                 out += 16;
