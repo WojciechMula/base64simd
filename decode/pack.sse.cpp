@@ -27,7 +27,7 @@ namespace base64 {
                                 _mm_slli_epi32(ca, 6)
                                );
 
-            // t0   =  [dddd0000|aaaaaabb|bbbbcccc|dddddddd]
+            // t1   =  [dddd0000|aaaaaabb|bbbbcccc|dddddddd]
             const __m128i t1 = _mm_or_si128(
                                 _mm_srli_epi32(t0, 16),
                                 _mm_slli_epi32(t0, 12)
