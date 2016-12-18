@@ -8,7 +8,7 @@ else
 fi
 
 iterations=5
-tmp=tmp.txt
+tmp=raw-results.txt
 results=results.txt
 
 rm -f $tmp
@@ -18,6 +18,6 @@ do
     $prog | tee -a $tmp
 done
 
-mv $tmp $results
+cp $tmp $results
 
 python script/print_table.py $results

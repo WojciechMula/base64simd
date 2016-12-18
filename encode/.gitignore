@@ -17,7 +17,7 @@ check_avx512bw
 
 unpack_test
 
-tmp.txt
+raw-results.txt
 results.txt
 table.txt
 pin-log.txt
