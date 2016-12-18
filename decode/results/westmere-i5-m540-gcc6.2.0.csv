@@ -1,180 +1,100 @@
-improved scalar, N/A, N/A, 0.04763
-scalar, N/A, N/A, 0.06922
-SSE, base, naive, 0.02895
-SSE, byte blend, naive, 0.02965
-SSE, incremental, naive, 0.03414
-SSE, pshufb, naive, 0.02581
-SSE, base, improved, 0.02772
-SSE, byte blend, improved, 0.02825
-SSE, incremental, improved, 0.03283
-SSE, pshufb, improved, 0.02461
-SSE, base, improved + mult-add, 0.02688
-SSE, byte blend, improved + mult-add, 0.02724
-SSE, incremental, improved + mult-add, 0.03071
-SSE, pshufb, improved + mult-add, 0.02333
-SSE, base, multiply-add, 0.02611
-SSE, byte blend, multiply-add, 0.02548
-SSE, incremental, multiply-add, 0.02888
-SSE, pshufb, multiply-add, 0.02193
-improved scalar, N/A, N/A, 0.04742
-scalar, N/A, N/A, 0.06902
-SSE, base, naive, 0.02894
-SSE, byte blend, naive, 0.02955
-SSE, incremental, naive, 0.03401
-SSE, pshufb, naive, 0.02580
-SSE, base, improved, 0.02777
-SSE, byte blend, improved, 0.02823
-SSE, incremental, improved, 0.03271
-SSE, pshufb, improved, 0.02459
-SSE, base, improved + mult-add, 0.02684
-SSE, byte blend, improved + mult-add, 0.02719
-SSE, incremental, improved + mult-add, 0.03065
-SSE, pshufb, improved + mult-add, 0.02330
-SSE, base, multiply-add, 0.02609
-SSE, byte blend, multiply-add, 0.02541
-SSE, incremental, multiply-add, 0.02879
-SSE, pshufb, multiply-add, 0.02195
-improved scalar, N/A, N/A, 0.04753
-scalar, N/A, N/A, 0.06915
-SSE, base, naive, 0.02894
-SSE, byte blend, naive, 0.02954
-SSE, incremental, naive, 0.03410
-SSE, pshufb, naive, 0.02577
-SSE, base, improved, 0.02772
-SSE, byte blend, improved, 0.02824
-SSE, incremental, improved, 0.03277
-SSE, pshufb, improved, 0.02457
-SSE, base, improved + mult-add, 0.02684
-SSE, byte blend, improved + mult-add, 0.02719
-SSE, incremental, improved + mult-add, 0.03065
-SSE, pshufb, improved + mult-add, 0.02326
-SSE, base, multiply-add, 0.02606
-SSE, byte blend, multiply-add, 0.02539
+improved scalar, N/A, N/A, 0.04755
+scalar, N/A, N/A, 0.06919
+SSE, base, naive, 0.02903
+SSE, byte blend, naive, 0.02988
+SSE, incremental, naive, 0.03295
+SSE, pshufb, naive, 0.02770
+SSE, base, multiply-add, 0.02571
+SSE, byte blend, multiply-add, 0.02523
 SSE, incremental, multiply-add, 0.02880
-SSE, pshufb, multiply-add, 0.02186
-improved scalar, N/A, N/A, 0.04739
-scalar, N/A, N/A, 0.06901
-SSE, base, naive, 0.02894
-SSE, byte blend, naive, 0.02960
-SSE, incremental, naive, 0.03404
-SSE, pshufb, naive, 0.02577
-SSE, base, improved, 0.02774
-SSE, byte blend, improved, 0.02824
-SSE, incremental, improved, 0.03270
-SSE, pshufb, improved, 0.02456
-SSE, base, improved + mult-add, 0.02681
-SSE, byte blend, improved + mult-add, 0.02720
-SSE, incremental, improved + mult-add, 0.03061
-SSE, pshufb, improved + mult-add, 0.02328
-SSE, base, multiply-add, 0.02605
-SSE, byte blend, multiply-add, 0.02544
-SSE, incremental, multiply-add, 0.02877
-SSE, pshufb, multiply-add, 0.02190
-improved scalar, N/A, N/A, 0.04752
-scalar, N/A, N/A, 0.06917
-SSE, base, naive, 0.02901
-SSE, byte blend, naive, 0.02966
-SSE, incremental, naive, 0.03410
-SSE, pshufb, naive, 0.02584
-SSE, base, improved, 0.02779
-SSE, byte blend, improved, 0.02827
-SSE, incremental, improved, 0.03280
-SSE, pshufb, improved, 0.02466
-SSE, base, improved + mult-add, 0.02688
-SSE, byte blend, improved + mult-add, 0.02725
-SSE, incremental, improved + mult-add, 0.03072
-SSE, pshufb, improved + mult-add, 0.02339
-SSE, base, multiply-add, 0.02618
-SSE, byte blend, multiply-add, 0.02555
-SSE, incremental, multiply-add, 0.02886
-SSE, pshufb, multiply-add, 0.02204
-improved scalar, N/A, N/A, 0.04740
-scalar, N/A, N/A, 0.06899
-SSE, base, naive, 0.02895
-SSE, byte blend, naive, 0.02957
-SSE, incremental, naive, 0.03403
-SSE, pshufb, naive, 0.02580
-SSE, base, improved, 0.02772
-SSE, byte blend, improved, 0.02820
-SSE, incremental, improved, 0.03273
-SSE, pshufb, improved, 0.02466
-SSE, base, improved + mult-add, 0.02687
-SSE, byte blend, improved + mult-add, 0.02718
-SSE, incremental, improved + mult-add, 0.03063
-SSE, pshufb, improved + mult-add, 0.02335
-SSE, base, multiply-add, 0.02607
-SSE, byte blend, multiply-add, 0.02543
-SSE, incremental, multiply-add, 0.02880
-SSE, pshufb, multiply-add, 0.02199
-improved scalar, N/A, N/A, 0.04749
-scalar, N/A, N/A, 0.06917
-SSE, base, naive, 0.02906
-SSE, byte blend, naive, 0.02964
-SSE, incremental, naive, 0.03416
-SSE, pshufb, naive, 0.02586
-SSE, base, improved, 0.02782
-SSE, byte blend, improved, 0.02825
-SSE, incremental, improved, 0.03281
-SSE, pshufb, improved, 0.02469
-SSE, base, improved + mult-add, 0.02686
-SSE, byte blend, improved + mult-add, 0.02725
-SSE, incremental, improved + mult-add, 0.03068
-SSE, pshufb, improved + mult-add, 0.02337
-SSE, base, multiply-add, 0.02611
-SSE, byte blend, multiply-add, 0.02550
-SSE, incremental, multiply-add, 0.02886
-SSE, pshufb, multiply-add, 0.02207
+SSE, pshufb, multiply-add, 0.02185
 improved scalar, N/A, N/A, 0.04745
 scalar, N/A, N/A, 0.06904
-SSE, base, naive, 0.02891
-SSE, byte blend, naive, 0.02954
-SSE, incremental, naive, 0.03403
-SSE, pshufb, naive, 0.02575
-SSE, base, improved, 0.02775
-SSE, byte blend, improved, 0.02821
-SSE, incremental, improved, 0.03268
-SSE, pshufb, improved, 0.02457
-SSE, base, improved + mult-add, 0.02681
-SSE, byte blend, improved + mult-add, 0.02717
-SSE, incremental, improved + mult-add, 0.03058
-SSE, pshufb, improved + mult-add, 0.02327
-SSE, base, multiply-add, 0.02603
-SSE, byte blend, multiply-add, 0.02538
-SSE, incremental, multiply-add, 0.02874
+SSE, base, naive, 0.02907
+SSE, byte blend, naive, 0.02988
+SSE, incremental, naive, 0.03292
+SSE, pshufb, naive, 0.02771
+SSE, base, multiply-add, 0.02575
+SSE, byte blend, multiply-add, 0.02528
+SSE, incremental, multiply-add, 0.02882
 SSE, pshufb, multiply-add, 0.02196
 improved scalar, N/A, N/A, 0.04743
-scalar, N/A, N/A, 0.06914
-SSE, base, naive, 0.02909
-SSE, byte blend, naive, 0.02961
-SSE, incremental, naive, 0.03413
-SSE, pshufb, naive, 0.02587
-SSE, base, improved, 0.02777
-SSE, byte blend, improved, 0.02826
-SSE, incremental, improved, 0.03280
-SSE, pshufb, improved, 0.02470
-SSE, base, improved + mult-add, 0.02691
-SSE, byte blend, improved + mult-add, 0.02721
-SSE, incremental, improved + mult-add, 0.03065
-SSE, pshufb, improved + mult-add, 0.02338
-SSE, base, multiply-add, 0.02615
-SSE, byte blend, multiply-add, 0.02552
-SSE, incremental, multiply-add, 0.02891
-SSE, pshufb, multiply-add, 0.02201
-improved scalar, N/A, N/A, 0.04743
+scalar, N/A, N/A, 0.06917
+SSE, base, naive, 0.02904
+SSE, byte blend, naive, 0.02987
+SSE, incremental, naive, 0.03293
+SSE, pshufb, naive, 0.02772
+SSE, base, multiply-add, 0.02569
+SSE, byte blend, multiply-add, 0.02529
+SSE, incremental, multiply-add, 0.02881
+SSE, pshufb, multiply-add, 0.02193
+improved scalar, N/A, N/A, 0.04740
 scalar, N/A, N/A, 0.06897
-SSE, base, naive, 0.02893
-SSE, byte blend, naive, 0.02953
-SSE, incremental, naive, 0.03401
-SSE, pshufb, naive, 0.02572
-SSE, base, improved, 0.02767
-SSE, byte blend, improved, 0.02820
-SSE, incremental, improved, 0.03263
-SSE, pshufb, improved, 0.02452
-SSE, base, improved + mult-add, 0.02678
-SSE, byte blend, improved + mult-add, 0.02717
-SSE, incremental, improved + mult-add, 0.03057
-SSE, pshufb, improved + mult-add, 0.02319
-SSE, base, multiply-add, 0.02600
-SSE, byte blend, multiply-add, 0.02537
-SSE, incremental, multiply-add, 0.02875
-SSE, pshufb, multiply-add, 0.02182
+SSE, base, naive, 0.02903
+SSE, byte blend, naive, 0.02987
+SSE, incremental, naive, 0.03291
+SSE, pshufb, naive, 0.02770
+SSE, base, multiply-add, 0.02571
+SSE, byte blend, multiply-add, 0.02533
+SSE, incremental, multiply-add, 0.02878
+SSE, pshufb, multiply-add, 0.02198
+improved scalar, N/A, N/A, 0.04750
+scalar, N/A, N/A, 0.06918
+SSE, base, naive, 0.02901
+SSE, byte blend, naive, 0.02985
+SSE, incremental, naive, 0.03299
+SSE, pshufb, naive, 0.02772
+SSE, base, multiply-add, 0.02569
+SSE, byte blend, multiply-add, 0.02525
+SSE, incremental, multiply-add, 0.02883
+SSE, pshufb, multiply-add, 0.02189
+improved scalar, N/A, N/A, 0.04742
+scalar, N/A, N/A, 0.06909
+SSE, base, naive, 0.02907
+SSE, byte blend, naive, 0.02989
+SSE, incremental, naive, 0.03294
+SSE, pshufb, naive, 0.02770
+SSE, base, multiply-add, 0.02571
+SSE, byte blend, multiply-add, 0.02524
+SSE, incremental, multiply-add, 0.02882
+SSE, pshufb, multiply-add, 0.02195
+improved scalar, N/A, N/A, 0.04929
+scalar, N/A, N/A, 0.06915
+SSE, base, naive, 0.02895
+SSE, byte blend, naive, 0.02985
+SSE, incremental, naive, 0.03288
+SSE, pshufb, naive, 0.02765
+SSE, base, multiply-add, 0.02565
+SSE, byte blend, multiply-add, 0.02519
+SSE, incremental, multiply-add, 0.02877
+SSE, pshufb, multiply-add, 0.02191
+improved scalar, N/A, N/A, 0.04752
+scalar, N/A, N/A, 0.06905
+SSE, base, naive, 0.02910
+SSE, byte blend, naive, 0.02995
+SSE, incremental, naive, 0.03305
+SSE, pshufb, naive, 0.02772
+SSE, base, multiply-add, 0.02590
+SSE, byte blend, multiply-add, 0.02530
+SSE, incremental, multiply-add, 0.02885
+SSE, pshufb, multiply-add, 0.02196
+improved scalar, N/A, N/A, 0.04744
+scalar, N/A, N/A, 0.06905
+SSE, base, naive, 0.02905
+SSE, byte blend, naive, 0.02984
+SSE, incremental, naive, 0.03297
+SSE, pshufb, naive, 0.02770
+SSE, base, multiply-add, 0.02576
+SSE, byte blend, multiply-add, 0.02529
+SSE, incremental, multiply-add, 0.02881
+SSE, pshufb, multiply-add, 0.02199
+improved scalar, N/A, N/A, 0.04760
+scalar, N/A, N/A, 0.06927
+SSE, base, naive, 0.02907
+SSE, byte blend, naive, 0.02984
+SSE, incremental, naive, 0.03304
+SSE, pshufb, naive, 0.02772
+SSE, base, multiply-add, 0.02583
+SSE, byte blend, multiply-add, 0.02523
+SSE, incremental, multiply-add, 0.02881
+SSE, pshufb, multiply-add, 0.02186
