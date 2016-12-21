@@ -21,8 +21,8 @@ namespace base64 {
             );
 
             // input   = packed_byte(00ab_cdef)
-            // bits15  = packed_byte(000a_bcde) -- five higest bits
-            const __m128i bits15 = _mm_and_si128(_mm_srli_epi16(input, 1), packed_byte(0x01f));
+            // bits15  = packed_byte(000a_bcde) -- five highest bits
+            const __m128i bits15 = _mm_shl_epi8(input, packed_byte(-1));
 
             // bit0    = packed_byte(0000_000f) -- the LSB
             const __m128i bit0   = _mm_and_si128(input, packed_byte(0x01));
