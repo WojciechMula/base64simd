@@ -231,11 +231,11 @@ namespace base64 {
             number of operations:
             - cmp (le/gt/eq):  3
             - shift:           1
-            - add/sub:         3
+            - add/sub:         2
             - and/or/andnot:   4
             - movemask:        1
             - pshufb           3
-            - total:         =15
+            - total:         =14
             */
 
 #define packed_byte(b) _mm_set1_epi8(uint8_t(b))
@@ -289,6 +289,91 @@ namespace base64 {
             const __m128i shift  = _mm_shuffle_epi8(shift_LUT, higher_nibble);
             const __m128i t0     = _mm_add_epi8(input, shift);
             const __m128i result = _mm_add_epi8(t0, _mm_and_si128(eq_2f, packed_byte(-3)));
+
+            return result;
+#undef packed_byte
+        }
+
+
+        __m128i lookup_pshufb_bitmask(const __m128i input) {
+
+            /*
+            number of operations:
+            - cmp (le/gt/eq):  2
+            - shift:           1
+            - add/sub:         2
+            - and/or/andnot:   4
+            - movemask:        1
+            - pshufb           3
+            - total:         =13
+            */
+
+            /*
+            lower nibble (. is 0)
+            ------------------------------------------------------------------------
+              0:    .   .   .   4   . -65   . -71   .   .   .   .   .   .   .   .
+              1:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              2:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              3:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              4:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              5:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              6:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              7:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              8:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+              9:    .   .   .   4 -65 -65 -71 -71   .   .   .   .   .   .   .   .
+             10:    .   .   .   . -65 -65 -71 -71   .   .   .   .   .   .   .   .
+             11:    .   .  19   . -65   . -71   .   .   .   .   .   .   .   .   .
+             12:    .   .   .   . -65   . -71   .   .   .   .   .   .   .   .   .
+             13:    .   .   .   . -65   . -71   .   .   .   .   .   .   .   .   .
+             14:    .   .   .   . -65   . -71   .   .   .   .   .   .   .   .   .
+             15:    .   .  16   . -65   . -71   .   .   .   .   .   .   .   .   .
+                   LSB                                                         MSB
+            */
+
+#define packed_byte(b) _mm_set1_epi8(uint8_t(b))
+
+            const __m128i higher_nibble = _mm_srli_epi32(input, 4) & packed_byte(0x0f);
+            const __m128i lower_nibble  = input & packed_byte(0x0f);
+
+            const __m128i shiftLUT = _mm_setr_epi8(
+                0,   0,  19,   4, -65, -65, -71, -71,
+                0,   0,   0,   0,   0,   0,   0,   0);
+
+            const __m128i maskLUT  = _mm_setr_epi8(
+                /* 0        */ char(0b10101000),
+                /* 1 .. 9   */ char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000),
+                /* 10       */ char(0b11110000),
+                /* 11       */ char(0b01010100),
+                /* 12 .. 14 */ char(0b01010000), char(0b01010000), char(0b01010000),
+                /* 15       */ char(0b01010100)
+            );
+
+            const __m128i bitposLUT = _mm_setr_epi8(
+                0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, char(0x80),
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            );
+
+            const __m128i sh     = _mm_shuffle_epi8(shiftLUT,  higher_nibble);
+            const __m128i eq_2f  = _mm_cmpeq_epi8(input, packed_byte(0x2f));
+            const __m128i shift  = _mm_blendv_epi8(sh, packed_byte(16), eq_2f);
+
+            const __m128i M      = _mm_shuffle_epi8(maskLUT,   lower_nibble);
+            const __m128i bit    = _mm_shuffle_epi8(bitposLUT, higher_nibble);
+
+            const __m128i non_match = _mm_cmpeq_epi8(_mm_and_si128(M, bit), _mm_setzero_si128());
+
+            const auto mask = _mm_movemask_epi8(non_match);
+            if (mask) {
+                // some characters do not match the valid range
+                for (unsigned i=0; i < 16; i++) {
+                    if (mask & (1 << i)) {
+                        throw invalid_input(i, 0);
+                    }
+                }
+            }
+            const __m128i result = _mm_add_epi8(input, shift);
 
             return result;
 #undef packed_byte

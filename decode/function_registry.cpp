@@ -79,10 +79,11 @@ void FunctionRegistry::build() {
     add("sse/incremental/naive",            "SSE",              "incremental",  "naive");
     add("sse/pshufb/naive",                 "SSE",              "pshufb",       "naive");
 
-    add("sse/base/madd",                    "SSE",              "base",         "multiply-add");
-    add("sse/blend/madd",                   "SSE",              "byte blend",   "multiply-add");
-    add("sse/incremental/madd",             "SSE",              "incremental",  "multiply-add");
-    add("sse/pshufb/madd",                  "SSE",              "pshufb",       "multiply-add");
+    add("sse/base/madd",                    "SSE",              "base",             "multiply-add");
+    add("sse/blend/madd",                   "SSE",              "byte blend",       "multiply-add");
+    add("sse/incremental/madd",             "SSE",              "incremental",      "multiply-add");
+    add("sse/pshufb/madd",                  "SSE",              "pshufb",           "multiply-add");
+    add("sse/pshufb2/madd",                 "SSE",              "pshufb bitmask",   "multiply-add");
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
     add("sse_bmi2/base",        "SSE & BMI2",       "base",         "N/A");
@@ -105,6 +106,7 @@ void FunctionRegistry::build() {
     add("avx2/base/madd",                    "AVX2",              "base",         "multiply-add");
     add("avx2/blend/madd",                   "AVX2",              "byte blend",   "multiply-add");
     add("avx2/pshufb/madd",                  "AVX2",              "pshufb",       "multiply-add");
+    add("avx2/pshufb2/madd",                 "AVX2",              "pshufb bitmask", "multiply-add");
 
 # if defined(HAVE_BMI2_INSTRUCTIONS)
     add("avx2_bmi2/base",       "AVX2 & BMI2",      "base",         "N/A");

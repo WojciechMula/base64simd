@@ -180,6 +180,74 @@ namespace base64 {
 #undef packed_byte
         }
 
+
+        __m256i lookup_pshufb_bitmask(const __m256i input) {
+
+#define packed_byte(b) _mm256_set1_epi8(uint8_t(b))
+
+            const __m256i higher_nibble = _mm256_srli_epi32(input, 4) & packed_byte(0x0f);
+            const __m256i lower_nibble  = input & packed_byte(0x0f);
+
+            const __m256i shiftLUT = _mm256_setr_epi8(
+                0,   0,  19,   4, -65, -65, -71, -71,
+                0,   0,   0,   0,   0,   0,   0,   0,
+
+                0,   0,  19,   4, -65, -65, -71, -71,
+                0,   0,   0,   0,   0,   0,   0,   0
+            );
+
+            const __m256i maskLUT  = _mm256_setr_epi8(
+                /* 0        */ char(0b10101000),
+                /* 1 .. 9   */ char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000),
+                /* 10       */ char(0b11110000),
+                /* 11       */ char(0b01010100),
+                /* 12 .. 14 */ char(0b01010000), char(0b01010000), char(0b01010000),
+                /* 15       */ char(0b01010100),
+
+                /* 0        */ char(0b10101000),
+                /* 1 .. 9   */ char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
+                               char(0b11111000),
+                /* 10       */ char(0b11110000),
+                /* 11       */ char(0b01010100),
+                /* 12 .. 14 */ char(0b01010000), char(0b01010000), char(0b01010000),
+                /* 15       */ char(0b01010100)
+            );
+
+            const __m256i bitposLUT = _mm256_setr_epi8(
+                0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, char(0x80),
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+
+                0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, char(0x80),
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            );
+
+            const __m256i sh     = _mm256_shuffle_epi8(shiftLUT,  higher_nibble);
+            const __m256i eq_2f  = _mm256_cmpeq_epi8(input, packed_byte(0x2f));
+            const __m256i shift  = _mm256_blendv_epi8(sh, packed_byte(16), eq_2f);
+
+            const __m256i M      = _mm256_shuffle_epi8(maskLUT,   lower_nibble);
+            const __m256i bit    = _mm256_shuffle_epi8(bitposLUT, higher_nibble);
+
+            const __m256i non_match = _mm256_cmpeq_epi8(_mm256_and_si256(M, bit), _mm256_setzero_si256());
+
+            const auto mask = _mm256_movemask_epi8(non_match);
+            if (mask) {
+                // some characters do not match the valid range
+                for (unsigned i=0; i < 32; i++) {
+                    if (mask & (1 << i)) {
+                        throw invalid_input(i, 0);
+                    }
+                }
+            }
+            const __m256i result = _mm256_add_epi8(input, shift);
+
+            return result;
+#undef packed_byte
+        }
+
     } // namespace avx2
 
 } // namespace base64

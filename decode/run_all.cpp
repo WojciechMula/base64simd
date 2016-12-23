@@ -30,6 +30,7 @@ RUN_SSE_TEMPLATE2("sse/base/madd",                   decode, lookup_base,       
 RUN_SSE_TEMPLATE2("sse/blend/madd",                  decode, lookup_byte_blend,  pack_madd);
 RUN_SSE_TEMPLATE2("sse/incremental/madd",            decode, lookup_incremental, pack_madd);
 RUN_SSE_TEMPLATE2("sse/pshufb/madd",                 decode, lookup_pshufb, pack_madd);
+RUN_SSE_TEMPLATE2("sse/pshufb2/madd",                decode, lookup_pshufb_bitmask, pack_madd);
 }
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
@@ -53,6 +54,7 @@ RUN_SSE_TEMPLATE2("sse/pshufb/madd",                 decode, lookup_pshufb, pack
     RUN_AVX2_TEMPLATE2("avx2/base/madd",             decode, lookup_base,        pack_madd);
     RUN_AVX2_TEMPLATE2("avx2/blend/madd",            decode, lookup_byte_blend,  pack_madd);
     RUN_AVX2_TEMPLATE2("avx2/pshufb/madd",           decode, lookup_pshufb,      pack_madd);
+    RUN_AVX2_TEMPLATE2("avx2/pshufb2/madd",          decode, lookup_pshufb_bitmask, pack_madd);
     }
 
     #if defined(HAVE_BMI2_INSTRUCTIONS)
