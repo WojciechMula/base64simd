@@ -19,19 +19,23 @@ RUN("scalar", base64::scalar::decode_lookup1);
 #endif
 
 {
-using namespace base64::sse;
+    using namespace base64::sse;
 
-RUN_SSE_TEMPLATE2("sse/1",          decode, lookup_base,        pack_naive);
-RUN_SSE_TEMPLATE2("sse/2",          decode, lookup_byte_blend,  pack_naive);
-RUN_SSE_TEMPLATE2("sse/3",          decode, lookup_incremental, pack_naive);
-RUN_SSE_TEMPLATE2("sse/4",          decode, lookup_pshufb,      pack_naive);
+    RUN_SSE_TEMPLATE2("sse/1",          decode, lookup_base,        pack_naive);
+    RUN_SSE_TEMPLATE2("sse/2",          decode, lookup_byte_blend,  pack_naive);
+    RUN_SSE_TEMPLATE2("sse/3",          decode, lookup_incremental, pack_naive);
+    RUN_SSE_TEMPLATE2("sse/4",          decode, lookup_pshufb,      pack_naive);
 
-RUN_SSE_TEMPLATE2("sse/5",          decode, lookup_base,        pack_madd);
-RUN_SSE_TEMPLATE2("sse/6",          decode, lookup_byte_blend,  pack_madd);
-RUN_SSE_TEMPLATE2("sse/7",          decode, lookup_incremental, pack_madd);
-RUN_SSE_TEMPLATE2("sse/8",          decode, lookup_pshufb,      pack_madd);
-RUN_SSE_TEMPLATE2("sse/9",          decode, lookup_pshufb_bitmask, pack_madd);
+    RUN_SSE_TEMPLATE2("sse/5",          decode, lookup_base,        pack_madd);
+    RUN_SSE_TEMPLATE2("sse/6",          decode, lookup_byte_blend,  pack_madd);
+    RUN_SSE_TEMPLATE2("sse/7",          decode, lookup_incremental, pack_madd);
+    RUN_SSE_TEMPLATE2("sse/8",          decode, lookup_pshufb,      pack_madd);
+    RUN_SSE_TEMPLATE2("sse/9",          decode, lookup_pshufb_bitmask, pack_madd);
 }
+
+#if defined(HAVE_XOP_INSTRUCTIONS)
+    RUN_SSE_TEMPLATE2("xop", base64::sse::decode, base64::xop::lookup_pshufb_bitmask, base64::sse::pack_madd);
+#endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
     {

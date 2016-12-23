@@ -11,6 +11,9 @@
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"
 #include "decoders.sse.cpp"
+#if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "decoders.xop.cpp"
+#endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "decoders.avx2.cpp"
 #endif

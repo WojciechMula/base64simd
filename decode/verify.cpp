@@ -7,6 +7,9 @@
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"
 #include "decoders.sse.cpp"
+#if defined(HAVE_XOP_INSTRUCTIONS)
+#   include "decoders.xop.cpp"
+#endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "decoders.avx2.cpp"
 #endif
@@ -302,6 +305,12 @@ int test() {
     RUN_SSE_TEMPLATE2("sse/8", decode, lookup_pshufb,      pack_madd);
     RUN_SSE_TEMPLATE2("sse/9", decode, lookup_pshufb_bitmask, pack_madd);
     }
+
+#if defined(HAVE_XOP_INSTRUCTIONS)
+    {
+    RUN_SSE_TEMPLATE2("xop", base64::sse::decode, base64::xop::lookup_pshufb_bitmask, base64::sse::pack_madd);
+    }
+#endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
     {
