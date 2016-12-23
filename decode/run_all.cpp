@@ -21,25 +21,25 @@ RUN("scalar", base64::scalar::decode_lookup1);
 {
 using namespace base64::sse;
 
-RUN_SSE_TEMPLATE2("sse/base/naive",                  decode, lookup_base,        pack_naive);
-RUN_SSE_TEMPLATE2("sse/blend/naive",                 decode, lookup_byte_blend,  pack_naive);
-RUN_SSE_TEMPLATE2("sse/incremental/naive",           decode, lookup_incremental, pack_naive);
-RUN_SSE_TEMPLATE2("sse/pshufb/naive",                decode, lookup_pshufb, pack_naive);
+RUN_SSE_TEMPLATE2("sse/1",          decode, lookup_base,        pack_naive);
+RUN_SSE_TEMPLATE2("sse/2",          decode, lookup_byte_blend,  pack_naive);
+RUN_SSE_TEMPLATE2("sse/3",          decode, lookup_incremental, pack_naive);
+RUN_SSE_TEMPLATE2("sse/4",          decode, lookup_pshufb,      pack_naive);
 
-RUN_SSE_TEMPLATE2("sse/base/madd",                   decode, lookup_base,        pack_madd);
-RUN_SSE_TEMPLATE2("sse/blend/madd",                  decode, lookup_byte_blend,  pack_madd);
-RUN_SSE_TEMPLATE2("sse/incremental/madd",            decode, lookup_incremental, pack_madd);
-RUN_SSE_TEMPLATE2("sse/pshufb/madd",                 decode, lookup_pshufb, pack_madd);
-RUN_SSE_TEMPLATE2("sse/pshufb2/madd",                decode, lookup_pshufb_bitmask, pack_madd);
+RUN_SSE_TEMPLATE2("sse/5",          decode, lookup_base,        pack_madd);
+RUN_SSE_TEMPLATE2("sse/6",          decode, lookup_byte_blend,  pack_madd);
+RUN_SSE_TEMPLATE2("sse/7",          decode, lookup_incremental, pack_madd);
+RUN_SSE_TEMPLATE2("sse/8",          decode, lookup_pshufb,      pack_madd);
+RUN_SSE_TEMPLATE2("sse/9",          decode, lookup_pshufb_bitmask, pack_madd);
 }
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
     {
     using namespace base64::sse;
 
-    RUN_SSE_TEMPLATE1("sse_bmi2/base",          decode_bmi2, lookup_base);
-    RUN_SSE_TEMPLATE1("sse_bmi2/blend",         decode_bmi2, lookup_byte_blend);
-    RUN_SSE_TEMPLATE1("sse_bmi2/incremental",   decode_bmi2, lookup_incremental);
+    RUN_SSE_TEMPLATE1("sse_bmi2/1", decode_bmi2, lookup_base);
+    RUN_SSE_TEMPLATE1("sse_bmi2/2", decode_bmi2, lookup_byte_blend);
+    RUN_SSE_TEMPLATE1("sse_bmi2/3", decode_bmi2, lookup_incremental);
     }
 #endif
 
@@ -47,22 +47,22 @@ RUN_SSE_TEMPLATE2("sse/pshufb2/madd",                decode, lookup_pshufb_bitma
     {
     using namespace base64::avx2;
 
-    RUN_AVX2_TEMPLATE2("avx2/base/naive",            decode, lookup_base,        pack_naive);
-    RUN_AVX2_TEMPLATE2("avx2/blend/naive",           decode, lookup_byte_blend,  pack_naive);
-    RUN_AVX2_TEMPLATE2("avx2/pshufb/naive",          decode, lookup_pshufb,      pack_naive);
+    RUN_AVX2_TEMPLATE2("avx2/1",    decode, lookup_base,        pack_naive);
+    RUN_AVX2_TEMPLATE2("avx2/2",    decode, lookup_byte_blend,  pack_naive);
+    RUN_AVX2_TEMPLATE2("avx2/3",    decode, lookup_pshufb,      pack_naive);
 
-    RUN_AVX2_TEMPLATE2("avx2/base/madd",             decode, lookup_base,        pack_madd);
-    RUN_AVX2_TEMPLATE2("avx2/blend/madd",            decode, lookup_byte_blend,  pack_madd);
-    RUN_AVX2_TEMPLATE2("avx2/pshufb/madd",           decode, lookup_pshufb,      pack_madd);
-    RUN_AVX2_TEMPLATE2("avx2/pshufb2/madd",          decode, lookup_pshufb_bitmask, pack_madd);
+    RUN_AVX2_TEMPLATE2("avx2/4",    decode, lookup_base,        pack_madd);
+    RUN_AVX2_TEMPLATE2("avx2/5",    decode, lookup_byte_blend,  pack_madd);
+    RUN_AVX2_TEMPLATE2("avx2/6",    decode, lookup_pshufb,      pack_madd);
+    RUN_AVX2_TEMPLATE2("avx2/7",    decode, lookup_pshufb_bitmask, pack_madd);
     }
 
     #if defined(HAVE_BMI2_INSTRUCTIONS)
         {
         using namespace base64::avx2;
 
-        RUN_AVX2_TEMPLATE1("avx2_bmi2/base",  decode_bmi2, lookup_base);
-        RUN_AVX2_TEMPLATE1("avx2_bmi2/blend", decode_bmi2, lookup_byte_blend);
+        RUN_AVX2_TEMPLATE1("avx2_bmi2/1", decode_bmi2, lookup_base);
+        RUN_AVX2_TEMPLATE1("avx2_bmi2/2", decode_bmi2, lookup_byte_blend);
         }
     #endif // HAVE_BMI2_INSTRUCTIONS
 #endif // HAVE_AVX2_INSTRUCTIONS
@@ -71,9 +71,9 @@ RUN_SSE_TEMPLATE2("sse/pshufb2/madd",                decode, lookup_pshufb_bitma
     {
     using namespace base64::avx512;
 
-    RUN_AVX2_TEMPLATE2("avx512/gather",              decode, lookup_gather,      pack_identity);
-    RUN_AVX2_TEMPLATE2("avx512/comparisons",         decode, lookup_comparisons, pack_improved);
-    RUN_AVX2_TEMPLATE2("avx512/comparisons/scatter", decode_store_scatter, lookup_comparisons, pack_improved);
+    RUN_AVX2_TEMPLATE2("avx512/1", decode,               lookup_gather,      pack_identity);
+    RUN_AVX2_TEMPLATE2("avx512/2", decode,               lookup_comparisons, pack_improved);
+    RUN_AVX2_TEMPLATE2("avx512/3", decode_store_scatter, lookup_comparisons, pack_improved);
     }
 #endif // HAVE_AVX512_INSTRUCTIONS
 
