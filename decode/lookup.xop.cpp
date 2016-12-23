@@ -12,7 +12,7 @@ namespace base64 {
 
 #define packed_byte(b) _mm_set1_epi8(uint8_t(b))
 
-            const __m128i higher_nibble = _mm_shl_epi8(input, packed_byte(4));
+            const __m128i higher_nibble = _mm_shl_epi8(input, packed_byte(-4));
             const __m128i lower_nibble  = _mm_and_si128(input, packed_byte(0x0f));
 
             const __m128i shiftLUT = _mm_setr_epi8(

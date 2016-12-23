@@ -2,7 +2,7 @@
 .PHONY: all clean run
 
 SDE=sde -cnl
-FLAGS_BASE=-Wall -Wextra -pedantic -O3 -std=c++14
+FLAGS_BASE=-Wall -Wextra -pedantic -O3 -std=gnu++11
 
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)

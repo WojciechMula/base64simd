@@ -85,11 +85,16 @@ void FunctionRegistry::build() {
     add("sse/8", "SSE", "pshufb",           "multiply-add");
     add("sse/9", "SSE", "pshufb bitmask",   "multiply-add");
 
+#if defined(HAVE_XOP_INSTRUCTIONS)
+    add("xop", "XOP", "pshufb bitmask", "multiply-add");
+#endif
+
 #if defined(HAVE_BMI2_INSTRUCTIONS)
     add("sse_bmi2/1", "SSE & BMI2", "base",         "N/A");
     add("sse_bmi2/2", "SSE & BMI2", "byte blend",   "N/A");
     add("sse_bmi2/3", "SSE & BMI2", "incremental",  "N/A");
 #endif
+
 #if defined(HAVE_AVX2_INSTRUCTIONS)
     add("avx2/1", "AVX2", "base",         "naive");
     add("avx2/2", "AVX2", "byte blend",   "naive");
