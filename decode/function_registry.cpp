@@ -118,6 +118,9 @@ void FunctionRegistry::build() {
     add("avx512/2", "AVX512 (store: vectorized)", "vectorized", "improved");
     add("avx512/3", "AVX512 (store: scatter)",    "vectorized", "improved");
 #endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+    add("neon/1", "ARM NEON", "byte blend", "N/A");
+#endif
     widest_image = 0;
     for (auto& it: registry) {
 

@@ -91,4 +91,12 @@ RUN("scalar", base64::scalar::decode_lookup1);
     }
 #endif // HAVE_AVX512BW_INSTRUCTIONS
 
+#if defined(HAVE_NEON_INSTRUCTIONS)
+    {
+    using namespace base64::neon;
+
+    RUN_SSE_TEMPLATE1("neon/1", decode, lookup_byte_blend);
+    }
+#endif // HAVE_NEON_INSTRUCTIONS
+
 

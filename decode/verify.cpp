@@ -20,6 +20,9 @@
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "decoders.avx512bw.cpp"
 #endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+#   include "decoders.neon.cpp"
+#endif
 
 #include "function_registry.cpp"
 
@@ -292,6 +295,9 @@ int test() {
 #define RUN_AVX2_TEMPLATE1(name, decode_fn, lookup_fn) \
     RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
 
+#define RUN_NEON_TEMPLATE2(name, decode_fn, lookup_fn) \
+    RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
+
 #if defined(HAVE_SSE_INSTRUCTIONS)
     {
     using namespace base64::sse;
@@ -364,6 +370,13 @@ int test() {
     RUN_TEMPLATE2(64, 48, "avx512bw", decode, lookup, pack_madd)
     }
 #endif // HAVE_AVX512BW_INSTRUCTIONS
+
+#if defined(HAVE_NEON_INSTRUCTIONS)
+    {
+    using namespace base64::neon;
+    RUN_NEON_TEMPLATE2("neon/1", decode, lookup_byte_blend);
+    }
+#endif // HAVE_NEON_INSTRUCTIONS
     return 0;
 }
 
@@ -374,10 +387,10 @@ int main() {
     base64::scalar::prepare_lookup32();
 #if defined(HAVE_AVX512_INSTRUCTIONS)
     base64::avx512::prepare_lookups();
-#endif // HAVE_AVX515_INSTRUCTIONS
+#endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
     base64::avx512bw::prepare_lookups();
-#endif // HAVE_AVX512BW_INSTRUCTIONS
+#endif
 
 
     try {
