@@ -30,6 +30,10 @@
 #   include "lookup.xop.cpp"
 #   include "encode.xop.cpp"
 #endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+#   include "lookup.neon.cpp"
+#   include "encode.neon.cpp"
+#endif
 
 const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -247,6 +251,55 @@ void test_avx512(const char* name, LOOKUP_FN fn) {
 #endif
 
 
+#if defined(HAVE_NEON_INSTRUCTIONS)
+template<typename LOOKUP_FN>
+void test_neon(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
+
+    const size_t N = 8;
+
+    uint8_t input[N];
+    uint8_t output[N];
+
+    for (unsigned byte=0; byte < N; byte++) {
+
+        for (unsigned j=0; j < N; j++) {
+            input[j] = 0;
+        }
+
+        for (unsigned i=0; i < 64; i++) {
+
+            input[byte] = i;
+
+            uint8x8_t in  = vld1_u8(input);
+            uint8x8_t out = fn(in);
+
+            vst1_u8(output, out);
+
+            for (unsigned j=0; j < N; j++) {
+
+                if (j == byte) {
+                    if (output[j] != lookup[i]) {
+                        printf("failed at %d, byte %d - wrong result\n", i, byte);
+                        exit(1);
+                    }
+                } else {
+                    if (output[j] != lookup[0]) {
+                        printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
+                        exit(1);
+                    }
+                }
+            }
+        }
+    }
+
+    puts("OK");
+}
+#endif
+
+
 int validate_lookup() {
 
     test_scalar("reference branchless (optimized v2)", reference::lookup_version2);
@@ -277,6 +330,12 @@ int validate_lookup() {
     test_avx512("AVX512F (incremental logic)", base64::avx512::lookup_incremental_logic);
     test_avx512("AVX512F (incremental logic improved)", base64::avx512::lookup_incremental_logic_improved);
     test_avx512("AVX512F (binary search)", base64::avx512::lookup_binary_search);
+#endif
+
+#if defined(HAVE_NEON_INSTRUCTIONS)
+    test_neon("ARM NEON implementation of naive algorithm", base64::neon::lookup_naive);
+    test_neon("ARM NEON implementation of optimized algorithm", base64::neon::lookup_version2);
+    test_neon("ARM NEON implementation of pshufb improved algorithm", base64::neon::lookup_pshufb_improved);
 #endif
     return 0;
 }
@@ -394,6 +453,14 @@ void validate_encoding() {
 
     validate_encoding("XOP", xop);
 #endif
+
+#ifdef HAVE_NEON_INSTRUCTIONS
+    auto neon = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::neon::encode(base64::neon::lookup_naive, input, bytes, output);
+    };
+
+    validate_encoding("ARM NEON", neon);
+#endif
 }
 
 
@@ -404,7 +471,7 @@ int main() {
 #endif
 
     puts("Validate lookup procedures");
-    //validate_lookup();
+    validate_lookup();
 
     puts("Validate encoding");
     validate_encoding();

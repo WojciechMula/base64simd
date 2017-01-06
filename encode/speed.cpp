@@ -29,6 +29,14 @@
 #   include "lookup.avx512.cpp"
 #   include "encode.avx512.cpp"
 #endif
+#if defined(HAVE_AVX512_INSTRUCTIONS)
+#   include "lookup.neon.cpp"
+#   include "encode.neon.cpp"
+#endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+#   include "lookup.neon.cpp"
+#   include "encode.neon.cpp"
+#endif
 
 #include "application.cpp"
 
@@ -54,6 +62,7 @@ public:
             measure("scalar (32 bit)", base64::scalar::encode32);
         }
 
+#if !defined(HAVE_NEON_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("scalar64")) {
             measure("scalar (64 bit)", base64::scalar::encode64);
         }
@@ -61,6 +70,7 @@ public:
         if (cmd.empty() || cmd.has("swar")) {
             measure("SWAR (64 bit)", base64::swar::encode);
         }
+#endif
 
 #if defined(HAVE_SSE_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("sse")) {
@@ -179,6 +189,20 @@ public:
 
         if (cmd.empty() || cmd.has("avx512/gather")) {
             measure("AVX512 (gather)", avx512_gathers);
+        }
+#endif
+
+#if defined(HAVE_NEON_INSTRUCTIONS)
+        if (cmd.empty() || cmd.has("neon/1")) {
+            measure("ARM NEON (naive lookup)", neon_naive);
+        }
+
+        if (cmd.empty() || cmd.has("neon/2")) {
+            measure("ARM NEON (optimized lookup)", neon_optimized);
+        }
+
+        if (cmd.empty() || cmd.has("neon/3")) {
+            measure("ARM NEON (pshufb improved lookup)", neon_pshufb_improved);
         }
 #endif
 

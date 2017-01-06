@@ -5,12 +5,25 @@ void dump_hex(const uint8_t* buf, size_t num) {
 }
 
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
 void dump(__m128i xmm) {
     
     uint8_t buf[16];
     _mm_storeu_si128(reinterpret_cast<__m128i*>(buf), xmm);
     dump_hex(buf, 16);
 }
+#endif
+
+
+#if defined(HAVE_NEON_INSTRUCTIONS)
+void dump(uint8x8_t v) {
+    
+    uint8_t buf[8];
+    memset(buf, 0xcc, 8);
+    vst1_u8(buf, v);
+    dump_hex(buf, 8);
+}
+#endif
 
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)

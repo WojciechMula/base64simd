@@ -126,3 +126,21 @@ auto avx512_bin_search = [](uint8_t* input, size_t bytes, uint8_t* output) {
     encode(lookup_binary_search, unpack, input, bytes, output);
 };
 #endif
+
+#if defined(HAVE_NEON_INSTRUCTIONS)
+auto neon_naive = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    using namespace base64::neon;
+    encode(lookup_naive, input, bytes, output);
+};
+
+auto neon_optimized = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    using namespace base64::neon;
+    encode(lookup_version2, input, bytes, output);
+};
+
+auto neon_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    using namespace base64::neon;
+    encode(lookup_pshufb_improved, input, bytes, output);
+};
+#endif
+

@@ -32,6 +32,10 @@
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "encode.avx512bw.cpp"
 #endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+#   include "lookup.neon.cpp"
+#   include "encode.neon.cpp"
+#endif
 
 #include "application.cpp"
 
@@ -96,6 +100,11 @@ public:
         check("AVX512 (incremental logic improved)", avx512_swar_logic_improved, valid);
         check("AVX512 (incremental logic improved with gather load)", avx512_swar_logic_improved_load_gather, valid);
         check("AVX512 (binary search)", avx512_bin_search, valid);
+#endif
+#if defined(HAVE_NEON_INSTRUCTIONS)
+        check("ARM NEON (naive lookup)", neon_naive, valid);
+        check("ARM NEON (improved lookup)", neon_optimized, valid);
+        check("ARM NEON (pshuf improved)", neon_pshufb_improved, valid);
 #endif
 
         return 0;
