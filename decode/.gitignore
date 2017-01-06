@@ -4,11 +4,14 @@ check
 speed_avx2
 verify_avx2
 check_avx2
-speed_xop
-verify_xop
-check_xop
 verify_avx512
 check_avx512
 speed_avx512
 verify_avx512bw
 check_avx512bw
+speed_xop
+verify_xop
+check_xop
+speed_arm
+verify_arm
+check_arm

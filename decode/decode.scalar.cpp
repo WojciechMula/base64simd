@@ -1,5 +1,7 @@
 #include <cassert>
-#include <x86intrin.h>
+#if defined(HAVE_BMI_INSTRUCTIONS)
+#   include <x86intrin.h>
+#endif
 
 namespace base64 {
 

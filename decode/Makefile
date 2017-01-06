@@ -9,26 +9,30 @@ ifeq ($(HAVE_BMI2),present)
     FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
 endif
 
-FLAGS=$(FLAGS_BASE) -msse4
+FLAGS=$(FLAGS_BASE) -msse4 -DHAVE_SSE_INSTRUCTIONS
 FLAGS_AVX2=$(FLAGS_BASE) -mavx2 -mbmi2 -DHAVE_AVX2_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
 FLAGS_AVX512=$(FLAGS_BASE) -mavx512f -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
 FLAGS_AVX512BW=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512BW_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS 
 FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
+FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
 
 DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp config.h
 
 ALL=verify speed check
 ALL_XOP=verify_xop speed_xop check_xop
+ALL_ARM=verify_arm speed_arm check_arm
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw
-ALL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW)
+ALL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_ARM)
 
 all: $(ALL)
 
 sse: $(ALL)
 
 xop: $(ALL_XOP)
+
+arm: $(ALL_ARM)
 
 avx2: $(ALL_AVX2)
 
@@ -105,6 +109,15 @@ check_avx512: $(CHECK_DEPS)
 
 check_avx512bw: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_AVX512BW) check.cpp -o $@
+
+verify_arm: $(VERIFY_DEPS)
+	$(CXX) $(FLAGS_ARM) verify.cpp -o $@
+
+speed_arm: $(SPEED_DEPS)
+	$(CXX) $(FLAGS_ARM) speed.cpp -o $@
+
+check_arm: $(CHECK_DEPS)
+	$(CXX) $(FLAGS_ARM) check.cpp -o $@
 
 build_all: $(ALL_TARGETS)
 verify_all: verify verify_avx2 verify_avx512 verify_avx512bw

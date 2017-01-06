@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cstdint>
 #include <memory>
-#include <immintrin.h>
 
 #include "config.h"
 #include "../cmdline.cpp"
@@ -10,7 +9,9 @@
 
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"
-#include "decoders.sse.cpp"
+#if defined(HAVE_SSE_INSTRUCTIONS)
+#   include "decoders.sse.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "decoders.xop.cpp"
 #endif

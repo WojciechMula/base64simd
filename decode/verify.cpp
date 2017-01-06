@@ -1,12 +1,13 @@
 #include <cstdio>
 #include <cstring>
-#include <immintrin.h>
 
 #include "config.h"
 
 #include "decode.common.cpp"
 #include "decode.scalar.cpp"
-#include "decoders.sse.cpp"
+#if defined(HAVE_SSE_INSTRUCTIONS)
+#   include "decoders.sse.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "decoders.xop.cpp"
 #endif
@@ -291,6 +292,7 @@ int test() {
 #define RUN_AVX2_TEMPLATE1(name, decode_fn, lookup_fn) \
     RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
     {
     using namespace base64::sse;
 
@@ -305,6 +307,7 @@ int test() {
     RUN_SSE_TEMPLATE2("sse/8", decode, lookup_pshufb,      pack_madd);
     RUN_SSE_TEMPLATE2("sse/9", decode, lookup_pshufb_bitmask, pack_madd);
     }
+#endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
     {

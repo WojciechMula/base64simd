@@ -18,6 +18,7 @@ RUN("scalar", base64::scalar::decode_lookup1);
     RUN("scalar_bmi2", base64::scalar::decode_lookup1_bmi2);
 #endif
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
 {
     using namespace base64::sse;
 
@@ -32,6 +33,7 @@ RUN("scalar", base64::scalar::decode_lookup1);
     RUN_SSE_TEMPLATE2("sse/8",          decode, lookup_pshufb,      pack_madd);
     RUN_SSE_TEMPLATE2("sse/9",          decode, lookup_pshufb_bitmask, pack_madd);
 }
+#endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
     RUN_SSE_TEMPLATE2("xop", base64::sse::decode, base64::xop::lookup_pshufb_bitmask, base64::sse::pack_madd);
