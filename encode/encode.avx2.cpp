@@ -1,8 +1,3 @@
-#include <immintrin.h>
-#include <x86intrin.h>
-
-#include <cstdint>
-
 // definition copied from http://stackoverflow.com/questions/32630458/setting-m256i-to-the-value-of-two-m128i-values
 // thank you Paul! (http://stackoverflow.com/users/253056/paul-r)
 #define _mm256_set_m128i(v0, v1)  _mm256_insertf128_si256(_mm256_castsi128_si256(v1), (v0), 1)

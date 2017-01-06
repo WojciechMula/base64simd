@@ -11,7 +11,7 @@
 #include "encode.swar.cpp"
 #if defined(HAVE_SSE_INSTRUCTIONS)
 #   include "lookup.sse.cpp"
-#   include "encode.sse.cpp"a
+#   include "encode.sse.cpp"
 #endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"

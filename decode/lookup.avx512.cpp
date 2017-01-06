@@ -1,9 +1,4 @@
-#include <cstdint>
-#include <cassert>
 #include <stdexcept>
-
-#include <immintrin.h>
-#include <x86intrin.h>
 
 #define packed_dword(x) _mm512_set1_epi32(x)
 #define packed_byte(x) packed_dword((x) | ((x) << 8) | ((x) << 16) | ((x) << 24))

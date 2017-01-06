@@ -24,7 +24,8 @@ ALL_ARM=verify_arm speed_arm check_arm
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw
-ALL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_ARM)
+ALL_INTEL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW)
+ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM)
 
 all: $(ALL)
 
@@ -119,7 +120,7 @@ speed_arm: $(SPEED_DEPS)
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) check.cpp -o $@
 
-build_all: $(ALL_TARGETS)
+build_all: $(ALL_INTEL_TARGETS)
 verify_all: verify verify_avx2 verify_avx512 verify_avx512bw
 	# only Intel targets
 	sde -cnl -- ./verify

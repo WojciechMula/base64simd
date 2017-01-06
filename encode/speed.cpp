@@ -29,9 +29,9 @@
 #   include "lookup.avx512.cpp"
 #   include "encode.avx512.cpp"
 #endif
-#if defined(HAVE_AVX512_INSTRUCTIONS)
-#   include "lookup.neon.cpp"
-#   include "encode.neon.cpp"
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+#   include "lookup.avx512bw.cpp"
+#   include "encode.avx512bw.cpp"
 #endif
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "lookup.neon.cpp"

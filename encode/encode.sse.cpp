@@ -1,8 +1,3 @@
-#include <immintrin.h>
-#include <x86intrin.h>
-
-#include <cstdint>
-
 namespace base64 {
 
     namespace sse {

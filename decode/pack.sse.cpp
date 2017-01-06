@@ -1,6 +1,3 @@
-#include <immintrin.h>
-#include <x86intrin.h>
-
 /*
     Pack algorithm is responsible for converting from
     four 6-bit indices saved in separate bytes of 32-bit word

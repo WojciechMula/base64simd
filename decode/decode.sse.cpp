@@ -1,10 +1,3 @@
-#include <cstdint>
-#include <cassert>
-
-#include <immintrin.h>
-#include <x86intrin.h>
-
-
 namespace base64 {
 
     namespace sse {
