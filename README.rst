@@ -14,8 +14,9 @@ There are several versions of procedures utilizing following instructions sets:
 * SSE,
 * AVX2,
 * AVX512F,
-* AVX512BW, and
-* BMI2.
+* AVX512BW,
+* BMI2, and
+* ARM Neon (under development).
 
 Vectorization approaches were described in a series of articles:
 
