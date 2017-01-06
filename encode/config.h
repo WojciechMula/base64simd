@@ -11,3 +11,11 @@
 #       define HAVE_AVX2_INSTRUCTIONS
 #   endif
 #endif
+
+#if defined(HAVE_SSE_INSTRUCTIONS) ||       \
+    defined(HAVE_AVX2_INSTRUCTIONS) ||      \
+    defined(HAVE_AVX512_INSTRUCTIONS) ||    \
+    defined(HAVE_AVX512_INSTRUCTIONS)
+
+#   include <immintrin.h>
+#endif

@@ -3,17 +3,20 @@ verify_avx2
 verify_avx512
 verify_avx512bw
 verify_xop
+verify_arm
 
 speed
 speed_avx2
 speed_avx512
 speed_xop
+speed_arm
 
 check
 check_avx2
-check_xop
 check_avx512
 check_avx512bw
+check_xop
+check_arm
 
 unpack_test
 

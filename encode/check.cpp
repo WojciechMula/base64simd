@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cstdint>
 #include <memory>
-#include <immintrin.h>
 
 #include "config.h"
 #include "../gettime.cpp"
@@ -12,8 +11,10 @@
 #include "encode.scalar.cpp"
 #include "lookup.swar.cpp"
 #include "encode.swar.cpp"
-#include "lookup.sse.cpp"
-#include "encode.sse.cpp"
+#if defined(HAVE_SSE_INSTRUCTIONS)
+#   include "lookup.sse.cpp"
+#   include "encode.sse.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "encode.xop.cpp"
 #   include "lookup.xop.cpp"
@@ -38,7 +39,11 @@ class Application final: public ApplicationBase {
 
 public:
     Application(const CommandLine& c)
+#if defined(BUFFER_SIZE)
+        : ApplicationBase(c, BUFFER_SIZE) {}
+#else
         : ApplicationBase(c) {}
+#endif
 
     int run() {
 
@@ -49,6 +54,8 @@ public:
 
         check("scalar64", base64::scalar::encode64, valid);
         check("SWAR (64 bit)", base64::swar::encode, valid);
+
+#if defined(HAVE_SSE_INSTRUCTIONS)
         check("SSE (naive)", sse_naive, valid);
         check("SSE (optimized v1)", sse_optimized1, valid);
         check("SSE (optimized v2)", sse_optimized2, valid);
@@ -59,6 +66,7 @@ public:
         check("SSE (pshufb-based unrolled)", sse_pshufb_unrolled, valid);
         check("SSE (pshuf improved unrolled)",  sse_pshufb_improved_unrolled, valid);
         check("SSE (optimized v2 fully unrolled)", base64::sse::encode_full_unrolled, valid);
+#endif
 #if defined(HAVE_BMI2_INSTRUCTIONS)
         check("SSE & BMI2 (naive)", sse_bmi2_naive, valid);
         check("SSE & BMI2 (optimized)", sse_bmi2_optimized, valid);

@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cstdint>
 #include <memory>
-#include <immintrin.h>
 
 #include "config.h"
 #include "../gettime.cpp"
@@ -12,8 +11,10 @@
 #include "encode.scalar.cpp"
 #include "lookup.swar.cpp"
 #include "encode.swar.cpp"
-#include "lookup.sse.cpp"
-#include "encode.sse.cpp"
+#if defined(HAVE_SSE_INSTRUCTIONS)
+#   include "lookup.sse.cpp"
+#   include "encode.sse.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "encode.xop.cpp"
 #   include "lookup.xop.cpp"
@@ -37,7 +38,11 @@ class Application final: public ApplicationBase {
 
 public:
     Application(const CommandLine& c)
+#if defined(BUFFER_SIZE)
+        : ApplicationBase(c, BUFFER_SIZE) {}
+#else
         : ApplicationBase(c) {}
+#endif
 
     int run() {
         
@@ -57,6 +62,7 @@ public:
             measure("SWAR (64 bit)", base64::swar::encode);
         }
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("sse")) {
             measure("SSE (lookup: naive)", sse_naive);
         }
@@ -96,6 +102,7 @@ public:
         if (cmd.empty() || cmd.has("sse2/fully_unrolled")) {
             measure("SSE (fully unrolled improved lookup)", base64::sse::encode_full_unrolled);
         }
+#endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("bmi1")) {

@@ -9,9 +9,9 @@ protected:
     std::unique_ptr<uint8_t> input;
     std::unique_ptr<uint8_t> output;
 public:
-    ApplicationBase(const CommandLine& c)
+    ApplicationBase(const CommandLine& c, size_t cnt = 64*1024*1024)
         : cmd(c)
-        , count(64*1024*1024)
+        , count(cnt)
         , iterations(10)
         , initialized(false) {}
 

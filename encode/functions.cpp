@@ -1,5 +1,6 @@
 // this file must be included in the function's body
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
 auto sse_naive = [](uint8_t* input, size_t bytes, uint8_t* output) {
     base64::sse::encode(base64::sse::lookup_naive, input, bytes, output);
 };
@@ -35,6 +36,7 @@ auto sse_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
 auto sse_pshufb_improved_unrolled = [](uint8_t* input, size_t bytes, uint8_t* output) {
     base64::sse::encode_unrolled(base64::sse::lookup_pshufb_improved, input, bytes, output);
 };
+#endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
 auto sse_bmi2_naive = [](uint8_t* input, size_t bytes, uint8_t* output) {

@@ -2,14 +2,14 @@ import errno
 import platform
 import subprocess
 
-MACOS=(platform.system()=='Darwin')
 
-class CPUFlags:
+class Base:
     def __init__(self):
         self.flags = set()
 
         try:
-            self.flags = self.__parse_cpuinfo()
+            tmp = self.get_flags() or []
+            self.flags = set(tmp)
         except IOError as e:
             if e.errno == errno.ENOENT:
                 return
@@ -21,18 +21,35 @@ class CPUFlags:
         return name in self.flags
 
 
-    def __parse_cpuinfo(self):
+class Linux(Base):
+    def get_flags(self):
+        with open('/proc/cpuinfo', 'r') as f:
+            for line in f:
+                if line.startswith('flags'):
+                    return line.split()[2:]
 
-        def get_flags():
-            if MACOS:
-                return subprocess.Popen("sysctl -n machdep.cpu ".split(),  stdout=subprocess.PIPE).communicate()[0].decode("utf-8").lower().split()
-            else :
-                with open('/proc/cpuinfo', 'r') as f:
-                    for line in f:
-                        if line.startswith('flags'):
-                            return line.split()[2:]
-        return set(get_flags())
 
+class ARM(Base):
+    def get_flags(self):
+        with open('/proc/cpuinfo', 'r') as f:
+            for line in f:
+                if line.startswith('Features'):
+                    return line.split()[2:]
+
+
+class MacOS(Base):
+    def get_flags(self):
+        return subprocess.Popen("sysctl -n machdep.cpu ".split(),  stdout=subprocess.PIPE).communicate()[0].decode("utf-8").lower().split()
+
+
+
+if platform.system() == 'Darwin':
+    CPUFlags = MacOS
+else:
+    if platform.machine().startswith('arm'):
+        CPUFlags = ARM
+    else:
+        CPUFlags = Linux
 
 def main():
 

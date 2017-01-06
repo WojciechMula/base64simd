@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <cstdint>
 #include <cassert>
@@ -6,10 +7,12 @@
 #include "config.h"
 #include "encode.scalar.cpp"
 #include "lookup.reference.cpp"
-#include "lookup.sse.cpp"
-#include "encode.sse.cpp"
 #include "lookup.swar.cpp"
 #include "encode.swar.cpp"
+#if defined(HAVE_SSE_INSTRUCTIONS)
+#   include "lookup.sse.cpp"
+#   include "encode.sse.cpp"a
+#endif
 #if defined(HAVE_AVX2_INSTRUCTIONS)
 #   include "lookup.avx2.cpp"
 #   include "encode.avx2.cpp"
@@ -99,6 +102,7 @@ void test_swar(const char* name, LOOKUP_FN fn) {
 }
 
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
 template<typename LOOKUP_FN>
 void test_sse(const char* name, LOOKUP_FN fn) {
 
@@ -142,6 +146,7 @@ void test_sse(const char* name, LOOKUP_FN fn) {
 
     puts("OK");
 }
+#endif
 
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
@@ -250,11 +255,13 @@ int validate_lookup() {
 
     test_swar("SWAR (64 bit)", base64::swar::lookup_incremental_logic);
 
+#if defined(HAVE_SSE_INSTRUCTIONS)
     test_sse("SSE implementation of naive algorithm", base64::sse::lookup_naive);
     test_sse("SSE implementation of optimized algorithm (ver 1)", base64::sse::lookup_version1);
     test_sse("SSE implementation of optimized algorithm (ver 2)", base64::sse::lookup_version2);
     test_sse("SSE pshufb-based algorithm", base64::sse::lookup_pshufb);
     test_sse("SSE pshufb improved algorithm", base64::sse::lookup_pshufb_improved);
+#endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
     test_sse("XOP implementation", base64::xop::lookup);
@@ -313,6 +320,7 @@ void validate_encoding() {
 
     validate_encoding("SWAR", base64::swar::encode);
 
+#ifdef HAVE_SSE_INSTRUCTIONS
     auto sse = [](const uint8_t* input, size_t bytes, uint8_t* output) {
         base64::sse::encode(base64::sse::lookup_naive, input, bytes, output);
     };
@@ -324,6 +332,7 @@ void validate_encoding() {
     validate_encoding("SSE", sse);
     validate_encoding("SSE (unrolled)", sse_unrolled);
     validate_encoding("SSE (fully unrolled)", base64::sse::encode_full_unrolled);
+
     #ifdef HAVE_BMI2_INSTRUCTIONS
         auto sse_bmi2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
             base64::sse::encode_bmi2(base64::sse::lookup_naive, input, bytes, output);
@@ -331,6 +340,7 @@ void validate_encoding() {
 
         validate_encoding("SSE + BMI2", sse_bmi2);
     #endif
+#endif
 
 #ifdef HAVE_AVX2_INSTRUCTIONS
     auto avx2 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
