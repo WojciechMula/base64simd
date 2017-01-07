@@ -1,0 +1,40 @@
+improved scalar, N/A, N/A, 0.24282
+scalar, N/A, N/A, 0.49171
+ARM NEON, byte blend, N/A, 0.14307
+ARM NEON, pshufb bitmask, N/A, 0.10579
+improved scalar, N/A, N/A, 0.24250
+scalar, N/A, N/A, 0.49166
+ARM NEON, byte blend, N/A, 0.14302
+ARM NEON, pshufb bitmask, N/A, 0.10574
+improved scalar, N/A, N/A, 0.24268
+scalar, N/A, N/A, 0.49170
+ARM NEON, byte blend, N/A, 0.14302
+ARM NEON, pshufb bitmask, N/A, 0.10588
+improved scalar, N/A, N/A, 0.24375
+scalar, N/A, N/A, 0.49271
+ARM NEON, byte blend, N/A, 0.14523
+ARM NEON, pshufb bitmask, N/A, 0.10616
+improved scalar, N/A, N/A, 0.24263
+scalar, N/A, N/A, 0.49168
+ARM NEON, byte blend, N/A, 0.14298
+ARM NEON, pshufb bitmask, N/A, 0.10574
+improved scalar, N/A, N/A, 0.24359
+scalar, N/A, N/A, 0.49272
+ARM NEON, byte blend, N/A, 0.14524
+ARM NEON, pshufb bitmask, N/A, 0.10630
+improved scalar, N/A, N/A, 0.24252
+scalar, N/A, N/A, 0.49157
+ARM NEON, byte blend, N/A, 0.14301
+ARM NEON, pshufb bitmask, N/A, 0.10582
+improved scalar, N/A, N/A, 0.24247
+scalar, N/A, N/A, 0.49163
+ARM NEON, byte blend, N/A, 0.14308
+ARM NEON, pshufb bitmask, N/A, 0.10580
+improved scalar, N/A, N/A, 0.24368
+scalar, N/A, N/A, 0.49266
+ARM NEON, byte blend, N/A, 0.14526
+ARM NEON, pshufb bitmask, N/A, 0.10631
+improved scalar, N/A, N/A, 0.24284
+scalar, N/A, N/A, 0.49170
+ARM NEON, byte blend, N/A, 0.14303
+ARM NEON, pshufb bitmask, N/A, 0.10578

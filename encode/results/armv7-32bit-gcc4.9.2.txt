@@ -1,0 +1,25 @@
+input size: 201326592
+scalar (32 bit)                         ... 1.06887
+ARM NEON (naive lookup)                 ... 0.43345 (speedup 2.47)
+ARM NEON (optimized lookup)             ... 0.38460 (speedup 2.78)
+ARM NEON (pshufb improved lookup)       ... 0.32182 (speedup 3.32)
+input size: 201326592
+scalar (32 bit)                         ... 1.09007
+ARM NEON (naive lookup)                 ... 0.43296 (speedup 2.52)
+ARM NEON (optimized lookup)             ... 0.38450 (speedup 2.84)
+ARM NEON (pshufb improved lookup)       ... 0.32159 (speedup 3.39)
+input size: 201326592
+scalar (32 bit)                         ... 1.08991
+ARM NEON (naive lookup)                 ... 0.43353 (speedup 2.51)
+ARM NEON (optimized lookup)             ... 0.38470 (speedup 2.83)
+ARM NEON (pshufb improved lookup)       ... 0.32139 (speedup 3.39)
+input size: 201326592
+scalar (32 bit)                         ... 1.08405
+ARM NEON (naive lookup)                 ... 0.43360 (speedup 2.50)
+ARM NEON (optimized lookup)             ... 0.38504 (speedup 2.82)
+ARM NEON (pshufb improved lookup)       ... 0.32176 (speedup 3.37)
+input size: 201326592
+scalar (32 bit)                         ... 1.08167
+ARM NEON (naive lookup)                 ... 0.43361 (speedup 2.49)
+ARM NEON (optimized lookup)             ... 0.38450 (speedup 2.81)
+ARM NEON (pshufb improved lookup)       ... 0.32151 (speedup 3.36)
