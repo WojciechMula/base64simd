@@ -16,7 +16,7 @@ There are several versions of procedures utilizing following instructions sets:
 * AVX512F,
 * AVX512BW,
 * BMI2, and
-* ARM Neon (under development).
+* ARM Neon.
 
 Vectorization approaches were described in a series of articles:
 
@@ -49,16 +49,22 @@ Building
 --------------------------------------------------
 
 Type ``make`` to build ``verify``, ``check`` and ``speed`` program.  The
-programs support only scalar, SSE and BMI versions of procedures.
+programs support only scalar, SSE and BMI procedures.
 
 Type ``make avx2`` to build ``verify_avx2``, ``check_avx2`` and ``speed_avx2``.
-The programs additionally support AVX2 variants
+The programs additionally support AVX2 procedures.
 
 Type ``make avx512`` to build ``verify_avx512``, ``check_avx512`` and
-``speed_avx512``.  The programs support also AVX512F variants.
+``speed_avx512``.  The programs support also AVX512F procedures.
 
 Type ``make avx512BW`` to build ``verify_avx512BW``, ``check_avx512BW`` and
-``speed_avx512BW``.  The programs support also AVX512BW variants.
+``speed_avx512BW``.  The programs support also AVX512BW procedures.
+
+Type ``make xop`` to build ``verify_xop``, ``check_xop`` and ``speed_xop``.
+The programs support scalar, SSE and AMD XOP procedures.
+
+Type ``make arm`` to build ``verify_arm``, ``check_arm`` and ``speed_arm``.
+The programs support scalar, ARM Neon procedures.
 
 Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
 to run all programs.
