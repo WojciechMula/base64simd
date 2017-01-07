@@ -4,9 +4,8 @@ namespace base64 {
     namespace neon {
 
 #define packed_byte(x) vdup_n_u8(x)
-#define has_zero_byte(v) (((v) - 0x01010101UL) & ~(v) & 0x80808080UL)
 
-        uint8x8_t lookup_byte_blend(const uint8x8_t input) {
+        uint8x8_t lookup_byte_blend(const uint8x8_t input, uint8x8_t& error) {
 
             uint8x8_t shift;
 
@@ -33,18 +32,12 @@ namespace base64 {
             const uint8x8_t eq_slash = vceq_u8(input, packed_byte('/'));
             shift = vbsl_u8(eq_slash, packed_byte(16), shift);
 
-            // XXX: this is very slow, need to figure out how to speed it up
-            const uint32_t lo = vget_lane_u32(vreinterpret_u32_u8(shift), 0);
-            const uint32_t hi = vget_lane_u32(vreinterpret_u32_u8(shift), 1);
-            if (has_zero_byte(lo) || has_zero_byte(hi)) {
-                throw invalid_input(0, 0);
-            }
+            error = vceq_u8(shift, packed_byte(0));
 
             return vadd_u8(input, shift);
         }
 
 #undef packed_byte
-#undef has_zero_byte
 
     } // namespace sse
 

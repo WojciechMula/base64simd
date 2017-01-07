@@ -14,18 +14,40 @@ namespace base64 {
             uint8x8_t field_c;
             uint8x8_t field_d;
 
+            uint8x8_t error_a;
+            uint8x8_t error_b;
+            uint8x8_t error_c;
+            uint8x8_t error_d;
+
+            union {
+                uint8_t  error_mem[8];
+                uint32_t error_word[2];
+            };
+
             uint8x8x3_t result;
 
             for (size_t i=0; i < size; i += 8*4) {
 
                 const uint8x8x4_t in = vld4_u8(input + i);
 
-                try {
-                    field_a = lookup(in.val[0]);
-                    field_b = lookup(in.val[1]);
-                    field_c = lookup(in.val[2]);
-                    field_d = lookup(in.val[3]);
-                } catch (invalid_input& e) {
+                field_a = lookup(in.val[0], error_a);
+                field_b = lookup(in.val[1], error_b);
+                field_c = lookup(in.val[2], error_c);
+                field_d = lookup(in.val[3], error_d);
+
+                /*
+                    Due to long trip between the Neon and the core units,
+                    it's easier to use temporary memory.
+
+                    A lookup procedre prepares the vector of errors, where non-zero
+                    byte means errors. Later we merge them and store in the buffer.
+                    Then just one comparision is needed to determine if there were
+                    any error.
+                */
+                const uint8x8_t error = vorr_u8(vorr_u8(error_a, error_b), vorr_u8(error_c, error_d));
+
+                vst1_u8(error_mem, error);
+                if (error_word[0] | error_word[1]) {
 
                     for (size_t j=0; j < 8*4; j++) {
                         if (base64::scalar::lookup[input[i + j]] == 0xff) {
