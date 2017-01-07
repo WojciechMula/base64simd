@@ -17,6 +17,7 @@ namespace base64 {
                 
                 const uint8x16x3_t in = vld3q_u8(input + i);
 
+#if 1
                 const uint8x16_t field_a = vshrq_n_u8(in.val[0], 2);
                 const uint8x16_t field_b = vandq_u8(
                                             vorrq_u8(vshrq_n_u8(in.val[1], 4), vshlq_n_u8(in.val[0], 4)),
@@ -25,6 +26,19 @@ namespace base64 {
                                             vorrq_u8(vshrq_n_u8(in.val[2], 6), vshlq_n_u8(in.val[1], 2)),
                                             packed_byte(0x3f));
                 const uint8x16_t field_d = vandq_u8(in.val[2], packed_byte(0x3f));
+#else
+                // It's not faster, although we saved two instructions
+                const uint8x16_t field_a = vshrq_n_u8(in.val[0], 2);
+                const uint8x16_t field_b = vbslq_u8(
+                                            packed_byte(0x30),          // [0011_0000]
+                                            vshlq_n_u8(in.val[0], 4),   // [aabb_0000]
+                                            vshrq_n_u8(in.val[1], 4));  // [0000_bbbb]
+                const uint8x16_t field_c = vbslq_u8(
+                                            packed_byte(0x3c),          // [0011_1100] 
+                                            vshlq_n_u8(in.val[1], 2),   // [bbcc_cc00]
+                                            vshrq_n_u8(in.val[2], 6));  // [0000_00cc]
+                const uint8x16_t field_d = vandq_u8(in.val[2], packed_byte(0x3f));
+#endif
 
                 uint8x16x4_t result;
                 result.val[0] = lookup(field_a);
