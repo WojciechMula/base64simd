@@ -99,7 +99,7 @@ speed_xop: $(SPEED_DEPS) *.xop.cpp
 	$(CXX) $(FLAGS_XOP) speed.cpp -o $@
 
 speed_arm: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 speed.cpp -o $@
+	$(CXX) $(FLAGS_ARM) speed.cpp -o $@
 
 
 CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
