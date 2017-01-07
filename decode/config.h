@@ -14,7 +14,10 @@
 #   endif
 #endif
 
-#if !defined(HAVE_NEON_INSTRUCTIONS)
+#if defined(HAVE_NEON_INSTRUCTIONS)
+#   include <arm_neon.h>
+#   include "../neon.h"
+#else
 #   include <immintrin.h>
 #   include <x86intrin.h>
 #endif
