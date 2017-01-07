@@ -296,7 +296,7 @@ int test() {
     RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
 
 #define RUN_NEON_TEMPLATE2(name, decode_fn, lookup_fn) \
-    RUN_TEMPLATE1(64, 48, name, decode_fn, lookup_fn)
+    RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
 
 #if defined(HAVE_SSE_INSTRUCTIONS)
     {
