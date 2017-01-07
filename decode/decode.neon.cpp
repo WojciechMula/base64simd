@@ -39,9 +39,9 @@ namespace base64 {
                     Due to long trip between the Neon and the core units,
                     it's easier to use temporary memory.
 
-                    A lookup procedre prepares the vector of errors, where non-zero
+                    A lookup procedure prepares the vector of errors, where non-zero
                     byte means errors. Later we merge them and store in the buffer.
-                    Then just one comparision is needed to determine if there were
+                    Then just one comparison is needed to determine if there were
                     any error.
                 */
                 const uint8x8_t error = vorr_u8(vorr_u8(error_a, error_b), vorr_u8(error_c, error_d));

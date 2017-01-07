@@ -96,6 +96,7 @@ RUN("scalar", base64::scalar::decode_lookup1);
     using namespace base64::neon;
 
     RUN_SSE_TEMPLATE1("neon/1", decode, lookup_byte_blend);
+    RUN_SSE_TEMPLATE1("neon/2", decode, lookup_pshufb_bitmask);
     }
 #endif // HAVE_NEON_INSTRUCTIONS
 

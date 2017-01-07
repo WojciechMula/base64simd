@@ -375,6 +375,7 @@ int test() {
     {
     using namespace base64::neon;
     RUN_NEON_TEMPLATE2("neon/1", decode, lookup_byte_blend);
+    RUN_NEON_TEMPLATE2("neon/2", decode, lookup_pshufb_bitmask);
     }
 #endif // HAVE_NEON_INSTRUCTIONS
     return 0;

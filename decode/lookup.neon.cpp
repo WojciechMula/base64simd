@@ -5,7 +5,7 @@ namespace base64 {
 
 #define packed_byte(x) vdup_n_u8(x)
 
-        uint8x8_t lookup_byte_blend(const uint8x8_t input, uint8x8_t& error) {
+        uint8x8_t FORCE_INLINE lookup_byte_blend(const uint8x8_t input, uint8x8_t& error) {
 
             uint8x8_t shift;
 
@@ -35,6 +35,44 @@ namespace base64 {
             error = vceq_u8(shift, packed_byte(0));
 
             return vadd_u8(input, shift);
+        }
+
+
+        uint8x8_t FORCE_INLINE lookup_pshufb_bitmask(const uint8x8_t input, uint8x8_t& error) {
+
+            const uint8x8_t higher_nibble = vshr_n_u8(input, 4);
+            const uint8x8_t lower_nibble  = vand_u8(input, packed_byte(0x0f));
+
+            const uint8x8x2_t shiftLUT = {
+                0,   0,  19,   4, uint8_t(-65), uint8_t(-65), uint8_t(-71), uint8_t(-71),
+                0,   0,   0,   0,   0,   0,   0,   0};
+
+            const uint8x8x2_t maskLUT  = {
+                /* 0        : 0b1010_1000*/ 0xa8,
+                /* 1 .. 9   : 0b1111_1000*/ 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8, 0xf8,
+                /* 10       : 0b1111_0000*/ 0xf0,
+                /* 11       : 0b0101_0100*/ 0x54,
+                /* 12 .. 14 : 0b0101_0000*/ 0x50, 0x50, 0x50,
+                /* 15       : 0b0101_0100*/ 0x54
+            };
+
+            const uint8x8x2_t bitposLUT = {
+                0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+            };
+
+            const uint8x8_t sh     = vtbl2_u8(shiftLUT,  higher_nibble);
+            const uint8x8_t eq_2f  = vceq_u8(input, packed_byte(0x2f));
+            const uint8x8_t shift  = vbsl_u8(eq_2f, packed_byte(16), sh);
+
+            const uint8x8_t M      = vtbl2_u8(maskLUT,   lower_nibble);
+            const uint8x8_t bit    = vtbl2_u8(bitposLUT, higher_nibble);
+
+            error = vceq_u8(vand_u8(M, bit), packed_byte(0));
+
+            const uint8x8_t result = vadd_u8(input, shift);
+
+            return result;
         }
 
 #undef packed_byte
