@@ -334,14 +334,14 @@ namespace base64 {
                 0,   0,   0,   0,   0,   0,   0,   0);
 
             const __m128i maskLUT  = _mm_setr_epi8(
-                /* 0        */ char(0b10101000),
-                /* 1 .. 9   */ char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
-                               char(0b11111000), char(0b11111000), char(0b11111000), char(0b11111000),
-                               char(0b11111000),
-                /* 10       */ char(0b11110000),
-                /* 11       */ char(0b01010100),
-                /* 12 .. 14 */ char(0b01010000), char(0b01010000), char(0b01010000),
-                /* 15       */ char(0b01010100)
+                /* 0        : 0b1010_1000*/ char(0xa8),
+                /* 1 .. 9   : 0b1111_1000*/ char(0xf8), char(0xf8), char(0xf8), char(0xf8),
+                                            char(0xf8), char(0xf8), char(0xf8), char(0xf8),
+                                            char(0xf8),
+                /* 10       : 0b1111_0000*/ char(0xf0),
+                /* 11       : 0b0101_0100*/ 0x54,
+                /* 12 .. 14 : 0b0101_0000*/ 0x50, 0x50, 0x50,
+                /* 15       : 0b0101_0100*/ 0x54
             );
 
             const __m128i bitposLUT = _mm_setr_epi8(
