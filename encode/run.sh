@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [[ $1 == "avx2" ]]
+if [[ $1 != "" ]]
 then
-    prog=./speed_avx2
+    prog=./speed_$1
 else
     prog=./speed
 fi

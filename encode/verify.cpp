@@ -258,7 +258,7 @@ void test_neon(const char* name, LOOKUP_FN fn) {
     printf("%s... ", name);
     fflush(stdout);
 
-    const size_t N = 8;
+    const size_t N = 16;
 
     uint8_t input[N];
     uint8_t output[N];
@@ -273,10 +273,10 @@ void test_neon(const char* name, LOOKUP_FN fn) {
 
             input[byte] = i;
 
-            uint8x8_t in  = vld1_u8(input);
-            uint8x8_t out = fn(in);
+            uint8x16_t in  = vld1q_u8(input);
+            uint8x16_t out = fn(in);
 
-            vst1_u8(output, out);
+            vst1q_u8(output, out);
 
             for (unsigned j=0; j < N; j++) {
 
