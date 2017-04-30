@@ -15,6 +15,7 @@ There are several versions of procedures utilizing following instructions sets:
 * AVX2,
 * AVX512F,
 * AVX512BW,
+* AVX512VL,
 * BMI2, and
 * ARM Neon.
 

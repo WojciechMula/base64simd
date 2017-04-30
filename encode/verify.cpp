@@ -26,6 +26,9 @@
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "encode.avx512bw.cpp"
 #endif
+#if defined(HAVE_AVX512VL_INSTRUCTIONS)
+#   include "encode.avx512vl.cpp"
+#endif
 #if defined(HAVE_XOP_INSTRUCTIONS)
 #   include "lookup.xop.cpp"
 #   include "encode.xop.cpp"
@@ -444,6 +447,10 @@ void validate_encoding() {
 
 #ifdef HAVE_AVX512BW_INSTRUCTIONS
     validate_encoding("AVX512BW", base64::avx512bw::encode);
+#endif
+
+#ifdef HAVE_AVX512VL_INSTRUCTIONS
+    validate_encoding("AVX512VL", base64::avx512vl::encode);
 #endif
 
 #ifdef HAVE_XOP_INSTRUCTIONS

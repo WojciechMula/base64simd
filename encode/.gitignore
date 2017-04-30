@@ -2,6 +2,7 @@ verify
 verify_avx2
 verify_avx512
 verify_avx512bw
+verify_avx512vl
 verify_xop
 verify_arm
 
@@ -15,6 +16,7 @@ check
 check_avx2
 check_avx512
 check_avx512bw
+check_avx512vl
 check_xop
 check_arm
 

@@ -32,6 +32,9 @@
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "encode.avx512bw.cpp"
 #endif
+#if defined(HAVE_AVX512VL_INSTRUCTIONS)
+#   include "encode.avx512vl.cpp"
+#endif
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "lookup.neon.cpp"
 #   include "encode.neon.cpp"
@@ -93,6 +96,9 @@ public:
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
         check("AVX512BW (improved splitting)", avx512bw, valid);
+#endif
+#if defined(HAVE_AVX512VL_INSTRUCTIONS)
+        check("AVX512VL", avx512vl, valid);
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         check("AVX512 (gather)", avx512_gathers, valid);
