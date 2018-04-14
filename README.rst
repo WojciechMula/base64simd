@@ -15,6 +15,7 @@ There are several versions of procedures utilizing following instructions sets:
 * AVX2,
 * AVX512F,
 * AVX512BW,
+* AVX512VBMI,
 * AVX512VL,
 * BMI2, and
 * ARM Neon.
@@ -53,13 +54,18 @@ Type ``make`` to build ``verify``, ``check`` and ``speed`` program.  The
 programs support only scalar, SSE and BMI procedures.
 
 Type ``make avx2`` to build ``verify_avx2``, ``check_avx2`` and ``speed_avx2``.
-The programs additionally support AVX2 procedures.
+The programs support SSE, BMI2 and AVX2 procedures.
 
 Type ``make avx512`` to build ``verify_avx512``, ``check_avx512`` and
-``speed_avx512``.  The programs support also AVX512F procedures.
+``speed_avx512``.  The programs support SSE, BMI2, AVX2, AVX512F procedures.
 
-Type ``make avx512BW`` to build ``verify_avx512BW``, ``check_avx512BW`` and
-``speed_avx512BW``.  The programs support also AVX512BW procedures.
+Type ``make avx512bw`` to build ``verify_avx512bw``, ``check_avx512bw`` and
+``speed_avx512bw``.  The programs support SSE, BMI2, AVX2, AVX512F and AVX512BW
+procedures.
+
+Type ``make avx512vbmi`` to build ``verify_avx512vbmi``, ``check_avx512vbmi``
+and ``speed_avx512vbmi``.  The programs support also SSE, BMI2, AVX2, AVX512F,
+AVX512BW and AVX512VBMI procedures.
 
 Type ``make xop`` to build ``verify_xop``, ``check_xop`` and ``speed_xop``.
 The programs support scalar, SSE and AMD XOP procedures.
@@ -81,8 +87,8 @@ To compile AVX512 versions of the programs at least GCC 5.3 is required.
 GCC 4.9.2 hasn't got AVX512 support.
 
 Please download `Intel Software Development Emulator`__ in order to run AVX512
-variants via ``make run_avx512`` or ``run_avx512bw``.  The emulator path should
-be added to the ``PATH``.
+variants via ``make run_avx512``, ``run_avx512bw`` or ``run_avx512vbmi``.
+The emulator path should be added to the ``PATH``.
 
 __ https://software.intel.com/en-us/articles/intel-software-development-emulator
 
