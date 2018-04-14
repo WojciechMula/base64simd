@@ -196,7 +196,7 @@ public:
 
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
         if (cmd.empty() || cmd.has("avx512bw/optimized2")) {
-            measure("AVX512 (incremental logic)", avx512bw_optimized2);
+            measure("AVX512BW (lookup: optimized2)", avx512bw_optimized2);
         }
 #endif
 
