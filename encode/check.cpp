@@ -101,6 +101,7 @@ public:
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
         check("AVX512BW (optimized v2)", avx512bw_optimized2, valid);
+        check("AVX512BW (pshufb improved)", avx512bw_pshufb_improved, valid);
 #endif
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
         check("AVX512VBMI (improved splitting)", avx512vbmi, valid);

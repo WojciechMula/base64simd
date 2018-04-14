@@ -200,6 +200,10 @@ public:
         if (cmd.empty() || cmd.has("avx512bw/optimized2")) {
             measure("AVX512BW (lookup: optimized2)", avx512bw_optimized2);
         }
+
+        if (cmd.empty() || cmd.has("avx512bw/pshufb_improved")) {
+            measure("AVX512BW (lookup: pshufb improved)", avx512bw_pshufb_improved);
+        }
 #endif
 
 #if defined(HAVE_NEON_INSTRUCTIONS)

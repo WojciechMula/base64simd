@@ -342,6 +342,7 @@ int validate_lookup() {
 
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
     test_avx512("AVX512BW implementation of optimized algorithm (ver 2)", base64::avx512bw::lookup_version2);
+    test_avx512("AVX512BW pshufb improved algorithm", base64::avx512bw::lookup_pshufb_improved);
 #endif
 
 #if defined(HAVE_NEON_INSTRUCTIONS)
