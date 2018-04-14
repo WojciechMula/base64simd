@@ -30,7 +30,9 @@
 #   include "encode.avx512.cpp"
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
+#   include "encode.avx512bw.cpp"
 #   include "lookup.avx512bw.cpp"
+#   include "unpack.avx512bw.cpp"
 #endif
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
 #   include "encode.avx512vbmi.cpp"
