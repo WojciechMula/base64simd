@@ -1,6 +1,6 @@
 namespace base64 {
 
-    namespace avx512bw {
+    namespace avx512vbmi {
 
         namespace precalc {
 
@@ -63,6 +63,6 @@ namespace base64 {
 #undef packed_byte
         }
 
-    } // namespace avx512bw
+    } // namespace avx512vbmi
 
 } // namespace base64

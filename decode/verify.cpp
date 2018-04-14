@@ -17,8 +17,8 @@
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 #   include "decoders.avx512.cpp"
 #endif
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
-#   include "decoders.avx512bw.cpp"
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+#   include "decoders.avx512vbmi.cpp"
 #endif
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "decoders.neon.cpp"
@@ -364,12 +364,12 @@ int test() {
     }
 #endif // HAVE_AVX512_INSTRUCTIONS
 
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
     {
-    using namespace base64::avx512bw;
-    RUN_TEMPLATE2(64, 48, "avx512bw", decode, lookup, pack_madd)
+    using namespace base64::avx512vbmi;
+    RUN_TEMPLATE2(64, 48, "avx512vbmi", decode, lookup, base64::avx512bw::pack_madd)
     }
-#endif // HAVE_AVX512BW_INSTRUCTIONS
+#endif // HAVE_AVX512VBMI_INSTRUCTIONS
 
 #if defined(HAVE_NEON_INSTRUCTIONS)
     {
@@ -389,8 +389,8 @@ int main() {
 #if defined(HAVE_AVX512_INSTRUCTIONS)
     base64::avx512::prepare_lookups();
 #endif
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
-    base64::avx512bw::prepare_lookups();
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+    base64::avx512vbmi::prepare_lookups();
 #endif
 
 

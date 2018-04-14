@@ -110,8 +110,8 @@ void FunctionRegistry::build() {
     add("avx2_bmi2/2", "AVX2 & BMI2", "byte blend", "N/A");
 #   endif
 #endif
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
-    add("avx512bw", "AVX512BW", "N/A", "multiply-add");
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+    add("avx512vbmi", "AVX512VBMI", "N/A", "multiply-add");
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
     add("avx512/1", "AVX512 (gather)",            "N/A",        "N/A");

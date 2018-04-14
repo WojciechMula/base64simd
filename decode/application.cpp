@@ -31,9 +31,9 @@ protected:
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         base64::avx512::prepare_lookups();
 #endif // HAVE_AVX512_INSTRUCTIONS
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
-        base64::avx512bw::prepare_lookups();
-#endif // HAVE_AVX512BW_INSTRUCTIONS
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+        base64::avx512vbmi::prepare_lookups();
+#endif // HAVE_AVX512VBMI_INSTRUCTIONS
 
         input.reset (new uint8_t[get_input_size()]);
         output.reset(new uint8_t[get_output_size() + 64]);

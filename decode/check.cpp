@@ -21,8 +21,8 @@
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 #   include "decoders.avx512.cpp"
 #endif
-#if defined(HAVE_AVX512BW_INSTRUCTIONS)
-#   include "decoders.avx512bw.cpp"
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+#   include "decoders.avx512vbmi.cpp"
 #endif
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "decoders.neon.cpp"
