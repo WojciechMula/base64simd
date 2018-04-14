@@ -83,6 +83,14 @@ RUN("scalar", base64::scalar::decode_lookup1);
     }
 #endif // HAVE_AVX512_INSTRUCTIONS
 
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+    {
+    using namespace base64::avx512bw;
+
+    RUN_AVX2_TEMPLATE2("avx512bw", decode, lookup_pshufb_bitmask, pack_madd);
+    }
+#endif // HAVE_AVX512VBMI_INSTRUCTIONS
+
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
     {
     using namespace base64::avx512vbmi;

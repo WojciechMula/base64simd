@@ -1,4 +1,3 @@
-#include "pack.avx512bw.cpp"
 #include "lookup.avx512vbmi.cpp"
 #include "decode.avx512vbmi.cpp"
 

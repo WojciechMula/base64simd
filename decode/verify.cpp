@@ -17,6 +17,9 @@
 #if defined(HAVE_AVX512_INSTRUCTIONS)
 #   include "decoders.avx512.cpp"
 #endif
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+#   include "decoders.avx512bw.cpp"
+#endif
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
 #   include "decoders.avx512vbmi.cpp"
 #endif
@@ -75,9 +78,10 @@ private:
         fn(input, bytes, output);
 
         if (output[0] != uint8_t(out[0]) || output[1] != uint8_t(out[1]) || output[2] != uint8_t(out[2])) {
-            printf("\ninvalid output %02x %02x %02x, expected %02x %02x %02x\n",
+            printf("\ninvalid output %02x %02x %02x, expected %02x %02x %02x (input: %c%c%c%c\n",
                         output[0], output[1], output[2],
-                        uint8_t(out[0]), uint8_t(out[1]), uint8_t(out[2]));
+                        uint8_t(out[0]), uint8_t(out[1]), uint8_t(out[2]),
+                        in[0], in[1], in[2], in[3]);
             return false;
         }
 
@@ -111,7 +115,7 @@ private:
                     try {
                         fn(input, bytes, output);
 
-                        printf("function should return error for invalid input %02x\n", k);
+                        printf("function should return error for invalid input %02x (at pos %u)\n", k, current);
                         dump_input();
                         return false;
                     } catch (base64::invalid_input& e) {
@@ -363,6 +367,13 @@ int test() {
     RUN_TEMPLATE2(64, 48, "avx512/2", decode, lookup_comparisons, pack_improved);
     }
 #endif // HAVE_AVX512_INSTRUCTIONS
+
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+    {
+    using namespace base64::avx512bw;
+    RUN_TEMPLATE2(64, 48, "avx512bw", decode, lookup_pshufb_bitmask, pack_madd)
+    }
+#endif // HAVE_AVX512VBMI_INSTRUCTIONS
 
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
     {
