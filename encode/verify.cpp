@@ -25,6 +25,7 @@
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "lookup.avx512bw.cpp"
+#   include "unpack.avx512bw.cpp"
 #endif
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
 #   include "encode.avx512vbmi.cpp"
@@ -450,6 +451,10 @@ void validate_encoding() {
     validate_encoding("AVX512", avx512);
     validate_encoding("AVX512 (lookup gather)", avx512_lookup_gather);
     validate_encoding("AVX512 (load gather)", avx512_load_gather);
+#endif
+
+#ifdef HAVE_AVX512BW_INSTRUCTIONS
+    validate_encoding("AVX512BW (unpack)", base64::avx512vbmi::encode);
 #endif
 
 #ifdef HAVE_AVX512VBMI_INSTRUCTIONS
