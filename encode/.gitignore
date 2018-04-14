@@ -2,6 +2,7 @@ verify
 verify_avx2
 verify_avx512
 verify_avx512bw
+verify_avx512vbmi
 verify_avx512vl
 verify_xop
 verify_arm
@@ -9,6 +10,7 @@ verify_arm
 speed
 speed_avx2
 speed_avx512
+speed_avx512bw
 speed_xop
 speed_arm
 
@@ -16,6 +18,7 @@ check
 check_avx2
 check_avx512
 check_avx512bw
+check_avx512vbmi
 check_avx512vl
 check_xop
 check_arm

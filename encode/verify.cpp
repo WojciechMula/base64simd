@@ -24,7 +24,10 @@
 #   include "encode.avx512.cpp"
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-#   include "encode.avx512bw.cpp"
+#   include "lookup.avx512bw.cpp"
+#endif
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+#   include "encode.avx512vbmi.cpp"
 #endif
 #if defined(HAVE_AVX512VL_INSTRUCTIONS)
 #   include "encode.avx512vl.cpp"
@@ -335,6 +338,10 @@ int validate_lookup() {
     test_avx512("AVX512F (binary search)", base64::avx512::lookup_binary_search);
 #endif
 
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+    test_avx512("AVX512BW implementation of optimized algorithm (ver 2)", base64::avx512bw::lookup_version2);
+#endif
+
 #if defined(HAVE_NEON_INSTRUCTIONS)
     test_neon("ARM NEON implementation of naive algorithm", base64::neon::lookup_naive);
     test_neon("ARM NEON implementation of optimized algorithm", base64::neon::lookup_version2);
@@ -445,8 +452,8 @@ void validate_encoding() {
     validate_encoding("AVX512 (load gather)", avx512_load_gather);
 #endif
 
-#ifdef HAVE_AVX512BW_INSTRUCTIONS
-    validate_encoding("AVX512BW", base64::avx512bw::encode);
+#ifdef HAVE_AVX512VBMI_INSTRUCTIONS
+    validate_encoding("AVX512VBMI", base64::avx512vbmi::encode);
 #endif
 
 #ifdef HAVE_AVX512VL_INSTRUCTIONS

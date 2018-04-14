@@ -88,7 +88,7 @@ namespace avx512f_swar {
         return _mm512_srli_epi32(MSB, 5);
     }
 
-} // namespace avx512f
+} // namespace avx512f_swar
 
 #undef packed_dword
 #undef packed_byte

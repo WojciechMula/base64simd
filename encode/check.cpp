@@ -30,7 +30,10 @@
 #   include "encode.avx512.cpp"
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-#   include "encode.avx512bw.cpp"
+#   include "lookup.avx512bw.cpp"
+#endif
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+#   include "encode.avx512vbmi.cpp"
 #endif
 #if defined(HAVE_AVX512VL_INSTRUCTIONS)
 #   include "encode.avx512vl.cpp"
@@ -95,7 +98,10 @@ public:
     #endif
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-        check("AVX512BW (improved splitting)", avx512bw, valid);
+        check("AVX512BW (optimized v2)", avx512bw_optimized2, valid);
+#endif
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+        check("AVX512VBMI (improved splitting)", avx512vbmi, valid);
 #endif
 #if defined(HAVE_AVX512VL_INSTRUCTIONS)
         check("AVX512VL", avx512vl, valid);

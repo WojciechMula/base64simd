@@ -31,7 +31,9 @@
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
 #   include "lookup.avx512bw.cpp"
-#   include "encode.avx512bw.cpp"
+#endif
+#if defined(HAVE_AVX512BMI_INSTRUCTIONS)
+#   include "lookup.avx512vbmi.cpp"
 #endif
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "lookup.neon.cpp"
@@ -189,6 +191,12 @@ public:
 
         if (cmd.empty() || cmd.has("avx512/gather")) {
             measure("AVX512 (gather)", avx512_gathers);
+        }
+#endif
+
+#if defined(HAVE_AVX512BW_INSTRUCTIONS)
+        if (cmd.empty() || cmd.has("avx512bw/optimized2")) {
+            measure("AVX512 (incremental logic)", avx512bw_optimized2);
         }
 #endif
 

@@ -1,6 +1,6 @@
 namespace base64 {
 
-    namespace avx512bw {
+    namespace avx512vbmi {
 
         void encode(const uint8_t* input, size_t bytes, uint8_t* output) {
 
