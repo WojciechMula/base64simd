@@ -27,10 +27,16 @@ Vectorization approaches were described in a series of articles:
 * `Base64 encoding & decoding using AVX512BW instructions`__,
 * `AVX512F base64 coding and decoding`__.
 
+Daniel Lemire and I wrote also paper `Faster Base64 Encoding
+and Decoding Using AVX2 Instructions`__ which was published
+by `ACM Transactiona on the Web`__.
+
 __ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
 __ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
 __ http://0x80.pl/notesen/2016-04-03-avx512-base64.html
 __ http://0x80.pl/articles/avx512-foundation-base64.html
+__ https://arxiv.org/abs/1704.00605
+__ https://tweb.acm.org/
 
 Performance results from various machines are located
 in subdirectories ``results``.
