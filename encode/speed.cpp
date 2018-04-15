@@ -62,165 +62,171 @@ public:
 
         #include "functions.cpp"
 
-        if (cmd.empty() || cmd.has("scalar32")) {
+        if (can_run("scalar", "scalar32")) {
             measure("scalar (32 bit)", base64::scalar::encode32);
         }
 
 #if !defined(HAVE_NEON_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("scalar64")) {
+        if (can_run("scalar", "scalar64")) {
             measure("scalar (64 bit)", base64::scalar::encode64);
         }
 
-        if (cmd.empty() || cmd.has("swar")) {
+        if (can_run("scalar", "swar")) {
             measure("SWAR (64 bit)", base64::swar::encode);
         }
 #endif
 
 #if defined(HAVE_SSE_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("sse")) {
+        if (can_run("sse", "sse")) {
             measure("SSE (lookup: naive)", sse_naive);
         }
 
-        if (cmd.empty() || cmd.has("sse1")) {
+        if (can_run("sse", "sse1")) {
             measure("SSE (lookup: other improved)", sse_optimized1);
         }
 
-        if (cmd.empty() || cmd.has("sse2")) {
+        if (can_run("sse" ,"sse2")) {
             measure("SSE (lookup: improved)", sse_optimized2);
         }
 
-        if (cmd.empty() || cmd.has("sse3")) {
+        if (can_run("sse", "sse3")) {
             measure("SSE (lookup: pshufb-based)", sse_pshufb);
         }
 
-        if (cmd.empty() || cmd.has("sse3/improved")) {
+        if (can_run("sse", "sse3/improved")) {
             measure("SSE (lookup: pshufb improved)", sse_pshufb_improved);
         }
 
-        if (cmd.empty() || cmd.has("sse1/unrolled")) {
+        if (can_run("sse", "sse1/unrolled")) {
             measure("SSE (lookup: other improved, unrolled)", sse_optimized1_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("sse2/unrolled")) {
+        if (can_run("sse", "sse2/unrolled")) {
             measure("SSE (lookup: improved, unrolled)", sse_optimized2_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("sse2/unrolled2")) {
+        if (can_run("sse", "sse2/unrolled2")) {
             measure("SSE (lookup: pshufb-based, unrolled)", sse_pshufb_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("sse3/improved/unrolled")) {
+        if (can_run("sse", "sse3/improved/unrolled")) {
             measure("SSE (lookup: pshufb improved unrolled)", sse_pshufb_improved_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("sse2/fully_unrolled")) {
+        if (can_run("sse", "sse2/fully_unrolled")) {
             measure("SSE (fully unrolled improved lookup)", base64::sse::encode_full_unrolled);
         }
 #endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("bmi1")) {
+        if (can_run("bmi", "bmi1")) {
             measure("SSE & BMI2 (lookup: naive)", sse_bmi2_naive);
         }
 
-        if (cmd.empty() || cmd.has("bmi2")) {
+        if (can_run("bmi", "bmi2")) {
             measure("SSE & BMI2 (lookup: improved)", sse_bmi2_optimized);
         }
 
-        if (cmd.empty() || cmd.has("bmi3")) {
+        if (can_run("bmi", "bmi3")) {
             measure("SSE & BMI2 (lookup: pshufb improved)", sse_bmi2_pshufb_improved);
         }
 #endif
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("xop/vpermb")) {
+        if (can_run("xop", "xop/vpermb")) {
             measure("XOP (vpermb)", xop_vperm);
         }
 
-        if (cmd.empty() || cmd.has("xop/pshufb")) {
+        if (can_run("xop", "xop/pshufb")) {
             measure("XOP (pshufb improved)", xop_pshufb);
         }
 #endif
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("avx2")) {
+        if (can_run("avx2", "avx2")) {
             measure("AVX2 (lookup: improved)", avx2_optimized2);
         }
 
-        if (cmd.empty() || cmd.has("avx2/unrolled")) {
+        if (can_run("avx2", "avx2/unrolled")) {
             measure("AVX2 (lookup: improved, unrolled)", avx2_optimized2_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("avx2/pshufb")) {
+        if (can_run("avx2", "avx2/pshufb")) {
             measure("AVX2 (lookup: pshufb-based)", avx2_pshufb);
         }
 
-        if (cmd.empty() || cmd.has("avx2/pshufb/unrolled")) {
+        if (can_run("avx2", "avx2/pshufb/unrolled")) {
             measure("AVX2 (lookup: pshufb-based, unrolled)", avx2_pshufb_unrolled);
         }
 
-        if (cmd.empty() || cmd.has("avx2/pshufb/improved")) {
+        if (can_run("avx2", "avx2/pshufb/improved")) {
             measure("AVX2 (lookup: pshufb improved)", avx2_pshufb_improved);
         }
 
-        if (cmd.empty() || cmd.has("avx2/pshufb/improved/unrolled")) {
+        if (can_run("avx2", "avx2/pshufb/improved/unrolled")) {
             measure("AVX2 (lookup: pshufb unrolled improved)", avx2_pshufb_improved_unrolled);
         }
 
     #if defined(HAVE_BMI2_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("avx2/pshufb/improved/unrolled")) {
+        if (can_run("avx2", "avx2/pshufb/improved/unrolled")) {
             measure("AVX2 & BMI (lookup: pshufb improved)", avx2_bmi2_pshufb_improved);
         }
     #endif
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("avx512/logic")) {
+        if (can_run("avx512", "avx512/logic")) {
             measure("AVX512 (incremental logic)", avx512_swar_logic);
         }
 
-        if (cmd.empty() || cmd.has("avx512/logic/improved")) {
+        if (can_run("avx512", "avx512/logic/improved")) {
             measure("AVX512 (incremental logic improved)", avx512_swar_logic_improved);
         }
 
-        if (cmd.empty() || cmd.has("avx512/logic/improved/gather")) {
+        if (can_run("avx512", "avx512/logic/improved/gather")) {
             measure("AVX512 (incremental logic improved with gather load)", avx512_swar_logic_improved_load_gather);
         }
 
-        if (cmd.empty() || cmd.has("avx512/binsearch")) {
+        if (can_run("avx512", "avx512/binsearch")) {
             measure("AVX512 (binary search)", avx512_bin_search);
         }
 
-        if (cmd.empty() || cmd.has("avx512/gather")) {
+        if (can_run("avx512", "avx512/gather")) {
             measure("AVX512 (gather)", avx512_gathers);
         }
 #endif
 
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("avx512bw/optimized2")) {
+        if (can_run("avx512bw", "avx512bw/optimized2")) {
             measure("AVX512BW (lookup: optimized2)", avx512bw_optimized2);
         }
 
-        if (cmd.empty() || cmd.has("avx512bw/pshufb_improved")) {
+        if (can_run("avx512bw", "avx512bw/pshufb_improved")) {
             measure("AVX512BW (lookup: pshufb improved)", avx512bw_pshufb_improved);
         }
 #endif
 
 #if defined(HAVE_NEON_INSTRUCTIONS)
-        if (cmd.empty() || cmd.has("neon/1")) {
+        if (can_run("neon", "neon/1")) {
             measure("ARM NEON (naive lookup)", neon_naive);
         }
 
-        if (cmd.empty() || cmd.has("neon/2")) {
+        if (can_run("neon", "neon/2")) {
             measure("ARM NEON (optimized lookup)", neon_optimized);
         }
 
-        if (cmd.empty() || cmd.has("neon/3")) {
+        if (can_run("neon", "neon/3")) {
             measure("ARM NEON (pshufb improved lookup)", neon_pshufb_improved);
         }
 #endif
 
         return 0;
+    }
+
+    bool can_run(const std::string& group_name, const std::string& function_name) const {
+        return cmd.empty()
+            || cmd.has(group_name)
+            || cmd.has(function_name);
     }
 
     template<typename T>
