@@ -50,34 +50,47 @@ the same structure. Each project contains three programs:
 Building
 --------------------------------------------------
 
-Type ``make`` to build ``verify``, ``check`` and ``speed`` program.  The
-programs support only scalar, SSE and BMI procedures.
 
-Type ``make avx2`` to build ``verify_avx2``, ``check_avx2`` and ``speed_avx2``.
-The programs support SSE, BMI2 and AVX2 procedures.
+.. list-table::
+    :header-rows: 1
 
-Type ``make avx512`` to build ``verify_avx512``, ``check_avx512`` and
-``speed_avx512``.  The programs support SSE, BMI2, AVX2, AVX512F procedures.
+    * - command
+      - tools
+      - instruction sets
 
-Type ``make avx512bw`` to build ``verify_avx512bw``, ``check_avx512bw`` and
-``speed_avx512bw``.  The programs support SSE, BMI2, AVX2, AVX512F and AVX512BW
-procedures.
+    * - ``make``
+      - ``verify``, ``check``, ``speed``
+      - scalar, SSE, BMI2
 
-Type ``make avx512vbmi`` to build ``verify_avx512vbmi``, ``check_avx512vbmi``
-and ``speed_avx512vbmi``.  The programs support also SSE, BMI2, AVX2, AVX512F,
-AVX512BW and AVX512VBMI procedures.
+    * - ``make avx2``
+      - ``verify_avx2``, ``check_avx2``, ``speed_avx2``
+      - scalar, SSE, BMI2, AVX2
 
-Type ``make xop`` to build ``verify_xop``, ``check_xop`` and ``speed_xop``.
-The programs support scalar, SSE and AMD XOP procedures.
+    * - ``make avx512``
+      - ``verify_avx512``, ``check_avx512``, ``speed_avx512``
+      - scalar, SSE, BMI2, AVX2, AVX512F
 
-Type ``make arm`` to build ``verify_arm``, ``check_arm`` and ``speed_arm``.
-The programs support scalar, ARM Neon procedures.
+    * - ``make avx512bw``
+      - ``verify_avx512bw``, ``check_avx512bw``, ``speed_avx512bw``
+      - scalar, SSE, BMI2, AVX2, AVX512F, AVX512BW
+
+    * - ``make avx512vbmi``
+      - ``verify_avx512vbmi``, ``check_avx512vbmi``
+      - scalar, SSE, BMI2, AVX2, AVX512F, AVX512BW, AVX512VBMI 
+    
+    * - ``make xop``
+      - ``verify_xop``, ``check_xop``, ``speed_xop``
+      - scalar, SSE and AMD XOP
+
+    * - ``make arm``
+      - ``verify_arm``, ``check_arm``, ``speed_arm``
+      - scalar, ARM Neon
 
 Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
 to run all programs.
 
 BMI2 presence is determined based on ``/proc/cpuinfo`` or counterpart.
-When an AVX2 or AVX512 target is used then BMI2 is enabled by default.
+When an AVX2 or AVX512 targets are used then BMI2 is enabled by default.
 
 
 AVX512
