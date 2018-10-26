@@ -99,7 +99,7 @@ verify_arm: $(VERIFY_DEPS) *.neon.cpp
 
 
 
-SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp benchmark_application.cpp config.h $(EXT_DEPS)
+SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
 
 speed: $(SPEED_DEPS)
 	$(CXX) $(FLAGS) $< -o $@
@@ -147,7 +147,7 @@ check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 $< -o $@
 
 
-BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp benchmark_application.cpp config.h ../benchmark.h
+BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h ../benchmark.h
 
 benchmark: $(BENCHMARK_DEPS)
 	$(CXX) $(FLAGS) $< -o $@

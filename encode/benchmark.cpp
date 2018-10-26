@@ -1,31 +1,29 @@
-#include <cstdlib>
 #include <cstdio>
-#include <cstdint>
-#include <memory>
 
-#include "config.h"
+#include "application.cpp"
+
 #include "../benchmark.h"
 
-#include "benchmark_application.cpp"
 
-class Application final: public BenchmarkApplication<Application> {
+class Application final: public ApplicationBase<Application> {
 
-    friend class BenchmarkApplication<Application>;
+    using super = ApplicationBase<Application>;
+    friend super; 
 
 public:
     Application(const CommandLine& cmdline)
-        : BenchmarkApplication<Application>(cmdline, 1024, 1000) {}
+        : super(cmdline, 1024, 10000) {}
 
-    int run() {
+    void run() {
 
         initialize();
 
-        return run_all();
+        run_all();
     }
 
 private:
     template<typename T>
-    void measure_impl(const char* name, T function) {
+    void run_function_impl(const char* name, T function) {
 
         auto fn = [this, function]() {
             function(input.get(), get_input_size(), output.get());
@@ -41,6 +39,8 @@ int main(int argc, char* argv[]) {
     CommandLine cmd(argc, argv);
     Application app(cmd);
 
-    return app.run();
+    app.run();
+
+    return EXIT_SUCCESS;
 }
 

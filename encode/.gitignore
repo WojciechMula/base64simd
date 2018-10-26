@@ -6,8 +6,6 @@ verify_*
 speed_*
 check_*
 benchmark_*
-# except source
-!benchmark_application.cpp
 
 unpack_test
 

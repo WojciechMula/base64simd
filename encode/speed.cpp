@@ -1,25 +1,29 @@
-#include <cstdlib>
 #include <cstdio>
-#include <cstdint>
-#include <memory>
-
-#include "config.h"
+#include "application.cpp"
 #include "../gettime.cpp"
 
-#include "benchmark_application.cpp"
 
-class Application final: public BenchmarkApplication<Application> {
+#if !defined(BUFFER_SIZE)
+#   define BUFFER_SIZE (64*1024*1024)
+#endif
 
-    friend class BenchmarkApplication<Application>;
+#if !defined(ITERATIONS)
+#   define ITERATIONS 10
+#endif
+
+class Application final: public ApplicationBase<Application> {
+
+    using super = ApplicationBase<Application>;
+    friend super;
 
     double reference_time;
 
 public:
-    Application(const CommandLine& c)
-        : BenchmarkApplication<Application>(c)
+    Application(const CommandLine& cmdline)
+        : super(cmdline, BUFFER_SIZE, ITERATIONS)
         , reference_time(0.0) {}
 
-    int run() {
+    void run() {
         
         initialize();
 
@@ -28,7 +32,7 @@ public:
 
 private:
     template<typename T>
-    double measure_impl(const char* name, T callback) {
+    double run_function_impl(const char* name, T callback) {
 
         printf("%-40s... ", name);
         fflush(stdout);
@@ -69,6 +73,8 @@ int main(int argc, char* argv[]) {
     CommandLine cmd(argc, argv);
     Application app(cmd);
 
-    return app.run();
+    app.run();
+
+    return EXIT_SUCCESS;
 }
 
