@@ -74,25 +74,11 @@ run_avx512vbmi: $(ALL_AVX512VBMI)
 	$(SDE) -- ./check_avx512vbmi
 
 VERIFY_DEPS=verify.cpp $(DEPS)
-SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../gettime.cpp
-CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../fnv32.cpp
 
 verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) $< -o $@
 
-speed: $(SPEED_DEPS)
-	$(CXX) $(FLAGS) $< -o $@
-
-check: $(CHECK_DEPS)
-	$(CXX) $(FLAGS) $< -o $@
-
 verify_xop: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_XOP) $< -o $@
-
-speed_xop: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_XOP) $< -o $@
-
-check_xop: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_XOP) $< -o $@
 
 verify_avx2: $(VERIFY_DEPS)
@@ -107,6 +93,18 @@ verify_avx512vbmi: $(VERIFY_DEPS)
 verify_avx512bw: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
+verify_arm: $(VERIFY_DEPS)
+	$(CXX) $(FLAGS_ARM) $< -o $@
+
+
+SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../gettime.cpp
+
+speed: $(SPEED_DEPS)
+	$(CXX) $(FLAGS) $< -o $@
+
+speed_xop: $(SPEED_DEPS)
+	$(CXX) $(FLAGS_XOP) $< -o $@
+
 speed_avx2: $(SPEED_DEPS)
 	$(CXX) $(FLAGS_AVX2) $< -o $@
 
@@ -115,6 +113,18 @@ speed_avx512: $(SPEED_DEPS)
 
 speed_avx512bw: $(SPEED_DEPS)
 	$(CXX) $(FLAGS_AVX512BW) $< -o $@
+
+speed_arm: $(SPEED_DEPS)
+	$(CXX) $(FLAGS_ARM) $< -o $@
+
+
+CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../fnv32.cpp
+
+check: $(CHECK_DEPS)
+	$(CXX) $(FLAGS) $< -o $@
+
+check_xop: $(CHECK_DEPS)
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 check_avx2: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_AVX2) $< -o $@
@@ -128,18 +138,12 @@ check_avx512bw: $(CHECK_DEPS)
 check_avx512vbmi: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
-verify_arm: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_ARM) $< -o $@
-
-speed_arm: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_ARM) $< -o $@
-
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
-build_all: $(ALL_INTEL_TARGETS)
-verify_all: verify verify_avx2 verify_avx512 verify_avx512bw
-	# only Intel targets
+
+build_intel: $(ALL_INTEL_TARGETS)
+verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw
 	sde -cnl -- ./verify
 	sde -cnl -- ./verify_avx2
 	sde -cnl -- ./verify_avx512
