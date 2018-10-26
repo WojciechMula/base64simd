@@ -18,6 +18,8 @@ public:
     std::string  lookup_method;
     std::string  pack_method;
 
+    const std::string& formatted() const { return image; }
+
 private:
     std::string image;
     std::string render() const {

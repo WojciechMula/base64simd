@@ -3,8 +3,8 @@ class ApplicationBase {
 protected:
     const CommandLine& cmd;
     const FunctionRegistry& names;
-    const unsigned count;
-    const unsigned iterations;
+    unsigned count;
+    unsigned iterations;
     bool initialized;
     bool quiet;
 

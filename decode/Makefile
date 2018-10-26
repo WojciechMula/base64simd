@@ -19,13 +19,13 @@ FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
 
 DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp config.h
 
-ALL=verify speed check
-ALL_XOP=verify_xop speed_xop check_xop
+ALL=verify speed check benchmark
+ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
 ALL_ARM=verify_arm speed_arm check_arm
-ALL_AVX2=verify_avx2 speed_avx2 check_avx2
-ALL_AVX512=verify_avx512 check_avx512 speed_avx512
-ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw
-ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi
+ALL_AVX2=verify_avx2 speed_avx2 check_avx2 benchmark_avx2
+ALL_AVX512=verify_avx512 check_avx512 speed_avx512 benchmark_avx512
+ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw benchmark_avx512bw
+ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
 ALL_INTEL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512VBMI) $(ALL_AVX512BW)
 ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM)
 
@@ -141,6 +141,26 @@ check_avx512vbmi: $(CHECK_DEPS)
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
+
+BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h
+
+benchmark: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS) $< -o $@
+
+benchmark_xop: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_XOP) $< -o $@
+
+benchmark_avx2: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX2) $< -o $@
+
+benchmark_avx512: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512) $< -o $@
+
+benchmark_avx512bw: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
+
+benchmark_avx512vbmi: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
 build_intel: $(ALL_INTEL_TARGETS)
 verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw

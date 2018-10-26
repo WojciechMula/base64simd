@@ -1,6 +1,8 @@
 speed
 verify
 check
+benchmark
 speed_*
 verify_*
 check_*
+benchmark_*
