@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "config.h"
+#include "../config.h"
 #include "../benchmark.h"
 #include "../cmdline.cpp"
 

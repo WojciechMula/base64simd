@@ -48,7 +48,7 @@ namespace base64 {
                 const __m512i shifts  = packed_qword(0x3036242a1016040alu); // 48, 54, 36, 42, 16, 22, 4, 10
                 const __m512i indices = _mm512_multishift_epi64_epi8(shifts, in);
 
-                // Note: the two higher bits of each indices' byte has garbage,
+                // Note: the two higher bits of each indices' byte have garbage,
                 //       but the following permutexvar instruction masks them out.
 
                 // translation 6-bit values -> ASCII

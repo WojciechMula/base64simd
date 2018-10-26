@@ -1,4 +1,4 @@
-#include "config.h"
+#include "../config.h"
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
@@ -242,6 +242,18 @@ protected:
 
         if (can_run("avx512bw", "avx512bw/pshufb_improved")) {
             run_function("AVX512BW (lookup: pshufb improved)", avx512bw_pshufb_improved);
+        }
+#endif
+
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+        if (can_run("avx512vbmi", "avx512vbmi")) {
+            run_function("AVX512VBMI", avx512vbmi);
+        }
+#endif
+
+#if defined(HAVE_AVX512VL_INSTRUCTIONS)
+        if (can_run("avx512vl", "avx512vl")) {
+            run_function("AVX512VL", avx512vl);
         }
 #endif
 

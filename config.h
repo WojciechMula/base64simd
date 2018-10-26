@@ -2,7 +2,7 @@
 
 #define FORCE_INLINE inline __attribute__((always_inline))
 
-#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
+#if defined(HAVE_AVX512VBMI_INSTRUCTIONS) || defined(HAVE_AVX512VL_INSTRUCTIONS)
 #   if !defined(HAVE_AVX512BW_INSTRUCTIONS)
 #       define HAVE_AVX512BW_INSTRUCTIONS 1
 #   endif

@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <cassert>
 
-#include "config.h"
+#include "../config.h"
 #include "encode.scalar.cpp"
 #include "lookup.reference.cpp"
 #include "lookup.swar.cpp"

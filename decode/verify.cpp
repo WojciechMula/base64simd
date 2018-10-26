@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
 
-#include "config.h"
+#include "../config.h"
 
 #include "all.cpp"
 

@@ -17,7 +17,7 @@ FLAGS_AVX512VBMI=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512VBMI_INSTRUCTION
 FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
 
-DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp config.h
+DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp ../config.h
 
 ALL=verify speed check benchmark
 ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
