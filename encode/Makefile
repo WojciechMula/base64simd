@@ -1,31 +1,32 @@
 .SUFFIXES:
-.PHONY: all avx2 avx512 avx512bw avx512vbmi avx512vl
+.PHONY: all avx2 avx512 avx512bw avx512vbmi avx512vl clean
 
-SDE=sde -cnl
+SDE=sde -cnl --
+FLAGS_BASE=$(CXXFLAGS) -Wall -Wextra -pedantic -O3
 
-FLAGS_BASE=-Wall -pedantic -O3
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
     FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
 endif
+
 FLAGS=$(FLAGS_BASE) -std=c++11 -msse4 -DHAVE_SSE_INSTRUCTIONS
 FLAGS_AVX2=$(FLAGS_BASE) -std=c++11 -mavx2 -mbmi2 -DHAVE_AVX2_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
 FLAGS_AVX512=$(FLAGS_BASE) -std=c++11 -mavx512f -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
 FLAGS_AVX512BW=$(FLAGS_BASE) -std=c++11 -mavx512bw -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_AVX512BW_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
-FLAGS_AVX512VBMI=$(FLAGS_BASE) -std=c++11 -mavx512vbmi -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_AVX512VBMI_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
+FLAGS_AVX512VBMI=$(FLAGS_BASE) -std=c++11 -mavx512vbmi -mbmi2 -DHAVE_AVX512_INSTRUCTIONS -DHAVE_AVX512BMI_INSTRUCTIONS -DHAVE_BMI2_INSTRUCTIONS
 FLAGS_AVX512VL=$(FLAGS_AVX512VBMI) -DHAVE_AVX512VL_INSTRUCTIONS
 FLAGS_XOP=$(FLAGS_BASE) -std=c++11 -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -std=gnu++11 -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
 
 EXT_DEPS=../fnv32.cpp ../gettime.cpp
 
-ALL=verify speed check
-ALL_AVX2=verify_avx2 speed_avx2 check_avx2
-ALL_AVX512=verify_avx512 check_avx512 speed_avx512
-ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw
-ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi
-ALL_AVX512VL=verify_avx512vl check_avx512vl
-ALL_XOP=verify_xop speed_xop check_xop
+ALL=verify speed check benchmark
+ALL_AVX2=verify_avx2 speed_avx2 check_avx2 benchmark_avx2
+ALL_AVX512=verify_avx512 check_avx512 speed_avx512 benchmark_avx512
+ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw benchmark_avx512bw
+ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
+ALL_AVX512VL=verify_avx512vl check_avx512vl benchmark_avx512vbmi
+ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
 ALL_ARM=verify_arm speed_arm check_arm
 ALL_INTEL_TARGETS=$(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512VBMI) $(ALL_XOP)
 ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM)
@@ -73,7 +74,7 @@ run_xop: $(ALL_XOP)
 VERIFY_DEPS=verify.cpp lookup.*.cpp unpack.*.cpp encode.*.cpp config.h
 
 verify: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS) verify.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 verify_avx2: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_AVX2) $< -o $@
@@ -98,7 +99,7 @@ verify_arm: $(VERIFY_DEPS) *.neon.cpp
 
 
 
-SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
+SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp benchmark_application.cpp config.h $(EXT_DEPS)
 
 speed: $(SPEED_DEPS)
 	$(CXX) $(FLAGS) $< -o $@
@@ -143,19 +144,46 @@ check_xop: $(CHECK_DEPS) *.xop.cpp
 	$(CXX) $(FLAGS_XOP) $< -o $@
 
 check_arm: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 check.cpp -o $@
+	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 $< -o $@
 
-build_all: $(ALL_INTEL_TARGETS)
 
-verify_all: verify verify_avx2 verify_avx512
-	# only Intel targets
-	sde -cnl -- ./verify
-	sde -cnl -- ./verify_avx2
-	sde -cnl -- ./verify_avx512
+BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp benchmark_application.cpp config.h ../benchmark.h
+
+benchmark: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS) $< -o $@
+
+benchmark_xop: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_XOP) $< -o $@
+
+benchmark_avx2: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX2) $< -o $@
+
+benchmark_avx512: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512) $< -o $@
+
+benchmark_avx512bw: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
+
+benchmark_avx512vbmi: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
+
+benchmark_avx512vl: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_AVX512VL) $< -o $@
+
+
+build_intel: $(ALL_INTEL_TARGETS)
+
+verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw verify_avx512vbmi verify_avx512vl
+	$(SDE) ./verify
+	$(SDE) ./verify_avx2
+	$(SDE) ./verify_avx512
+	$(SDE) ./verify_avx512bw
+	$(SDE) ./verify_avx512vbmi
+	$(SDE) ./verify_avx512vl
 
 unpack_test: unpack_bigendian.cpp
 	$(CXX) $(FLAGS) $^ -o $@
 
 clean:
-	rm -f $(ALL_TARGETS)
+	$(RM) $(ALL_TARGETS)
 

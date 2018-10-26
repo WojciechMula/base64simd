@@ -2,13 +2,19 @@ class ApplicationBase {
 
 protected:
     const CommandLine& cmd;
-    const unsigned count;
-    const unsigned iterations;
+    const size_t count;
+    const size_t iterations;
     bool initialized;
 
     std::unique_ptr<uint8_t> input;
     std::unique_ptr<uint8_t> output;
 public:
+    ApplicationBase(const CommandLine& c, size_t cnt, size_t iters)
+        : cmd(c)
+        , count(cnt)
+        , iterations(iters)
+        , initialized(false) {}
+
     ApplicationBase(const CommandLine& c, size_t cnt = 64*1024*1024)
         : cmd(c)
         , count(cnt)
