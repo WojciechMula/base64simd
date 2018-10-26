@@ -78,64 +78,64 @@ SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../gettime.cpp
 CHECK_DEPS=check.cpp $(DEPS) application.cpp ../cmdline.cpp ../fnv32.cpp
 
 verify: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS) verify.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 speed: $(SPEED_DEPS)
-	$(CXX) $(FLAGS) speed.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 check: $(CHECK_DEPS)
-	$(CXX) $(FLAGS) check.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 verify_xop: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_XOP) verify.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 speed_xop: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_XOP) speed.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 check_xop: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_XOP) check.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 verify_avx2: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX2) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 verify_avx512: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 verify_avx512vbmi: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512VBMI) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
 verify_avx512bw: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512BW) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 speed_avx2: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_AVX2) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 speed_avx512: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_AVX512) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 speed_avx512bw: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_AVX512BW) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 check_avx2: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX2) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 check_avx512: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX512) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 check_avx512bw: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX512BW) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 check_avx512vbmi: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX512VBMI) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
 verify_arm: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_ARM) verify.cpp -o $@
+	$(CXX) $(FLAGS_ARM) $< -o $@
 
 speed_arm: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_ARM) speed.cpp -o $@
+	$(CXX) $(FLAGS_ARM) $< -o $@
 
 check_arm: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_ARM) check.cpp -o $@
+	$(CXX) $(FLAGS_ARM) $< -o $@
 
 build_all: $(ALL_INTEL_TARGETS)
 verify_all: verify verify_avx2 verify_avx512 verify_avx512bw

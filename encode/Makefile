@@ -76,71 +76,71 @@ verify: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS) verify.cpp -o $@
 
 verify_avx2: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX2) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 verify_avx512: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 verify_avx512bw: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512BW) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 verify_avx512vbmi: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512VBMI) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
 verify_avx512vl: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_AVX512VL) verify.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VL) $< -o $@
 
 verify_xop: $(VERIFY_DEPS)
-	$(CXX) $(FLAGS_XOP) verify.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 verify_arm: $(VERIFY_DEPS) *.neon.cpp
-	$(CXX) $(FLAGS_ARM) verify.cpp -o $@
+	$(CXX) $(FLAGS_ARM) $< -o $@
 
 
 
 SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
 
 speed: $(SPEED_DEPS)
-	$(CXX) $(FLAGS) speed.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 speed_avx2: $(SPEED_DEPS) *.avx2.cpp
-	$(CXX) $(FLAGS_AVX2) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 speed_avx512: $(SPEED_DEPS) *.avx512.cpp
-	$(CXX) $(FLAGS_AVX512) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 speed_avx512bw: $(SPEED_DEPS) *.avx512.cpp
-	$(CXX) $(FLAGS_AVX512BW) speed.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 speed_xop: $(SPEED_DEPS) *.xop.cpp
-	$(CXX) $(FLAGS_XOP) speed.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 speed_arm: $(SPEED_DEPS)
-	$(CXX) $(FLAGS_ARM) speed.cpp -o $@
+	$(CXX) $(FLAGS_ARM) $< -o $@
 
 
 CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp functions.cpp application.cpp config.h $(EXT_DEPS)
 
 check: $(CHECK_DEPS)
-	$(CXX) $(FLAGS) check.cpp -o $@
+	$(CXX) $(FLAGS) $< -o $@
 
 check_avx2: $(CHECK_DEPS) *.avx2.cpp
-	$(CXX) $(FLAGS_AVX2) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX2) $< -o $@
 
 check_avx512: $(CHECK_DEPS) *.avx512.cpp
-	$(CXX) $(FLAGS_AVX512) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512) $< -o $@
 
 check_avx512bw: $(CHECK_DEPS) *.avx512.cpp *.avx512bw.cpp
-	$(CXX) $(FLAGS_AVX512BW) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512BW) $< -o $@
 
 check_avx512vbmi: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX512VBMI) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VBMI) $< -o $@
 
 check_avx512vl: $(CHECK_DEPS)
-	$(CXX) $(FLAGS_AVX512VL) check.cpp -o $@
+	$(CXX) $(FLAGS_AVX512VL) $< -o $@
 
 check_xop: $(CHECK_DEPS) *.xop.cpp
-	$(CXX) $(FLAGS_XOP) check.cpp -o $@
+	$(CXX) $(FLAGS_XOP) $< -o $@
 
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 check.cpp -o $@
