@@ -27,10 +27,11 @@ Vectorization approaches were described in a series of articles:
 * `Base64 encoding & decoding using AVX512BW instructions`__,
 * `AVX512F base64 coding and decoding`__.
 
-Daniel Lemire and I wrote also paper `Faster Base64 Encoding
+`Daniel Lemire`__ and I wrote also paper `Faster Base64 Encoding
 and Decoding Using AVX2 Instructions`__ which was published
 by `ACM Transactiona on the Web`__.
 
+__ http://lemire.me
 __ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
 __ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
 __ http://0x80.pl/notesen/2016-04-03-avx512-base64.html
@@ -95,7 +96,7 @@ Building
 Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
 to run all programs.
 
-BMI2 presence is determined based on ``/proc/cpuinfo`` or counterpart.
+BMI2 presence is determined based on ``/proc/cpuinfo`` or a counterpart.
 When an AVX2 or AVX512 targets are used then BMI2 is enabled by default.
 
 
