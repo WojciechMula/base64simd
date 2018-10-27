@@ -4,73 +4,45 @@
 #include <memory>
 
 #include "../config.h"
-#include "../cmdline.cpp"
 #include "../fnv32.cpp"
 
-#include "all.cpp"
-
-#include "function_registry.cpp"
 #include "application.cpp"
 
-class Application final: public ApplicationBase {
+class Application final: public ApplicationBase<Application> {
+
+    using super = ApplicationBase<Application>;
+    friend super;
 
     bool all_ok;
+    uint32_t valid_hash;
 
 public:
     Application(const CommandLine& c, const FunctionRegistry& r)
-        : ApplicationBase(c, r)
-        , all_ok(true) {}
+        : super(c, r)
+        , all_ok(true)
+        , valid_hash(0) {}
 
-    int run() {
-        uint32_t valid_hash = 0;
+    bool run() {
 
-#define RUN(name, function) \
-        if (cmd.empty() || cmd.has(name)) { \
-            valid_hash = check(name, function, valid_hash); \
-        }
-
-#define RUN_TEMPLATE1(name, decode_fn, lookup_fn) \
-        if (cmd.empty() || cmd.has(name)) { \
-            auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
-                return decode_fn(lookup_fn, input, size, output); \
-            }; \
-            valid_hash = check(name, function, valid_hash); \
-        }
-
-#define RUN_TEMPLATE2(name, decode_fn, lookup_fn, pack_fn) \
-        if (cmd.empty() || cmd.has(name)) { \
-            auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
-                return decode_fn(lookup_fn, pack_fn, input, size, output); \
-            }; \
-            valid_hash = check(name, function, valid_hash); \
-        }
-
-#define RUN_SSE_TEMPLATE1 RUN_TEMPLATE1
-#define RUN_AVX2_TEMPLATE1 RUN_TEMPLATE1
-#define RUN_SSE_TEMPLATE2 RUN_TEMPLATE2
-#define RUN_AVX2_TEMPLATE2 RUN_TEMPLATE2
-
-        #include "run_all.cpp"
+        initialize();
+        run_all();
 
         if (cmd.empty()) {
-
             puts(all_ok ? "all OK" : "!!!ERRORS!!!");
         }
 
-        return 0;
+        return all_ok;
     }
 
 private:
     template<typename T>
-    uint32_t check(const char* name, T callback, uint32_t valid_hash) {
-
-        initialize();
+    void run_function_impl(const char* name, T function) {
 
         printf("%*s ... ", -names.get_width(), names[name]);
         fflush(stdout);
 
         clear_output();
-        callback(input.get(), get_input_size(), output.get());
+        function(input.get(), get_input_size(), output.get());
 
         const uint32_t hash = FNV32::get(reinterpret_cast<const char*>(output.get()), get_output_size());
         printf("hash: %08x", hash);
@@ -82,7 +54,7 @@ private:
 
         putchar('\n');
 
-        return hash;
+        valid_hash = hash;
     }
 };
 
@@ -93,7 +65,7 @@ int main(int argc, char* argv[]) {
     CommandLine cmd(argc, argv);
     Application app(cmd, names);
 
-    return app.run();
+    return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
 

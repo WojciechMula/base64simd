@@ -2,7 +2,7 @@
 .PHONY: all clean run
 
 SDE=sde -cnl
-FLAGS_BASE=-Wall -Wextra -pedantic -O3 -std=gnu++11
+FLAGS_BASE=$(CXXFLAGS) -Wall -Wextra -pedantic -O3 -std=gnu++11
 
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
@@ -17,7 +17,7 @@ FLAGS_AVX512VBMI=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512VBMI_INSTRUCTION
 FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
 
-DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp run_all.cpp function_registry.cpp ../avx512_swar.cpp ../config.h
+DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp function_registry.cpp ../avx512_swar.cpp ../config.h
 
 ALL=verify speed check benchmark
 ALL_XOP=verify_xop speed_xop check_xop benchmark_xop

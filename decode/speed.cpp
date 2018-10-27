@@ -5,74 +5,36 @@
 
 #include "../config.h"
 #include "../gettime.cpp"
-#include "../cmdline.cpp"
 
-#include "all.cpp"
-
-#include "function_registry.cpp"
 #include "application.cpp"
 
-class Application final: public ApplicationBase {
+class Application final: public ApplicationBase<Application> {
+
+    using super = ApplicationBase<Application>;
+    friend super;
 
     bool print_csv;
+    double reference;
 
 public:
     Application(const CommandLine& c, const FunctionRegistry& r)
-        : ApplicationBase(c, r) {
+        : ApplicationBase(c, r)
+        , print_csv(cmd.has_flag("csv"))
+        , reference(0.0) {
 
-        print_csv = cmd.has_flag("csv");
-        quiet     = print_csv;
+        quiet = print_csv;
     }
 
-    int run() {
-        double reference = 0.0;
+    void run() {
 
-#define RUN(name, function) \
-        if (cmd.empty() || cmd.has(name)) { \
-            const double ret = measure(name, function, reference); \
-            if (reference == 0.0) { \
-                reference = ret; \
-            } \
-        }
-
-
-#define RUN_TEMPLATE1(name, decode_fn, lookup_fn) \
-        if (cmd.empty() || cmd.has(name)) { \
-            auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
-                return decode_fn(lookup_fn, input, size, output); \
-            }; \
-            const double ret = measure(name, function, reference); \
-            if (reference == 0.0) { \
-                reference = ret; \
-            } \
-        }
-
-#define RUN_TEMPLATE2(name, decode_fn, lookup_fn, pack_fn) \
-        if (cmd.empty() || cmd.has(name)) { \
-            auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
-                return decode_fn(lookup_fn, pack_fn, input, size, output); \
-            }; \
-            const double ret = measure(name, function, reference); \
-            if (reference == 0.0) { \
-                reference = ret; \
-            } \
-        }
-
-#define RUN_SSE_TEMPLATE1 RUN_TEMPLATE1
-#define RUN_AVX2_TEMPLATE1 RUN_TEMPLATE1
-#define RUN_SSE_TEMPLATE2 RUN_TEMPLATE2
-#define RUN_AVX2_TEMPLATE2 RUN_TEMPLATE2
-
-        #include "run_all.cpp"
-
-        return 0;
+        initialize();
+        
+        run_all();
     }
 
 private:
     template<typename T>
-    double measure(const char* name, T callback, double reference) {
-
-        initialize();
+    double run_function_impl(const char* name, T callback) {
 
         if (print_csv) {
             const auto& fn = names.get(name);
@@ -103,7 +65,7 @@ private:
             printf(", %0.5f\n", time);
         } else {
             if (reference > 0.0) {
-                printf("%0.5f (speed up: %0.2f)", time, reference/time);
+                printf("%0.5f (speed-up: %0.2f)", time, reference/time);
             } else {
                 printf("%0.5f", time);
             }
@@ -115,13 +77,14 @@ private:
     }
 };
 
-
 int main(int argc, char* argv[]) {
 
     FunctionRegistry registry;
     CommandLine cmd(argc, argv);
     Application app(cmd, registry);
 
-    return app.run();
+    app.run();
+
+    return EXIT_SUCCESS;
 }
 
