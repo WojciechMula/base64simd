@@ -54,17 +54,28 @@ run: $(ALL)
 	./check
 	./speed
 
+run_sse: run
+
 run_avx2: $(ALL_AVX2)
 	./verify_avx2
 	./check_avx2
 	./speed_avx2
 
 run_avx512: $(ALL_AVX512)
-	$(SDE) -- ./verify_avx512
-	$(SDE) -- ./check_avx512
+	$(SDE) ./verify_avx512
+	$(SDE) ./check_avx512
+
+run_avx512bw: $(ALL_AVX512)
+	$(SDE) ./verify_avx512
+	$(SDE) ./check_avx512
 
 run_avx512vbmi: $(ALL_AVX512VBMI)
-	$(SDE) -- ./check_avx512vbmi
+	$(SDE) ./verify_avx512vbmi
+	$(SDE) ./check_avx512vbmi
+
+run_avx512vl: $(ALL_AVX512VL)
+	$(SDE) ./verify_avx512vl
+	$(SDE) ./check_avx512vl
 
 run_xop: $(ALL_XOP)
 	./verify_xop

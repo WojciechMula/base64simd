@@ -93,8 +93,9 @@ Building
       - ``verify_arm``, ``check_arm``, ``speed_arm``
       - scalar, ARM Neon
 
-Type ``make run``, ``make run_avx2``, ``make run_avx512`` or ``make run_avx512bw``
-to run all programs.
+Type ``make run`` (for SSE) or ``make run_ARCH`` to run all programs for given
+instruction sets; ``ARCH`` can be "sse", "avx2", "avx512", "avx512bw",
+"avx512vbmi", "avx512vl".
 
 BMI2 presence is determined based on ``/proc/cpuinfo`` or a counterpart.
 When an AVX2 or AVX512 targets are used then BMI2 is enabled by default.
@@ -104,7 +105,7 @@ AVX512
 --------------------------------------------------
 
 To compile AVX512 versions of the programs at least GCC 5.3 is required.
-GCC 4.9.2 hasn't got AVX512 support.
+GCC 4.9.2 doesn't have AVX512 support.
 
 Please download `Intel Software Development Emulator`__ in order to run AVX512
 variants via ``make run_avx512``, ``run_avx512bw`` or ``run_avx512vbmi``.

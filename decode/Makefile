@@ -50,6 +50,8 @@ run: $(ALL)
 	./check
 	./speed
 
+run_sse: run
+
 run_xop: $(ALL_XOP)
 	./verify_xop
 	./check_xop

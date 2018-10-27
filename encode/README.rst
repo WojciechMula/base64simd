@@ -8,9 +8,8 @@ Programs details
 --------------------------------------------------
 
 * ``verify`` --- verifies branchless procedures calculating the lookup table
-* ``check`` --- checks if base64 encoders using different lookup procedures
-  and splitting bytes methods works correctly
-* ``speed`` --- allows to measure speed of all or selected base64 encoder;
+* ``check`` --- checks if base64 encoders work correctly
+* ``speed`` --- allows to measure speed of all or selected base64 encoder
   it encodes 192 MiB of artificial data 10 times, and then print the smallest
   measurement.
-
+* ``benchmark`` --- measure CPU cycles per input byte of all or selected encoder
