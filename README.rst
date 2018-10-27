@@ -47,16 +47,19 @@ Project organization
 --------------------------------------------------
 
 There are separate subdirectories for both algorithms, however both have
-the same structure. Each project contains three programs:
+the same structure. Each project contains four programs:
 
 * ``verify`` --- does simple validation of particular parts of algorithms,
 * ``check`` --- validates whole procedures,
-* ``speed`` --- compares speed of different variants of procedures.
-
+* ``speed`` --- compares speed of different variants of procedures,
+* ``benchmark`` --- similarly to ``speed`` but works on small buffers and
+  calculates CPU cycle rate (available only for Intel architectures).
 
 Building
 --------------------------------------------------
 
+Change to either directory ``encode`` or ``decode`` and then use following
+``make`` commands.
 
 .. list-table::
     :header-rows: 1
@@ -66,27 +69,27 @@ Building
       - instruction sets
 
     * - ``make``
-      - ``verify``, ``check``, ``speed``
+      - ``verify``, ``check``, ``speed``, ``benchmark``
       - scalar, SSE, BMI2
 
     * - ``make avx2``
-      - ``verify_avx2``, ``check_avx2``, ``speed_avx2``
+      - ``verify_avx2``, ``check_avx2``, ``speed_avx2``, ``benchmark_avx2``
       - scalar, SSE, BMI2, AVX2
 
     * - ``make avx512``
-      - ``verify_avx512``, ``check_avx512``, ``speed_avx512``
+      - ``verify_avx512``, ``check_avx512``, ``speed_avx512``, ``benchmark_avx512``
       - scalar, SSE, BMI2, AVX2, AVX512F
 
     * - ``make avx512bw``
-      - ``verify_avx512bw``, ``check_avx512bw``, ``speed_avx512bw``
+      - ``verify_avx512bw``, ``check_avx512bw``, ``speed_avx512bw``, ``benchmark_avx512bw``
       - scalar, SSE, BMI2, AVX2, AVX512F, AVX512BW
 
     * - ``make avx512vbmi``
-      - ``verify_avx512vbmi``, ``check_avx512vbmi``
+      - ``verify_avx512vbmi``, ``check_avx512vbmi``, ``benchmark_avx512vbmi``
       - scalar, SSE, BMI2, AVX2, AVX512F, AVX512BW, AVX512VBMI 
     
     * - ``make xop``
-      - ``verify_xop``, ``check_xop``, ``speed_xop``
+      - ``verify_xop``, ``check_xop``, ``speed_xop``, ``benchmark_xop``
       - scalar, SSE and AMD XOP
 
     * - ``make arm``
