@@ -1,4 +1,4 @@
-// file:///home/wojtek/www/public_html/notesen/2016-04-03-avx512-base64.html#faster-procedure-avx512bw
+// http://0x80.pl/notesen/2016-04-03-avx512-base64.html#faster-procedure-avx512bw
 
 namespace base64 {
 
