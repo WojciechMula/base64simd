@@ -2,7 +2,6 @@
 // thank you Paul! (http://stackoverflow.com/users/253056/paul-r)
 #define _mm256_set_m128i(v0, v1)  _mm256_insertf128_si256(_mm256_castsi128_si256(v1), (v0), 1)
 
-
 namespace base64 {
 
     namespace avx2 {
@@ -37,11 +36,11 @@ namespace base64 {
 
                 __m256i in = _mm256_shuffle_epi8(_mm256_set_m128i(hi, lo), shuf);
 #else
-                // just one memory load, however it read 4-bytes off on the first iteration
+                // just one memory load, however it reads 4-bytes off on the first iteration
 
                 const __m256i data = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(input + i - 4));
                 // data = [????|HHHG|GGFF|FEEE|DDDC|CCBB|BAAA|????]
-                //            256-bit lane    |   256-bit lane
+                //            128-bit lane    |   128-bit lane
 
                 // bytes from groups A...G are placed in separate 32-bit lanes
                 // in = [0HHH|0GGG|0FFF|0EEE|0DDD|0CCC|0BBB|0AAA]
@@ -170,33 +169,53 @@ namespace base64 {
 
             for (size_t i = 0; i < bytes; i += 4*6) {
 
-                const uint64_t d0 = *reinterpret_cast<const uint64_t*>(input + i + 0*6);
-                const uint64_t d1 = *reinterpret_cast<const uint64_t*>(input + i + 1*6);
-                const uint64_t d2 = *reinterpret_cast<const uint64_t*>(input + i + 2*6);
-                const uint64_t d3 = *reinterpret_cast<const uint64_t*>(input + i + 3*6);
-                const uint64_t t0 = __builtin_bswap64(d0) >> 16;
-                const uint64_t t1 = __builtin_bswap64(d1) >> 16;
-                const uint64_t t2 = __builtin_bswap64(d2) >> 16;
-                const uint64_t t3 = __builtin_bswap64(d3) >> 16;
-                const uint64_t expanded_0 = _pdep_u64(t0, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_1 = _pdep_u64(t1, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_2 = _pdep_u64(t2, 0x3f3f3f3f3f3f3f3flu);
-                const uint64_t expanded_3 = _pdep_u64(t3, 0x3f3f3f3f3f3f3f3flu);
+                const __m256i data = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(input + i - 4));
+                // data = [????|HHHG|GGFF|FEEE|DDDC|CCBB|BAAA|????]
+                //            128-bit lane    |   128-bit lane
 
-                const __m256i indices = _mm256_setr_epi32(
-                    __builtin_bswap32(expanded_0 >> 32),
-                    __builtin_bswap32(uint32_t(expanded_0)),
-                    __builtin_bswap32(expanded_1 >> 32),
-                    __builtin_bswap32(uint32_t(expanded_1)),
-                    __builtin_bswap32(expanded_2 >> 32),
-                    __builtin_bswap32(uint32_t(expanded_2)),
-                    __builtin_bswap32(expanded_3 >> 32),
-                    __builtin_bswap32(uint32_t(expanded_3))
+                // bytes from groups A...G are placed in separate 64-bit lanes
+                // in = [00HH|HGGG|00FF|FEEE|00DD|DCCC|00BB|BAAA]
+                const __m256i shuf = _mm256_set_epi8(
+                    -1, -1, 9, 10, 11, 6, 7, 8, 
+                    -1, -1, 3, 4, 5, 0, 1, 2,
+
+                    -1, -1, 13, 14, 15, 10, 11, 12, 
+                    -1, -1, 7, 8, 9, 4, 5, 6
+                );
+
+                const __m256i t0 = _mm256_shuffle_epi8(data, shuf);
+
+                const __m128i lo = _mm256_extracti128_si256(t0, 0);
+                const __m128i hi = _mm256_extracti128_si256(t0, 1);
+
+                const uint64_t expanded_0 = _pdep_u64(_mm_extract_epi64(lo, 0), 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_1 = _pdep_u64(_mm_extract_epi64(lo, 1), 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_2 = _pdep_u64(_mm_extract_epi64(hi, 0), 0x3f3f3f3f3f3f3f3flu);
+                const uint64_t expanded_3 = _pdep_u64(_mm_extract_epi64(hi, 1), 0x3f3f3f3f3f3f3f3flu);
+
+                const __m256i indices = _mm256_setr_epi64x(
+                    expanded_0,
+                    expanded_1,
+                    expanded_2,
+                    expanded_3
                 );
 
                 const auto result = lookup(indices);
 
-                _mm256_storeu_si256(reinterpret_cast<__m256i*>(out), result);
+                const __m256i t1 = _mm256_shuffle_epi8(result, _mm256_setr_epi8(
+                     3,  2,  1,  0,
+                     7,  6,  5,  4,
+                    11, 10,  9,  8,
+                    15, 14, 13, 12,
+
+                     3,  2,  1,  0,
+                     7,  6,  5,  4,
+                    11, 10,  9,  8,
+                    15, 14, 13, 12
+                ));
+
+
+                _mm256_storeu_si256(reinterpret_cast<__m256i*>(out), t1);
                 out += 32;
             }
         }
