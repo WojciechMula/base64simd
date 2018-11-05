@@ -104,6 +104,11 @@ auto avx512bw_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output
     using namespace base64::avx512bw;
     encode(lookup_pshufb_improved, unpack, input, bytes, output);
 };
+
+auto avx512bw_pshufb_improved_unrolled2 = [](uint8_t* input, size_t bytes, uint8_t* output) {
+    using namespace base64::avx512bw;
+    encode_unrolled2(lookup_pshufb_improved, unpack, input, bytes, output);
+};
 #endif
 
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)

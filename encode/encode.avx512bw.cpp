@@ -41,6 +41,39 @@ namespace base64 {
             }
         }
 
+
+        // the above template unrolled
+        template <typename LOOKUP_FN, typename UNPACK_FN>
+        void encode_unrolled2(LOOKUP_FN lookup, UNPACK_FN unpack, const uint8_t* input, size_t bytes, uint8_t* output) {
+
+            uint8_t* out = output;
+            const __m512i permute_lookup = _mm512_set_epi32(-1, 11, 10, 9, -1, 8, 7, 6, -1, 5, 4, 3, -1, 2, 1, 0);
+            const __m512i shuffle_lookup = _mm512_set4_epi32(0x0a0b090a, 0x07080607, 0x04050304, 0x01020001);
+
+            for (size_t i = 0; i < bytes; i += 4 * 12 * 2) {
+                const __m512i a0 = _mm512_loadu_si512(input + i);
+                const __m512i b0 = _mm512_loadu_si512(input + i + 4 * 12);
+
+                const __m512i a1 = _mm512_permutexvar_epi32(permute_lookup, a0);
+                const __m512i b1 = _mm512_permutexvar_epi32(permute_lookup, b0);
+
+                const __m512i a2 = _mm512_shuffle_epi8(a1, shuffle_lookup);
+                const __m512i b2 = _mm512_shuffle_epi8(b1, shuffle_lookup);
+
+                const __m512i indices_a = unpack(a2);
+                const __m512i indices_b = unpack(b2);
+
+                // do lookup
+                const __m512i result_a = lookup(indices_a);
+                const __m512i result_b = lookup(indices_b);
+
+                _mm512_storeu_si512(reinterpret_cast<__m512i*>(out),      result_a);
+                _mm512_storeu_si512(reinterpret_cast<__m512i*>(out + 64), result_b);
+
+                out += 2 * 64;
+            }
+        }
+
     } // namespace avx512bw
 
 } // namespace base64

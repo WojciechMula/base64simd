@@ -236,12 +236,16 @@ protected:
 #endif
 
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-        if (can_run("avx512bw", "avx512bw/optimized2")) {
+        if (can_run("avx512bw", "avx512bw/1")) {
             run_function("AVX512BW (lookup: optimized2)", avx512bw_optimized2);
         }
 
-        if (can_run("avx512bw", "avx512bw/pshufb_improved")) {
+        if (can_run("avx512bw", "avx512bw/2")) {
             run_function("AVX512BW (lookup: pshufb improved)", avx512bw_pshufb_improved);
+        }
+
+        if (can_run("avx512bw", "avx512bw/3")) {
+            run_function("AVX512BW (lookup: pshufb improved, unrolled x 2)", avx512bw_pshufb_improved_unrolled2);
         }
 #endif
 
