@@ -204,65 +204,37 @@ int test() {
         fflush(stdout);
     };
 
-    show_name("scalar");
-    {   Test test(4, 3);
+    const int ANSI_GREEN = 32;
 
-        if (test.run(base64::scalar::decode_lookup1)) {
-            puts("OK");
-        } else {
-            return 1;
-        }
+#define RUN_PROCEDURE(input_size, output_size, name, function)  \
+    show_name(name);                                            \
+    {   Test test(input_size, output_size);                     \
+        if (test.run(function)) {                               \
+            printf("\033[%dm%s\033[0m\n", ANSI_GREEN, "OK");    \
+        } else {                                                \
+            return 1;                                           \
+        }                                                       \
     }
 
-    show_name("improved");
-    fflush(stdout);
-    {   Test test(4, 3);
-
-        if (test.run(base64::scalar::decode_lookup2)) {
-            puts("OK");
-        } else {
-            return 1;
-        }
-    }
+    RUN_PROCEDURE(4, 3, "scalar",   base64::scalar::decode_lookup1);
+    RUN_PROCEDURE(4, 3, "improved", base64::scalar::decode_lookup2);
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
-    show_name("scalar_bmi2");
-    {   Test test(4, 3);
-
-        if (test.run(base64::scalar::decode_lookup1_bmi2)) {
-            puts("OK");
-        } else {
-            return 1;
-        }
-     }
+    RUN_PROCEDURE(4, 3, "scalar_bmi2", base64::scalar::decode_lookup1_bmi2);
 #endif // HAVE_BMI2_INSTRUCTIONS
 
 #define RUN_TEMPLATE1(input_size, output_size, name, decode_fn, lookup_fn) { \
-        show_name(name); \
         auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
             return decode_fn(lookup_fn, input, size, output); \
         }; \
-        Test test(input_size, output_size); \
-        \
-        if (test.run(function)) { \
-            puts("OK"); \
-        } else { \
-            return 1; \
-        } \
+        RUN_PROCEDURE(input_size, output_size, name, function) \
     }
 
 #define RUN_TEMPLATE2(input_size, output_size, name, decode_fn, lookup_fn, pack_fn) { \
-        show_name(name); \
         auto function = [](const uint8_t* input, size_t size, uint8_t* output) { \
             return decode_fn(lookup_fn, pack_fn, input, size, output); \
         }; \
-        Test test(input_size, output_size); \
-        \
-        if (test.run(function)) { \
-            puts("OK"); \
-        } else { \
-            return 1; \
-        } \
+        RUN_PROCEDURE(input_size, output_size, name, function) \
     }
 
 #define RUN_SSE_TEMPLATE2(name, decode_fn, lookup_fn, pack_fn) \
