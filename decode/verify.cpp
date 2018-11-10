@@ -266,6 +266,8 @@ int test() {
     RUN_SSE_TEMPLATE2("sse/7", decode, lookup_incremental, pack_madd);
     RUN_SSE_TEMPLATE2("sse/8", decode, lookup_pshufb,      pack_madd);
     RUN_SSE_TEMPLATE2("sse/9", decode, lookup_pshufb_bitmask, pack_madd);
+
+    RUN_PROCEDURE(16, 12, "sse/10", decode_aqrit);
     }
 #endif
 

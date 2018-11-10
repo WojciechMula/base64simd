@@ -115,6 +115,61 @@ namespace base64 {
         }
 #endif // defined(HAVE_BMI2_INSTRUCTIONS)
 
+        // The algorithm by aqrit. It uses a clever hashing of input bytes
+        void decode_aqrit(const uint8_t* input, size_t size, uint8_t* output) {
+
+            const __m128i delta_asso = _mm_setr_epi8(
+                    0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+                    0x00, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x0F
+            );
+            const __m128i delta_values = _mm_setr_epi8(
+                    int8_t(0x00), int8_t(0x00), int8_t(0x00), int8_t(0x13),
+                    int8_t(0x04), int8_t(0xBF), int8_t(0xBF), int8_t(0xB9),
+                    int8_t(0xB9), int8_t(0x00), int8_t(0x10), int8_t(0xC3),
+                    int8_t(0xBF), int8_t(0xBF), int8_t(0xB9), int8_t(0xB9)
+            );
+            const __m128i check_asso = _mm_setr_epi8(
+                    0x0D, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+                    0x01, 0x01, 0x03, 0x07, 0x0B, 0x0B, 0x0B, 0x0F
+            );
+            const __m128i check_values = _mm_setr_epi8(
+                    int8_t(0x80), int8_t(0x80), int8_t(0x80), int8_t(0x80),
+                    int8_t(0xCF), int8_t(0xBF), int8_t(0xD5), int8_t(0xA6),
+                    int8_t(0xB5), int8_t(0x86), int8_t(0xD1), int8_t(0x80),
+                    int8_t(0xB1), int8_t(0x80), int8_t(0x91), int8_t(0x80)
+            );
+
+            for (size_t i=0; i < size; i += 16) {
+
+                const __m128i src     = _mm_loadu_si128((__m128i*)(input + i));
+                const __m128i shifted = _mm_srli_epi32(src, 3);
+
+                const __m128i delta_hash = _mm_avg_epu8(_mm_shuffle_epi8(delta_asso, src), shifted);
+                const __m128i check_hash = _mm_avg_epu8(_mm_shuffle_epi8(check_asso, src), shifted);
+
+                const __m128i out = _mm_adds_epi8(_mm_shuffle_epi8(delta_values, delta_hash), src);
+                const __m128i chk = _mm_adds_epi8(_mm_shuffle_epi8(check_values, check_hash), src);
+
+                const int mask = _mm_movemask_epi8(chk);
+                if (mask != 0) {
+                    const int pos = __builtin_ctz(mask);
+                    throw invalid_input(i + pos, input[i + pos]);
+                }
+
+                const __m128i pack_shuffle = _mm_setr_epi8(
+                    2,  1,  0,  6,  5,  4, 10,  9,
+                    8, 14, 13, 12, -1, -1, -1, -1
+                );
+
+                const __m128i t0 = _mm_maddubs_epi16(out, _mm_set1_epi32(0x01400140));
+                const __m128i t1 = _mm_madd_epi16(t0, _mm_set1_epi32(0x00011000));
+                const __m128i t2 = _mm_shuffle_epi8(t1, pack_shuffle);
+
+                _mm_storeu_si128((__m128i*)output, t2);
+                output += 12;
+            }
+        }
+
     } // namespace sse
 
 } // namespace base64

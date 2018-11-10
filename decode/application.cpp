@@ -111,6 +111,8 @@ protected:
         RUN_TEMPLATE2("sse/7", decode, lookup_incremental,    pack_madd);
         RUN_TEMPLATE2("sse/8", decode, lookup_pshufb,         pack_madd);
         RUN_TEMPLATE2("sse/9", decode, lookup_pshufb_bitmask, pack_madd);
+
+        run_function("sse/10", decode_aqrit);
         }
 #endif // defined(HAVE_SSE_INSTRUCTIONS)
 

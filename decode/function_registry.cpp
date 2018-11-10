@@ -35,24 +35,15 @@ private:
 class FunctionRegistry final {
 
     std::unordered_map<std::string, Function> registry;
-    Function unknown;
     int widest_image;
 
 public:
-    FunctionRegistry()
-        : unknown({"???", "unknown", "N/A", "N/A"}) {
-
+    FunctionRegistry() {
         build();
     }
 
     const Function& get(const std::string& name) const {
-
-        const auto it = registry.find(name);
-        if (it != registry.end()) {
-            return it->second;
-        } else {
-            return unknown;
-        }
+        return registry.at(name);
     }
 
     const char* operator[](const std::string& name) const {
@@ -66,15 +57,16 @@ public:
 private:
     void build();
     void add(const std::string& name, const std::string& display_name, const std::string& lookup_method, const std::string& pack_method);
+    void add(const std::string& name, const std::string& display_name);
 };
 
 
 void FunctionRegistry::build() {
 
-    add("improved",         "improved scalar",  "N/A", "N/A");
-    add("scalar",           "scalar",           "N/A", "N/A");
+    add("improved",         "improved scalar");
+    add("scalar",           "scalar");
 #if defined(HAVE_BMI2_INSTRUCTIONS)
-    add("scalar_bmi2",      "scalar & BMI2",    "N/A", "N/A");
+    add("scalar_bmi2",      "scalar & BMI2");
 #endif
     add("sse/1", "SSE", "base",         "naive");
     add("sse/2", "SSE", "byte blend",   "naive");
@@ -86,6 +78,7 @@ void FunctionRegistry::build() {
     add("sse/7", "SSE", "incremental",      "multiply-add");
     add("sse/8", "SSE", "pshufb",           "multiply-add");
     add("sse/9", "SSE", "pshufb bitmask",   "multiply-add");
+    add("sse/10", "SSE (aqrit)");
 
 #if defined(HAVE_XOP_INSTRUCTIONS)
     add("xop", "XOP", "pshufb bitmask", "multiply-add");
@@ -139,4 +132,9 @@ void FunctionRegistry::build() {
 void FunctionRegistry::add(const std::string& name, const std::string& display_name, const std::string& lookup, const std::string& pack) {
 
     registry.insert({name, {name, display_name, lookup, pack}});
+}
+
+void FunctionRegistry::add(const std::string& name, const std::string& display_name) {
+
+    registry.insert({name, {name, display_name, "N/A", "N/A"}});
 }
