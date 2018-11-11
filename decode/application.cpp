@@ -168,7 +168,8 @@ protected:
         {
         using namespace base64::avx512bw;
 
-        RUN_TEMPLATE2("avx512bw", decode, lookup_pshufb_bitmask, pack_madd);
+        RUN_TEMPLATE2("avx512bw/1", decode, lookup_pshufb_bitmask, pack_madd);
+        RUN_TEMPLATE2("avx512bw/2", decode, lookup_aqrit, pack_madd);
         }
 #endif // HAVE_AVX512VBMI_INSTRUCTIONS
 

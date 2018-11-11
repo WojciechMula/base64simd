@@ -106,13 +106,14 @@ void FunctionRegistry::build() {
 #   endif
 #endif
 #if defined(HAVE_AVX512BW_INSTRUCTIONS)
-    add("avx512bw", "AVX512BW", "N/A", "multiply-add");
+    add("avx512bw/1", "AVX512BW", "N/A",   "multiply-add");
+    add("avx512bw/2", "AVX512BW", "aqrit", "multiply-add");
 #endif
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
     add("avx512vbmi", "AVX512VBMI", "N/A", "multiply-add");
 #endif
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-    add("avx512/1", "AVX512 (gather)",            "N/A",        "N/A");
+    add("avx512/1", "AVX512 (gather)");
     add("avx512/2", "AVX512 (store: vectorized)", "vectorized", "improved");
     add("avx512/3", "AVX512 (store: scatter)",    "vectorized", "improved");
 #endif
