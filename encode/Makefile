@@ -109,7 +109,7 @@ verify_arm: $(VERIFY_DEPS) *.neon.cpp
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
 
-APPLICATION_DEPS=functions.cpp application.cpp ../config.h
+APPLICATION_DEPS=application.cpp ../config.h
 
 SPEED_DEPS=speed.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) $(EXT_DEPS)
 
