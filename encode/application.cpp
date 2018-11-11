@@ -99,105 +99,105 @@ protected:
 protected:
     void run_all() {
         
-        if (can_run("scalar", "scalar32")) {
+        if (can_run("scalar", "scalar/1")) {
             run_function("scalar (32 bit)", base64::scalar::encode32);
         }
 
 #if !defined(HAVE_NEON_INSTRUCTIONS)
-        if (can_run("scalar", "scalar64")) {
+        if (can_run("scalar", "scalar/2")) {
             run_function("scalar (64 bit)", base64::scalar::encode64);
         }
 
-        if (can_run("scalar", "swar")) {
+        if (can_run("scalar", "scalar/3")) {
             run_function("SWAR (64 bit)", base64::swar::encode);
         }
 #endif
 
 #if defined(HAVE_SSE_INSTRUCTIONS)
-        if (can_run("sse", "sse")) {
+        if (can_run("sse", "sse/1")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_naive, input, bytes, output);
             };
             run_function("SSE (lookup: naive)", fun);
         }
 
-        if (can_run("sse", "sse1")) {
+        if (can_run("sse", "sse/2")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_version1, input, bytes, output);
             };
             run_function("SSE (lookup: other improved)", fun);
         }
 
-        if (can_run("sse" ,"sse2")) {
+        if (can_run("sse" ,"sse/3")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_version2, input, bytes, output);
             };
             run_function("SSE (lookup: improved)", fun);
         }
 
-        if (can_run("sse", "sse3")) {
+        if (can_run("sse", "sse/4")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_pshufb, input, bytes, output);
             };
             run_function("SSE (lookup: pshufb-based)", fun);
         }
 
-        if (can_run("sse", "sse3/improved")) {
+        if (can_run("sse", "sse/5")) {
             auto sse_pshufb_improved = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_pshufb_improved, input, bytes, output);
             };
             run_function("SSE (lookup: pshufb improved)", sse_pshufb_improved);
         }
 
-        if (can_run("sse", "sse1/unrolled")) {
+        if (can_run("sse", "sse/6")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_unrolled(base64::sse::lookup_version1, input, bytes, output);
             };
             run_function("SSE (lookup: other improved, unrolled)", fun);
         }
 
-        if (can_run("sse", "sse2/unrolled")) {
+        if (can_run("sse", "sse/7")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_unrolled(base64::sse::lookup_version2, input, bytes, output);
             };
             run_function("SSE (lookup: improved, unrolled)", fun);
         }
 
-        if (can_run("sse", "sse2/unrolled2")) {
+        if (can_run("sse", "sse/8")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_unrolled(base64::sse::lookup_pshufb, input, bytes, output);
             };
             run_function("SSE (lookup: pshufb-based, unrolled)", fun);
         }
 
-        if (can_run("sse", "sse3/improved/unrolled")) {
+        if (can_run("sse", "sse/9")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode(base64::sse::lookup_pshufb_improved, input, bytes, output);
             };
             run_function("SSE (lookup: pshufb improved unrolled)", fun);
         }
 
-        if (can_run("sse", "sse2/fully_unrolled")) {
+        if (can_run("sse", "sse/10")) {
             run_function("SSE (fully unrolled improved lookup)", base64::sse::encode_full_unrolled);
         }
 #endif
 
 #if defined(HAVE_BMI2_INSTRUCTIONS)
-        if (can_run("bmi", "bmi1")) {
+        if (can_run("bmi", "bmi/1")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_bmi2(base64::sse::lookup_naive, input, bytes, output);
             };
             run_function("SSE & BMI2 (lookup: naive)", fun);
         }
 
-        if (can_run("bmi", "bmi2")) {
+        if (can_run("bmi", "bmi/2")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_bmi2(base64::sse::lookup_version1, input, bytes, output);
             };
             run_function("SSE & BMI2 (lookup: improved)", fun);
         }
 
-        if (can_run("bmi", "bmi3")) {
+        if (can_run("bmi", "bmi/3")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::sse::encode_bmi2(base64::sse::lookup_pshufb_improved, input, bytes, output);
             };
@@ -222,42 +222,42 @@ protected:
 #endif
 
 #if defined(HAVE_AVX2_INSTRUCTIONS)
-        if (can_run("avx2", "avx2")) {
+        if (can_run("avx2", "avx2/1")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode(base64::avx2::lookup_version2, input, bytes, output);
             };
             run_function("AVX2 (lookup: improved)", fun);
         }
 
-        if (can_run("avx2", "avx2/unrolled")) {
+        if (can_run("avx2", "avx2/2")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode_unrolled(base64::avx2::lookup_version2, input, bytes, output);
             };
             run_function("AVX2 (lookup: improved, unrolled)", fun);
         }
 
-        if (can_run("avx2", "avx2/pshufb")) {
+        if (can_run("avx2", "avx2/3")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode(base64::avx2::lookup_pshufb, input, bytes, output);
             };
             run_function("AVX2 (lookup: pshufb-based)", fun);
         }
 
-        if (can_run("avx2", "avx2/pshufb/unrolled")) {
+        if (can_run("avx2", "avx2/4")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode_unrolled(base64::avx2::lookup_pshufb, input, bytes, output);
             };
             run_function("AVX2 (lookup: pshufb-based, unrolled)", fun);
         }
 
-        if (can_run("avx2", "avx2/pshufb/improved")) {
+        if (can_run("avx2", "avx2/5")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode(base64::avx2::lookup_pshufb_improved, input, bytes, output);
             };
             run_function("AVX2 (lookup: pshufb improved)", fun);
         }
 
-        if (can_run("avx2", "avx2/pshufb/improved/unrolled")) {
+        if (can_run("avx2", "avx2/6")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode_unrolled(base64::avx2::lookup_pshufb_improved, input, bytes, output);
             };
@@ -265,7 +265,7 @@ protected:
         }
 
     #if defined(HAVE_BMI2_INSTRUCTIONS)
-        if (can_run("avx2", "avx2/pshufb/improved/unrolled")) {
+        if (can_run("avx2", "avx2/7")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 base64::avx2::encode_bmi2(base64::avx2::lookup_pshufb_improved, input, bytes, output);
             };
@@ -275,7 +275,7 @@ protected:
 #endif
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-        if (can_run("avx512", "avx512/logic")) {
+        if (can_run("avx512", "avx512/1")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 using namespace base64::avx512;
                 encode(lookup_incremental_logic, unpack, input, bytes, output);
@@ -283,7 +283,7 @@ protected:
             run_function("AVX512 (incremental logic)", fun);
         }
 
-        if (can_run("avx512", "avx512/logic/improved")) {
+        if (can_run("avx512", "avx512/2")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 using namespace base64::avx512;
                 encode(lookup_incremental_logic_improved, unpack, input, bytes, output);
@@ -291,7 +291,7 @@ protected:
             run_function("AVX512 (incremental logic improved)", fun);
         }
 
-        if (can_run("avx512", "avx512/logic/improved/gather")) {
+        if (can_run("avx512", "avx512/3")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 using namespace base64::avx512;
                 encode_load_gather(lookup_incremental_logic_improved, unpack, input, bytes, output);
@@ -299,7 +299,7 @@ protected:
             run_function("AVX512 (incremental logic improved with gather load)", fun);
         }
 
-        if (can_run("avx512", "avx512/binsearch")) {
+        if (can_run("avx512", "avx512/4")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 using namespace base64::avx512;
                 encode(lookup_binary_search, unpack, input, bytes, output);
@@ -307,7 +307,7 @@ protected:
             run_function("AVX512 (binary search)", fun);
         }
 
-        if (can_run("avx512", "avx512/gather")) {
+        if (can_run("avx512", "avx512/5")) {
             auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
                 using namespace base64::avx512;
                 encode(lookup_gather, unpack_identity, input, bytes, output);
