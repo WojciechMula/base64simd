@@ -24,18 +24,19 @@ Vectorization approaches were described in a series of articles:
 
 * `Base64 encoding with SIMD instructions`__,
 * `Base64 decoding with SIMD instructions`__,
-* `Base64 encoding & decoding using AVX512BW instructions`__,
+* `Base64 encoding & decoding using AVX512BW instructions`__ (includes AVX512VBMI and AVX512VL),
 * `AVX512F base64 coding and decoding`__.
+
+__ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
+__ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
+__ http://0x80.pl/notesen/2016-04-03-avx512-base64.html
+__ http://0x80.pl/articles/avx512-foundation-base64.html
 
 `Daniel Lemire`__ and I wrote also paper `Faster Base64 Encoding
 and Decoding Using AVX2 Instructions`__ which was published
 by `ACM Transactiona on the Web`__.
 
 __ http://lemire.me
-__ http://0x80.pl/notesen/2016-01-12-sse-base64-encoding.html
-__ http://0x80.pl/notesen/2016-01-17-sse-base64-decoding.html
-__ http://0x80.pl/notesen/2016-04-03-avx512-base64.html
-__ http://0x80.pl/articles/avx512-foundation-base64.html
 __ https://arxiv.org/abs/1704.00605
 __ https://tweb.acm.org/
 
