@@ -134,3 +134,12 @@ See also
 
 * Daniel's benchmarks and comparison with state of the art solutions
   https://github.com/lemire/fastbase64
+
+
+Who uses our algorithms?
+--------------------------------------------------
+
+* C/C++ library by **Alfred Klomp** https://github.com/aklomp/base64
+* .NET library by **Günther Foidl** https://github.com/gfoidl/Base64
+* there was attempt to include an assembly implementation into Go:
+  https://github.com/golang/go/issues/20206
