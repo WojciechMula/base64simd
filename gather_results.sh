@@ -2,7 +2,7 @@
 
 function usage
 {
-    echo "$0 [-a sse|avx2|avx512|avx512bw|avx512vbmi] [-n name] [-k]"
+    echo "$0 [-a sse|avx2|avx512|avx512bw|avx512vbmi|avx512vl] [-n name] [-k]"
 }
 
 BASENAME=results
@@ -21,11 +21,13 @@ do
             elif [[ ${ARCHITECTURE} == "avx2"
                  || ${ARCHITECTURE} == "avx512"
                  || ${ARCHITECTURE} == "avx512bw"
+                 || ${ARCHITECTURE} == "avx512vl"
                  || ${ARCHITECTURE} == "avx512vbmi" ]]
 
             then
                 TARGET=benchmark_${ARCHITECTURE}
             else
+                echo "Wrong architecture ${ARCHITECTURE}
                 usage
                 exit 1
             fi
