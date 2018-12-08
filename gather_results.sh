@@ -27,7 +27,7 @@ do
             then
                 TARGET=benchmark_${ARCHITECTURE}
             else
-                echo "Wrong architecture ${ARCHITECTURE}
+                echo "Wrong architecture ${ARCHITECTURE}"
                 usage
                 exit 1
             fi
