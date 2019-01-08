@@ -1,5 +1,5 @@
 #include <cassert>
-#if defined(HAVE_BMI_INSTRUCTIONS)
+#if defined(HAVE_BMI_INSTRUCTIONS) || defined(HAVE_BMI2_INSTRUCTIONS)
 #   include <x86intrin.h>
 #endif
 
@@ -176,8 +176,12 @@ namespace base64 {
                 // output: [00000000|ddddddcc|ccccbbbb|bbaaaaaa]
 
                 const uint32_t combined = (b0 << (3*8)) | (b1 << (2*8)) | (b2 << (1*8)) | (b3);
-                const uint32_t dword = _bswap(_pext_u32(combined, 0x3f3f3f3f) << 8);
+#ifdef __GNUC__
+                const uint32_t dword = __builtin_bswap32(_pext_u32(combined, 0x3f3f3f3f) << 8);
+#else
 
+                const uint32_t dword = _bswap(_pext_u32(combined, 0x3f3f3f3f) << 8);
+#endif
                 *reinterpret_cast<uint32_t*>(out) = dword;
                 out += 3;
             }

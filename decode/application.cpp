@@ -1,6 +1,8 @@
 #include "../cmdline.cpp"
+#include "../benchmark.h"
 #include "function_registry.cpp"
 #include "all.cpp"
+#include <cstring>
 
 template <typename Derived>
 class ApplicationBase {
@@ -48,6 +50,7 @@ protected:
         }
 
         fill_input();
+        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_input_size()), "memcpy", 1000, count);
 
         initialized = true;
     }

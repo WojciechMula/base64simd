@@ -2,11 +2,11 @@
 .PHONY: all clean run
 
 SDE=sde -cnl
-FLAGS_BASE=$(CXXFLAGS) -Wall -Wextra -pedantic -O3 -std=gnu++11
+FLAGS_BASE=$(CXXFLAGS) -Wall -Wextra -pedantic -O3 -std=c++14
 
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
-    FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
+    FLAGS_BASE+=-mbmi2 -DHAVE_BMI2_INSTRUCTIONS
 endif
 
 FLAGS=$(FLAGS_BASE) -msse4 -DHAVE_SSE_INSTRUCTIONS
