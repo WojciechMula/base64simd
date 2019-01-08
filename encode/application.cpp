@@ -1,7 +1,9 @@
 #include "../config.h"
+#include "../benchmark.h"
 #include <cstdint>
 #include <cstdlib>
 #include <memory>
+#include <cstring>
 
 #include "encode.scalar.cpp"
 #include "lookup.swar.cpp"
@@ -73,6 +75,7 @@ public:
         printf("input size: %lu\n", get_input_size());
 
         fill_input();
+        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_input_size()), "memcpy", 1000, count);
 
         initialized = true;
     }
