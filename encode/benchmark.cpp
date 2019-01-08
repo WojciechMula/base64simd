@@ -29,7 +29,7 @@ private:
             function(input.get(), get_input_size(), output.get());
         };
 
-        BEST_TIME(, fn(), name, iterations, count);
+        BEST_TIME(, fn(), name, iterations, get_input_size());
     }
 };
 

@@ -13,14 +13,13 @@ void* avx512_memcpy(void *dst, const void * src, size_t n) {
       __m512i x = _mm512_loadu_si512((const char*)src + i);
       _mm512_storeu_si512((char*)dst + i, x);
     }
-    if((n%64)!=0) ::memcpy((char*)dst + n - (n%64), (const char*)src + n - (n%64), n%64);
+    size_t leftover = n % 64;
+    ::memcpy((char*)dst + n - leftover, (const char*)src + n - leftover, leftover);
     return dst;
   } else {
     return ::memcpy(dst,src,n);
   }
-
 }
-
 #endif
 
 template <typename Derived>
@@ -60,19 +59,25 @@ protected:
 #if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
         base64::avx512vbmi::prepare_lookups();
 #endif // HAVE_AVX512VBMI_INSTRUCTIONS
-
         input.reset (new uint8_t[get_input_size()]);
         output.reset(new uint8_t[get_output_size() + 64]);
 
         if (!quiet) {
             printf("input size: %lu\n", get_input_size());
+            printf("number of iterations: %u\n", iterations);
+            printf("We report the time in cycles per output byte.\n");
+            printf("For reference, we present the time needed to copy %zu bytes.\n", get_output_size());
         }
 
         fill_input();
-        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_output_size()), "memcpy", 1000, count);
+        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_output_size()), "memcpy", iterations, get_output_size());
 
 #if defined(HAVE_AVX512_INSTRUCTIONS)
-        BEST_TIME(/**/, avx512_memcpy(output.get(),input.get(),get_output_size()), "memcpy (avx512)", 1000, count);
+        size_t inalign = reinterpret_cast<uintptr_t>(input.get()) & 63;
+        size_t outalign = reinterpret_cast<uintptr_t>(output.get()) & 63;
+        if((inalign !=0) || (outalign!=0))
+          printf("warning: your data pointers are unaligned: %zu %zu\n", inalign, outalign);
+        BEST_TIME(/**/, avx512_memcpy(output.get(),input.get(),get_output_size()), "memcpy (avx512)", iterations, get_output_size());
 #endif
         initialized = true;
     }

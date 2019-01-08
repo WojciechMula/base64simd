@@ -17,7 +17,7 @@ public:
     Application(const CommandLine& c, const FunctionRegistry& r) : super(c, r) {
 
         count      = 4 * 1024; /* override the defaults */
-        iterations = 1000;
+        iterations = 10000;
     }
 
     void run() {
