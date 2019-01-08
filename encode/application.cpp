@@ -44,7 +44,24 @@
 
 #include "../cmdline.cpp"
 
+#if defined(HAVE_AVX512_INSTRUCTIONS)
+#include <immintrin.h>
+void* avx512_memcpy(void *dst, const void * src, size_t n) {
+  if(n >= 64) {
+    size_t nminus64 = n - 64;
+    for(size_t i = 0; i <= nminus64; i+=64) {
+      __m512i x = _mm512_loadu_si512((const char*)src + i);
+      _mm512_storeu_si512((char*)dst + i, x);
+    }
+    if((n%64)!=0) ::memcpy((char*)dst + n - (n%64), (const char*)src + n - (n%64), n%64);
+    return dst;
+  } else {
+    return ::memcpy(dst,src,n);
+  }
+  
+}
 
+#endif
 template <typename Derived>
 class ApplicationBase {
 
@@ -76,7 +93,9 @@ public:
 
         fill_input();
         BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_input_size()), "memcpy", 1000, count);
-
+#if defined(HAVE_AVX512_INSTRUCTIONS)
+        BEST_TIME(/**/, avx512_memcpy(output.get(),input.get(),get_input_size()), "memcpy (avx512)", 1000, count);
+#endif
         initialized = true;
     }
 
