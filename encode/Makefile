@@ -6,7 +6,7 @@ FLAGS_BASE=$(CXXFLAGS) -Wall -Wextra -pedantic -O3
 
 HAVE_BMI2=$(shell python script/cpuflags.py bmi2)
 ifeq ($(HAVE_BMI2),present)
-    FLAGS_BASE+=-DHAVE_BMI2_INSTRUCTIONS
+    FLAGS_BASE+=-mbmi2 -DHAVE_BMI2_INSTRUCTIONS
 endif
 
 FLAGS=$(FLAGS_BASE) -std=c++11 -msse4 -DHAVE_SSE_INSTRUCTIONS
