@@ -50,7 +50,7 @@ protected:
         }
 
         fill_input();
-        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_input_size()), "memcpy", 1000, count);
+        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_output_size()), "memcpy", 1000, count);
 
         initialized = true;
     }
