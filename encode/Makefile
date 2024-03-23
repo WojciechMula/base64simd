@@ -219,7 +219,7 @@ check_riscv: check_rvv
 	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 speed_riscv: speed_rvv
-	spike -l --log-commits --log=log --isa=$(SPIKE_ISA) `which pk` $^
+	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 unpack_test: unpack_bigendian.cpp
 	$(CXX) $(FLAGS) $^ -o $@

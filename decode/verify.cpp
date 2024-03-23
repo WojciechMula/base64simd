@@ -4,14 +4,14 @@
 #include "../config.h"
 
 #include "all.cpp"
-
 #include "function_registry.cpp"
+#include "initialize.cpp"
 
 
 class Test {
 
-    uint8_t input[64];
-    uint8_t output[64];
+    uint8_t input[128];
+    uint8_t output[128];
     unsigned bytes;
     unsigned out_size;
     unsigned current;
@@ -56,7 +56,7 @@ private:
         fn(input, bytes, output);
 
         if (output[0] != uint8_t(out[0]) || output[1] != uint8_t(out[1]) || output[2] != uint8_t(out[2])) {
-            printf("\ninvalid output %02x %02x %02x, expected %02x %02x %02x (input: %c%c%c%c\n",
+            printf("\ninvalid output %02x %02x %02x, expected %02x %02x %02x (input: %c%c%c%c)\n",
                         output[0], output[1], output[2],
                         uint8_t(out[0]), uint8_t(out[1]), uint8_t(out[2]),
                         in[0], in[1], in[2], in[3]);
@@ -252,6 +252,9 @@ int test() {
 #define RUN_NEON_TEMPLATE2(name, decode_fn, lookup_fn) \
     RUN_TEMPLATE1(32, 24, name, decode_fn, lookup_fn)
 
+#define RUN_RVV_VLEN16_LMUL8_TEMPLATE(name, decode_fn, lookup_fn, pack_fn) \
+    RUN_TEMPLATE2(16*8, 3*((16*8)/4), name, decode_fn, lookup_fn, pack_fn)
+
 #if defined(HAVE_SSE_INSTRUCTIONS)
     {
     using namespace base64::sse;
@@ -342,21 +345,20 @@ int test() {
     RUN_NEON_TEMPLATE2("neon/2", decode, lookup_pshufb_bitmask);
     }
 #endif // HAVE_NEON_INSTRUCTIONS
+
+#if defined(HAVE_RVV_INSTRUCTIONS)
+    {
+    using namespace base64::rvv;
+    RUN_RVV_VLEN16_LMUL8_TEMPLATE("rvv/1", decode_vlen16_m8, lookup_vlen16_m8, pack_vlen16_m8);
+    }
+#endif // HAVE_RVV_INSTRUCTIONS
+
     return 0;
 }
 
 
 int main() {
-
-    base64::scalar::prepare_lookup();
-    base64::scalar::prepare_lookup32();
-#if defined(HAVE_AVX512_INSTRUCTIONS)
-    base64::avx512::prepare_lookups();
-#endif
-#if defined(HAVE_AVX512VBMI_INSTRUCTIONS)
-    base64::avx512vbmi::prepare_lookups();
-#endif
-
+    initialize();
 
     try {
         return test();

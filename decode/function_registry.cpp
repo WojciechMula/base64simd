@@ -1,7 +1,6 @@
 #include <unordered_map>
 #include <string>
 #include <sstream>
-#include <iostream>
 
 class Function {
 
@@ -32,7 +31,6 @@ private:
         }
     }
 };
-
 
 class FunctionRegistry final {
 
@@ -122,6 +120,9 @@ void FunctionRegistry::build() {
 #if defined(HAVE_NEON_INSTRUCTIONS)
     add("neon/1", "ARM NEON", "byte blend", "N/A");
     add("neon/2", "ARM NEON", "pshufb bitmask", "N/A");
+#endif
+#if defined(HAVE_RVV_INSTRUCTIONS)
+    add("rvv/1", "RISC-V Vector", "N/A", "N/A");
 #endif
     widest_image = 0;
     for (auto& it: registry) {

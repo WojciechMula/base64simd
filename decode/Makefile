@@ -17,6 +17,7 @@ FLAGS_AVX512VBMI=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512VBMI_INSTRUCTION
 FLAGS_AVX512VL=$(FLAGS_AVX512VBMI) -DHAVE_AVX512VL_INSTRUCTIONS
 FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
+FLAGS_RVV=$(FLAGS_BASE) -std=c++11 -march=rv64gcv -DHAVE_RVV_INSTRUCTIONS -static
 
 DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp function_registry.cpp ../avx512_swar.cpp ../config.h
 
@@ -27,8 +28,9 @@ ALL_AVX2=verify_avx2 speed_avx2 check_avx2 benchmark_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512 benchmark_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw benchmark_avx512bw
 ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
+ALL_RVV=verify_rvv check_rvv
 ALL_INTEL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512VBMI) $(ALL_AVX512BW)
-ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM)
+ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM) $(ALL_RVV)
 
 all: $(ALL)
 
@@ -99,6 +101,9 @@ verify_avx512bw: $(VERIFY_DEPS)
 verify_arm: $(VERIFY_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
+verify_rvv: $(VERIFY_DEPS)
+	$(CXX) $(FLAGS_RVV) $< -o $@
+
 
 SPEED_DEPS=speed.cpp $(DEPS) application.cpp ../cmdline.cpp ../gettime.cpp
 
@@ -144,6 +149,9 @@ check_avx512vbmi: $(CHECK_DEPS)
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
+check_rvv: $(CHECK_DEPS)
+	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE="1*1024" -DITERATIONS=1 $< -o $@
+
 
 BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h
 
@@ -168,12 +176,27 @@ benchmark_avx512vbmi: $(BENCHMARK_DEPS)
 benchmark_avx512vl: $(BENCHMARK_DEPS)
 	$(CXX) $(FLAGS_AVX512VL) $< -o $@
 
+benchmark_rvv: $(BENCHMARK_DEPS)
+	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE="4 * 1024" -DITERATIONS=100 $< -o $@
+
 build_intel: $(ALL_INTEL_TARGETS)
 verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw
 	sde -cnl -- ./verify
 	sde -cnl -- ./verify_avx2
 	sde -cnl -- ./verify_avx512
 	sde -cnl -- ./verify_avx512bw
+
+SPIKE_ISA=rv64gcv_Zicntr
+
+verify_riscv: verify_rvv
+	#spike -l --log-commits --log=log --isa=$(SPIKE_ISA) `which pk` $^
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+check_riscv: check_rvv
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+benchmark_riscv: benchmark_rvv
+	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 clean:
 	rm -f $(ALL_TARGETS)

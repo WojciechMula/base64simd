@@ -23,7 +23,6 @@ public:
         , valid_hash(0) {}
 
     bool run() {
-
         initialize();
         run_all();
 
@@ -67,5 +66,3 @@ int main(int argc, char* argv[]) {
 
     return app.run() ? EXIT_SUCCESS : EXIT_FAILURE;
 }
-
-

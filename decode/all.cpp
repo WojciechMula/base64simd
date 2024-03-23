@@ -21,4 +21,6 @@
 #if defined(HAVE_NEON_INSTRUCTIONS)
 #   include "decoders.neon.cpp"
 #endif
-
+#if defined(HAVE_RVV_INSTRUCTIONS)
+#   include "decoders.rvv.cpp"
+#endif
