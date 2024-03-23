@@ -6,6 +6,7 @@ verify_*
 speed_*
 check_*
 benchmark_*
+log
 
 unpack_test
 

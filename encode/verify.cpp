@@ -42,6 +42,10 @@
 #   include "lookup.neon.cpp"
 #   include "encode.neon.cpp"
 #endif
+#if defined(HAVE_RVV_INSTRUCTIONS)
+#   include "lookup.rvv.cpp"
+#   include "encode.rvv.cpp"
+#endif
 
 const char* lookup = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
@@ -308,6 +312,105 @@ void test_neon(const char* name, LOOKUP_FN fn) {
 #endif
 
 
+#if defined(HAVE_RVV_INSTRUCTIONS)
+template<typename LOOKUP_FN>
+void test_rvv_vlen16_m1(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
+
+    const size_t N = 16;
+
+    uint8_t input[N];
+    uint8_t output[N * 10];
+
+    for (unsigned byte=0; byte < N; byte++) {
+
+        memset(input, 0, N);
+
+        for (unsigned i=0; i < 64; i++) {
+
+            input[byte] = i;
+
+            const size_t vl = __riscv_vsetvlmax_e8m1();
+            vuint8m1_t in   = __riscv_vle8_v_u8m1(input, vl);
+            vuint8m1_t out  = fn(in, vl);
+
+            __riscv_vse8_v_u8m1(output, out, vl);
+
+            for (unsigned j=0; j < N; j++) {
+                if (j == byte) {
+                    if (output[j] != lookup[i]) {
+                        printf("failed at %d, byte %d - wrong result\n", i, byte);
+                        const uint8_t got  = output[j];
+                        const uint8_t want = lookup[i];
+                        printf("* got:  %3d (0x%02x, '%c')\n", got, got, got);
+                        printf("* want: %3d (0x%02x, '%c')\n", want, want, want);
+                        exit(1);
+                    }
+                } else {
+                    if (output[j] != lookup[0]) {
+                        printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
+                        exit(1);
+                    }
+                }
+            }
+        }
+    }
+
+    puts("OK");
+}
+
+template<typename LOOKUP_FN>
+void test_rvv_vlen16_m8(const char* name, LOOKUP_FN fn) {
+
+    printf("%s... ", name);
+    fflush(stdout);
+
+    const size_t N = 16 * 8;
+
+    uint8_t input[N];
+    uint8_t output[N * 10];
+
+    for (unsigned byte=0; byte < N; byte++) {
+
+        memset(input, 0, N);
+
+        for (unsigned i=0; i < 64; i++) {
+            input[byte] = i;
+
+            const size_t vl = __riscv_vsetvlmax_e8m8();
+            vuint8m8_t in   = __riscv_vle8_v_u8m8(input, vl);
+            vuint8m8_t out  = fn(in, vl);
+
+            __riscv_vse8_v_u8m8(output, out, vl);
+
+            for (unsigned j=0; j < N; j++) {
+                if (j == byte) {
+                    if (output[j] != lookup[i]) {
+                        printf("failed at %d, byte %d - wrong result\n", i, byte);
+                        const uint8_t got  = output[j];
+                        const uint8_t want = lookup[i];
+                        printf("* got:  %3d (0x%02x, '%c')\n", got, got, got);
+                        printf("* want: %3d (0x%02x, '%c')\n", want, want, want);
+                        exit(1);
+                    }
+                } else {
+                    if (output[j] != lookup[0]) {
+                        printf("failed at %d, byte %d - spoiled random byte\n", i, byte);
+                        exit(1);
+                    }
+                }
+            }
+        }
+    }
+
+    puts("OK");
+}
+#endif
+
+
+
 int validate_lookup() {
 
     test_scalar("reference branchless (optimized v2)", reference::lookup_version2);
@@ -350,6 +453,11 @@ int validate_lookup() {
     test_neon("ARM NEON implementation of optimized algorithm", base64::neon::lookup_version2);
     test_neon("ARM NEON implementation of pshufb improved algorithm", base64::neon::lookup_pshufb_improved);
 #endif
+
+#if defined(HAVE_RVV_INSTRUCTIONS)
+    test_rvv_vlen16_m1("RISC-V Vector implementation of pshufb improved algorithm", base64::rvv::lookup_pshufb_improved);
+    test_rvv_vlen16_m8("RISC-V Vector implementation using wide gather", base64::rvv::lookup_wide_gather);
+#endif
     return 0;
 }
 
@@ -368,6 +476,8 @@ void validate_encoding(const char* name, ENC encode) {
                             "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v";
     const size_t outlen   = strlen(expected);
     uint8_t output[512];
+    memset(output, '_', sizeof(output));
+    output[sizeof(output) - 1] = 0;
 
     printf("%s... ", name);
     fflush(stdout);
@@ -487,11 +597,24 @@ void validate_encoding() {
 
     validate_encoding("ARM NEON", neon);
 #endif
+
+#ifdef HAVE_RVV_INSTRUCTIONS
+    auto rvv_m1 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::rvv::encode(base64::rvv::lookup_pshufb_improved, input, bytes, output);
+    };
+
+    validate_encoding("RISC-V Vector (LMUL=1)", rvv_m1);
+
+    auto rvv_m8 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::rvv::encode_m8(base64::rvv::lookup_wide_gather, input, bytes, output);
+    };
+
+    validate_encoding("RISC-V Vector (LMUL=8)", rvv_m8);
+#endif
 }
 
 
 int main() {
-
 #if defined(HAVE_AVX512_INSTRUCTIONS)
     base64::avx512::initialize();
 #endif

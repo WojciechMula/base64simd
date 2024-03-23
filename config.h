@@ -26,7 +26,13 @@
 #   endif
 #endif
 
-#if !defined(HAVE_NEON_INSTRUCTIONS)
+#if !defined(HAVE_NEON_INSTRUCTIONS) && !defined(HAVE_RVV_INSTRUCTIONS)
 #   include <immintrin.h>
 #   include <x86intrin.h>
+#endif
+
+#if defined(HAVE_RVV_INSTRUCTIONS)
+#   ifdef __riscv_v_intrinsic
+#       include <riscv_vector.h>
+#   endif
 #endif

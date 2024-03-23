@@ -17,6 +17,7 @@ FLAGS_AVX512VBMI=$(FLAGS_BASE) -std=c++11 -mavx512vbmi -mbmi2 -DHAVE_AVX512VBMI_
 FLAGS_AVX512VL=$(FLAGS_AVX512VBMI) -DHAVE_AVX512VL_INSTRUCTIONS
 FLAGS_XOP=$(FLAGS_BASE) -std=c++11 -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -std=gnu++11 -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
+FLAGS_RVV=$(FLAGS_BASE) -std=c++11 -march=rv64gcv -DHAVE_RVV_INSTRUCTIONS -static
 
 EXT_DEPS=../fnv32.cpp ../gettime.cpp
 
@@ -28,8 +29,9 @@ ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
 ALL_AVX512VL=verify_avx512vl check_avx512vl benchmark_avx512vl
 ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
 ALL_ARM=verify_arm speed_arm check_arm
+ALL_RVV=verify_rvv
 ALL_INTEL_TARGETS=$(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_AVX512VBMI) $(ALL_AVX512VL) $(ALL_XOP)
-ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM)
+ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM) $(ALL_RVV)
 
 all: $(ALL)
 
@@ -108,6 +110,8 @@ verify_xop: $(VERIFY_DEPS)
 verify_arm: $(VERIFY_DEPS) *.neon.cpp
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
+verify_rvv: $(VERIFY_DEPS) *.rvv.cpp ../rvv-debug.h
+	$(CXX) $(FLAGS_RVV) $< -o $@
 
 APPLICATION_DEPS=application.cpp ../config.h
 
@@ -198,6 +202,10 @@ verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw verify_avx512vbmi
 	$(SDE) ./verify_avx512bw
 	$(SDE) ./verify_avx512vbmi
 	$(SDE) ./verify_avx512vl
+
+verify_riscv: verify_rvv
+	#spike -l --log-commits --log=log --isa=rv64gcv `which pk` $^
+	spike --isa=rv64gcv `which pk` $^
 
 unpack_test: unpack_bigendian.cpp
 	$(CXX) $(FLAGS) $^ -o $@
