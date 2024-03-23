@@ -114,10 +114,11 @@ namespace base64 {
             const size_t     vl   = __riscv_vsetvlmax_e8m8();
             const vuint8m8_t shuf = __riscv_vle8_v_u8m8(expand_vlen16_m8, vl);
 
-            while (bytes > 0) {
+            const size_t step = 3*(4*8);
+            while (bytes >= step) {
                 const vuint8m8_t in = __riscv_vle8_v_u8m8(input, vl);
-                input += 3*(4*8);
-                bytes -= 3*(4*8);
+                input += step;
+                bytes -= step;
 
                 // in32  = [bbbbcccc|ccdddddd|aaaaaabb|bbbbcccc]
                 const vuint8m8_t  tmp  = __riscv_vrgather_vv_u8m8(in, shuf, vl);

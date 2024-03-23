@@ -29,7 +29,7 @@ ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
 ALL_AVX512VL=verify_avx512vl check_avx512vl benchmark_avx512vl
 ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
 ALL_ARM=verify_arm speed_arm check_arm
-ALL_RVV=verify_rvv
+ALL_RVV=verify_rvv speed_rvv check_rvv
 ALL_INTEL_TARGETS=$(ALL) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512BW) $(ALL_AVX512VBMI) $(ALL_AVX512VL) $(ALL_XOP)
 ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM) $(ALL_RVV)
 
@@ -141,6 +141,9 @@ speed_xop: $(SPEED_DEPS) *.xop.cpp
 speed_arm: $(SPEED_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
+speed_rvv: $(SPEED_DEPS) *.rvv.cpp
+	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE=8912 $< -o $@
+
 
 CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) $(EXT_DEPS)
 
@@ -167,6 +170,9 @@ check_xop: $(CHECK_DEPS) *.xop.cpp
 
 check_arm: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_ARM) -DBUFFER_SIZE=4194304 $< -o $@
+
+check_rvv: $(CHECK_DEPS) *.rvv.cpp
+	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE=262144 $< -o $@
 
 
 BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) ../benchmark.h
@@ -203,9 +209,17 @@ verify_intel: verify verify_avx2 verify_avx512 verify_avx512bw verify_avx512vbmi
 	$(SDE) ./verify_avx512vbmi
 	$(SDE) ./verify_avx512vl
 
+SPIKE_ISA=rv64gcv_Zicntr
+
 verify_riscv: verify_rvv
-	#spike -l --log-commits --log=log --isa=rv64gcv `which pk` $^
-	spike --isa=rv64gcv `which pk` $^
+	#spike -l --log-commits --log=log --isa=$(SPIKE_ISA) `which pk` $^
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+check_riscv: check_rvv
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+speed_riscv: speed_rvv
+	spike -l --log-commits --log=log --isa=$(SPIKE_ISA) `which pk` $^
 
 unpack_test: unpack_bigendian.cpp
 	$(CXX) $(FLAGS) $^ -o $@

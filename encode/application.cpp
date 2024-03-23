@@ -41,6 +41,10 @@
 #   include "lookup.neon.cpp"
 #   include "encode.neon.cpp"
 #endif
+#if defined(HAVE_RVV_INSTRUCTIONS)
+#   include "lookup.rvv.cpp"
+#   include "encode.rvv.cpp"
+#endif
 
 #include "../cmdline.cpp"
 
@@ -75,11 +79,10 @@ void* avx512_memcpy(void *dst, const void * src, size_t n) {
   }
   
 }
-
 #endif
+
 template <typename Derived>
 class ApplicationBase {
-
 protected:
     const CommandLine& cmd;
     const size_t count;
@@ -96,7 +99,6 @@ public:
         , initialized(false) {}
 
     void initialize() {
-
         if (initialized) {
             return;
         }
@@ -104,12 +106,12 @@ public:
         input.reset (new uint8_t[get_input_size()]);
         output.reset(new uint8_t[get_output_size()]);
 
-        printf("input size: %lu\n", get_input_size());
+        printf("input size: %lu, output size: %lu\n", get_input_size(), get_output_size());
         printf("number of iterations: %lu\n", iterations);
         printf("We report the time in cycles per input byte.\n");
         fill_input();
         printf("For reference, we present the time needed to copy %zu bytes.\n", get_input_size());
-        BEST_TIME(/**/, ::memcpy(output.get(),input.get(),get_input_size()), "memcpy", iterations, get_input_size());
+        BEST_TIME(/**/, ::memcpy(output.get(), input.get(), get_input_size()), "memcpy", iterations, get_input_size());
 #if defined(HAVE_AVX512_INSTRUCTIONS)
         size_t inalign = reinterpret_cast<uintptr_t>(input.get()) & 63;
         size_t outalign = reinterpret_cast<uintptr_t>(output.get()) & 63;
@@ -126,7 +128,9 @@ protected:
     }
 
     size_t get_output_size() const {
-        return 4*count;
+        const size_t padding_log2 = 8;
+        const size_t mask = (size_t(1) << padding_log2) - 1;
+        return (4*count + mask) & ~mask;
     }
 
     void fill_input() {
@@ -426,6 +430,24 @@ protected:
                 encode(lookup_pshufb_improved, input, bytes, output);
             };
             run_function("ARM NEON (pshufb improved lookup)", fun);
+        }
+#endif
+
+#if defined(HAVE_RVV_INSTRUCTIONS)
+        if (can_run("rvv", "rvv/1")) {
+            auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
+                using namespace base64::rvv;
+                encode(lookup_pshufb_improved, input, bytes, output);
+            };
+            run_function("RISC-V RVV (LMUL=1)", fun);
+        }
+
+        if (can_run("rvv", "rvv/2")) {
+            auto fun = [](uint8_t* input, size_t bytes, uint8_t* output) {
+                using namespace base64::rvv;
+                encode_m8(lookup_wide_gather, input, bytes, output);
+            };
+            run_function("RISC-V RVV (LMUL=8)", fun);
         }
 #endif
     }
