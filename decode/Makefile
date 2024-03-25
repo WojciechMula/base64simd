@@ -153,6 +153,12 @@ check_rvv: $(CHECK_DEPS)
 	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE="1*1024" -DITERATIONS=1 $< -o $@
 
 
+CHECK_WS_DEPS=check_ws.cpp $(DEPS) ../cmdline.cpp ../fnv32.cpp
+
+check_ws: $(CHECK_WS_DEPS)
+	$(CXX) $(FLAGS) $< -o $@
+
+
 BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h
 
 benchmark: $(BENCHMARK_DEPS)

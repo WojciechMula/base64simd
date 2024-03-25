@@ -8,19 +8,26 @@ namespace base64 {
     namespace scalar {
 
         static uint8_t lookup[256];
+        static uint8_t lookup_ws[256];
         static uint32_t lookup32[4][256];
 
         void prepare_lookup() {
-
             for (unsigned i=0; i < 256; i++) {
                 lookup[i] = 0xff;
+                lookup_ws[i] = 0xff;
             }
 
             for (unsigned i=0; i < 64; i++) {
-
                 const uint8_t c = static_cast<uint8_t>(base64::lookup[i]);
                 lookup[c] = i;
+                lookup_ws[c] = i;
             }
+
+            lookup_ws[' '] = 0x7f;
+            lookup_ws['\n'] = 0x7f;
+            lookup_ws['\r'] = 0x7f;
+            lookup_ws['\t'] = 0x7f;
+            lookup_ws['\v'] = 0x7f;
         }
 
         void decode_lookup1(const uint8_t* input, size_t size, uint8_t* output) {
@@ -60,6 +67,64 @@ namespace base64 {
                 *out++ = (b2 >> 2) | (b1 << 4);
                 *out++ = b3 | (b2 << 6);
             }
+        }
+
+        uint8_t* decode_lookup_ws(const uint8_t* input, size_t size, uint8_t* output) {
+            uint8_t* out = output;
+            int k = 0;
+
+            uint8_t bytes[4];
+            bytes[0] = 0;
+            bytes[1] = 0;
+            bytes[2] = 0;
+            bytes[3] = 0;
+
+            for (size_t i=0; i < size; i++) {
+                const uint8_t b = base64::scalar::lookup[input[i]];
+                if (b == 0xff) {
+                    throw invalid_input(i, input[i]);
+                }
+
+                if (b == 0x7f) {
+                    continue;
+                }
+
+                if (k == 4) {
+                    *out++ = (bytes[1] >> 4) | (bytes[0] << 2);
+                    *out++ = (bytes[2] >> 2) | (bytes[1] << 4);
+                    *out++ = bytes[3] | (bytes[2] << 6);
+                    k = 0;
+                }
+
+                bytes[k] = b;
+                k += 1;
+            }
+
+            switch (k) {
+                case 1: {
+                    *out++ = (bytes[0] << 2);
+                    break;
+                }
+                case 2: {
+                    *out++ = (bytes[1] >> 4) | (bytes[0] << 2);
+                    *out++ = (bytes[1] << 4);
+                    break;
+                }
+                case 3: {
+                    *out++ = (bytes[1] >> 4) | (bytes[0] << 2);
+                    *out++ = (bytes[2] >> 2) | (bytes[1] << 4);
+                    *out++ = (bytes[2] << 6);
+                    break;
+                }
+                case 4: {
+                    *out++ = (bytes[1] >> 4) | (bytes[0] << 2);
+                    *out++ = (bytes[2] >> 2) | (bytes[1] << 4);
+                    *out++ = bytes[3] | (bytes[2] << 6);
+                    break;
+                }
+            }
+
+            return out;
         }
 
         void prepare_lookup32() {
