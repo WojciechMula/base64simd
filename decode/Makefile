@@ -17,18 +17,18 @@ FLAGS_AVX512VBMI=$(FLAGS_BASE) -mavx512vbmi -mbmi2 -DHAVE_AVX512VBMI_INSTRUCTION
 FLAGS_AVX512VL=$(FLAGS_AVX512VBMI) -DHAVE_AVX512VL_INSTRUCTIONS
 FLAGS_XOP=$(FLAGS_BASE) -mxop -DHAVE_XOP_INSTRUCTIONS
 FLAGS_ARM=$(FLAGS_BASE) -mfpu=neon -DHAVE_NEON_INSTRUCTIONS
-FLAGS_RVV=$(FLAGS_BASE) -std=c++11 -march=rv64gcv -DHAVE_RVV_INSTRUCTIONS -static
+FLAGS_RVV=$(FLAGS_BASE) -march=rv64gcv -DHAVE_RVV_INSTRUCTIONS -static
 
 DEPS=decode.*.cpp decoders.*.cpp lookup.*.cpp pack.*.cpp all.cpp function_registry.cpp ../avx512_swar.cpp ../config.h
 
-ALL=verify speed check benchmark
+ALL=verify speed check benchmark check_ws
 ALL_XOP=verify_xop speed_xop check_xop benchmark_xop
 ALL_ARM=verify_arm speed_arm check_arm
 ALL_AVX2=verify_avx2 speed_avx2 check_avx2 benchmark_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512 benchmark_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw benchmark_avx512bw
 ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
-ALL_RVV=verify_rvv check_rvv
+ALL_RVV=verify_rvv check_rvv check_ws_rvv
 ALL_INTEL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512VBMI) $(ALL_AVX512BW)
 ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM) $(ALL_RVV)
 
@@ -158,6 +158,9 @@ CHECK_WS_DEPS=check_ws.cpp $(DEPS) ../cmdline.cpp ../fnv32.cpp
 check_ws: $(CHECK_WS_DEPS)
 	$(CXX) $(FLAGS) $< -o $@
 
+check_ws_rvv: $(CHECK_WS_DEPS)
+	$(CXX) $(FLAGS_RVV) $< -o $@
+
 
 BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h
 
@@ -199,6 +202,9 @@ verify_riscv: verify_rvv
 	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 check_riscv: check_rvv
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+check_ws_riscv: check_ws_rvv
 	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 benchmark_riscv: benchmark_rvv

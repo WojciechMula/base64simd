@@ -80,7 +80,7 @@ namespace base64 {
             bytes[3] = 0;
 
             for (size_t i=0; i < size; i++) {
-                const uint8_t b = base64::scalar::lookup[input[i]];
+                const uint8_t b = base64::scalar::lookup_ws[input[i]];
                 if (b == 0xff) {
                     throw invalid_input(i, input[i]);
                 }
