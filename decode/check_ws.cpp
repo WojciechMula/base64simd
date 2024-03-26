@@ -94,7 +94,7 @@ protected:
     void decode(const char* name, FN_DECODE function) {
         tests_run += 1;
 
-        printf("%*s ... ", 32, name);
+        printf("%*s ... ", 40, name);
         fflush(stdout);
 
         clear_output();
@@ -140,10 +140,19 @@ public:
             decode("RISC-V Vector extension", function);
         }
 
+        {
+            using namespace base64::rvv;
+
+            auto function = [](const uint8_t* input, size_t size, uint8_t* output) {
+                return decode_vlen16_m8_omit_ws(lookup_vlen16_m8_omit_ws, pack_vlen16_m8_ver2, input, size, output);
+            };
+            decode("RISC-V Vector extension (version 2)", function);
+        }
+#endif // HAVE_RVV_INSTRUCTIONS
+
         if (test_failures > 0) {
             return false;
         }
-#endif // HAVE_RVV_INSTRUCTIONS
 
         return true;
     }
