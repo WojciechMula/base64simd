@@ -209,6 +209,9 @@ protected:
         using namespace base64::rvv;
 
         RUN_TEMPLATE2("rvv/1", decode_vlen16_m8, lookup_vlen16_m8, pack_vlen16_m8);
+        RUN_TEMPLATE2("rvv/2", decode_vlen16_m8, lookup_vlen16_m8, pack_vlen16_m8_ver2);
+        RUN_TEMPLATE2("rvv/3", decode_vlen16_m8_omit_ws, lookup_vlen16_m8_omit_ws, pack_vlen16_m8);
+        RUN_TEMPLATE2("rvv/4", decode_vlen16_m8_omit_ws, lookup_vlen16_m8_omit_ws, pack_vlen16_m8_ver2);
         }
 #endif // HAVE_RVV_INSTRUCTIONS
 

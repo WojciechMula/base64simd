@@ -122,7 +122,10 @@ void FunctionRegistry::build() {
     add("neon/2", "ARM NEON", "pshufb bitmask", "N/A");
 #endif
 #if defined(HAVE_RVV_INSTRUCTIONS)
-    add("rvv/1", "RISC-V Vector", "N/A", "N/A");
+    add("rvv/1", "RISC-V Vector (pack: gather)", "N/A", "N/A");
+    add("rvv/2", "RISC-V Vector (pack: compress)", "N/A", "N/A");
+    add("rvv/3", "RISC-V Vector (omit ws; pack: gather)", "N/A", "N/A");
+    add("rvv/4", "RISC-V Vector (omit ws, pack: compress)", "N/A", "N/A");
 #endif
     widest_image = 0;
     for (auto& it: registry) {
