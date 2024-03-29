@@ -4,6 +4,9 @@
 
 #include "../benchmark.h"
 
+#ifndef ITERATIONS
+#   define ITERATIONS 1000
+#endif
 
 class Application final: public ApplicationBase<Application> {
 
@@ -12,7 +15,7 @@ class Application final: public ApplicationBase<Application> {
 
 public:
     Application(const CommandLine& cmdline)
-        : super(cmdline, 1024, 10000) {}
+        : super(cmdline, 1024, ITERATIONS) {}
 
     void run() {
 

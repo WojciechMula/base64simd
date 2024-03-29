@@ -198,6 +198,8 @@ benchmark_avx512vbmi: $(BENCHMARK_DEPS) *.avx512.cpp *.avx512bw.cpp *.avx512vbmi
 benchmark_avx512vl: $(BENCHMARK_DEPS) *.avx512.cpp *.avx512bw.cpp *.avx512vl.cpp
 	$(CXX) $(FLAGS_AVX512VL) $< -o $@
 
+benchmark_rvv: $(BENCHMARK_DEPS) *.rvv.cpp
+	$(CXX) $(FLAGS_RVV) -DITERATIONS=50 $< -o $@
 
 build_intel: $(ALL_INTEL_TARGETS)
 
@@ -219,6 +221,9 @@ check_riscv: check_rvv
 	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 speed_riscv: speed_rvv
+	spike --isa=$(SPIKE_ISA) `which pk` $^
+
+benchmark_riscv: benchmark_rvv
 	spike --isa=$(SPIKE_ISA) `which pk` $^
 
 unpack_test: unpack_bigendian.cpp

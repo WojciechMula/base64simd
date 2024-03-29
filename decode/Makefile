@@ -28,7 +28,7 @@ ALL_AVX2=verify_avx2 speed_avx2 check_avx2 benchmark_avx2
 ALL_AVX512=verify_avx512 check_avx512 speed_avx512 benchmark_avx512
 ALL_AVX512BW=verify_avx512bw check_avx512bw speed_avx512bw benchmark_avx512bw
 ALL_AVX512VBMI=verify_avx512vbmi check_avx512vbmi benchmark_avx512vbmi
-ALL_RVV=verify_rvv check_rvv check_ws_rvv
+ALL_RVV=verify_rvv check_rvv check_ws_rvv benchmark_rvv
 ALL_INTEL_TARGETS=$(ALL) $(ALL_XOP) $(ALL_AVX2) $(ALL_AVX512) $(ALL_AVX512VBMI) $(ALL_AVX512BW)
 ALL_TARGETS=$(ALL_INTEL_TARGETS) $(ALL_ARM) $(ALL_RVV)
 
