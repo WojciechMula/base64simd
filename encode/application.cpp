@@ -449,6 +449,14 @@ protected:
             };
             run_function("RISC-V RVV (LMUL=8)", fun);
         }
+
+        if (can_run("rvv", "rvv/3")) {
+            auto fun = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+                using namespace base64::rvv;
+                encode_loadseg(input, bytes, output);
+            };
+            run_function("RISC-V Vector (LMUL=4, segmented load)", fun);
+        }
 #endif
     }
 

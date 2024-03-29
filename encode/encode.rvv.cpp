@@ -104,6 +104,9 @@ namespace base64 {
                 __riscv_vse8_v_u8m1(out, result, vl);
                 out += vl;
             }
+
+            // scalar fallback
+            base64::scalar::encode32(input, bytes, out);
         }
 
         template <typename LOOKUP_FN>
@@ -155,6 +158,99 @@ namespace base64 {
                 __riscv_vse8_v_u8m8(out, result, vl);
                 out += vl;
             }
+
+            // scalar fallback
+            base64::scalar::encode32(input, bytes, out);
+        }
+
+        void encode_loadseg(const uint8_t* input, size_t bytes, uint8_t* output) {
+
+            uint8_t* out = output;
+
+            const size_t VLEN = 16;
+            const size_t LMUL = 2;
+
+            asm volatile (
+                // preload 64-byte lookup for conversion from 6-bit values into Base64 ASCII values
+                "vsetvli        t0, zero, e8, m8\n"
+                "vl8re8.v       v24, (%[lookup])\n"
+            "1:\n"
+                // while (bytes >= input_inc)
+                "li             t0, %[input_inc]\n"
+                "bltu           %[bytes], t0, 2f\n"
+
+                "vsetvli        t0, zero, e8, m2\n"
+                "vlseg3e8.v     v0, (%[input])\n"
+                // [CCdddddd|bbbbcccc|aaaaaaBB] x VLEN x LMUL
+                //   byte 2   byte 1   byte 0
+                //
+                // v{0..1} = byte 0
+                // v{2..3} = byte 1
+                // v{4..5} = byte 2
+
+                // v{6..7} = [00dddddd] - byte 3 of output
+                "li             t0, 0x3f\n"
+                "vand.vx        v6, v4, t0\n"
+
+                // v{12..13} = [00aaaaaa] - byte 0 of output
+                "vsrl.vi        v12, v0, 2\n"
+
+                // v{10..11} = [000000CC]
+                "vsrl.vi        v4, v4, 6\n"
+
+                // v{8..9}   = [00cccc00]
+                "vand.vi        v8, v2, 0xf\n"
+                "vsll.vi        v8, v8, 2\n"
+
+                // v{2..3}   = [00ccccCC] - byte 2 of output
+                "vor.vv         v4, v8, v4\n"
+
+                // v{8..9}   = [0000bbbb]
+                "vsrl.vi        v8, v2, 4\n"
+                // v{0..1}   = [000000BB]
+                "vand.vi        v0, v0, 0x03\n"
+                // v{0..1}   = [00BB0000]
+                "vsll.vi        v0, v0, 4\n"
+                // v{0..3}   = [00BBbbbb] - byte 1 of output
+                "vor.vv         v2, v0, v8\n"
+
+                // prepare layout
+                "vmv.v.v        v0, v12\n"  // byte 0
+                                            // byte 1 - already in v2
+                                            // byte 2 - already in v4
+                                            // byte 3 - already in v6
+
+                // translate 6-bit values => ASCII
+                "vsetvli        t0, zero, e8, m8\n"
+                "vrgather.vv    v8, v24, v0\n"
+
+                "vsetvli        t0, zero, e8, m2\n"
+                "vsseg4e8.v     v8, (%[output])\n"
+
+                "li             t0, %[output_inc]\n"
+                "add            %[output], %[output], t0\n"
+
+                "li             t0, %[input_inc]\n"
+                "add            %[input], %[input], t0\n"
+                "sub            %[bytes], %[bytes], t0\n"
+
+                "j              1b\n"
+            "2:\n"
+                /* outputs */
+                :
+                /* inputs */
+                : [input]  "r" (input)
+                , [output] "r" (out)
+                , [bytes]  "r" (bytes)
+                , [lookup] "r" (base64::rvv::lookup_vlen16_m8)
+                , [input_inc] "i" (3 * VLEN * LMUL)
+                , [output_inc] "i" (4 * VLEN * LMUL)
+                /* clobbers */
+                : "t0", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13"
+            );
+
+            // scalar fallback
+            base64::scalar::encode32(input, bytes, out);
         }
     } // namespace rvv
 } // namespace base64

@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdint>
 #include <cassert>
+#include <string>
 
 #include "../config.h"
 #include "encode.scalar.cpp"
@@ -462,32 +463,51 @@ int validate_lookup() {
 }
 
 
+
+
 template <typename ENC>
 void validate_encoding(const char* name, ENC encode) {
+    static bool initialized = false;
 
-    const char*  input    = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-                            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
-                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
-                            "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
-                            "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
-                            "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f";
-    const size_t len      = 96;
-    const char*  expected = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v"
-                            "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v";
-    const size_t outlen   = strlen(expected);
-    uint8_t output[512];
+    static std::string input;
+    static std::string expected;
+
+    const size_t n = 9;
+    if (not initialized) {
+        const char* input_chunk = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+                                  "\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+                                  "\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f";
+
+        const char* encoded_chunk = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4v";
+
+        for (size_t i=0; i < n; i++) {
+            input.append(input_chunk, 48);
+            expected.append(encoded_chunk);
+        }
+
+        initialized = true;
+    }
+
+    const size_t encoded_len = 64;
+
+    uint8_t output[encoded_len * n + 32];
     memset(output, '_', sizeof(output));
     output[sizeof(output) - 1] = 0;
 
     printf("%s... ", name);
     fflush(stdout);
 
-    encode(reinterpret_cast<const uint8_t*>(input), len, output);
+    encode(reinterpret_cast<const uint8_t*>(input.data()), input.size(), output);
 
-    if (memcmp(expected, output, outlen) != 0) {
+    if (memcmp(expected.data(), output, expected.size()) != 0) {
         puts("FAILED");
-        printf("expected: '%s'\n", expected);
-        printf("result:   '%s'\n", output);
+        printf("expected:     '%s'\n", expected.c_str());
+        printf("result:       '%s'\n", output);
+        printf("result [hex]:");
+        for (size_t i=0; i < sizeof(output); i++) {
+            printf(" %02x", output[i]);
+        }
+        putchar('\n');
         exit(1);
     }
 
@@ -610,6 +630,12 @@ void validate_encoding() {
     };
 
     validate_encoding("RISC-V Vector (LMUL=8)", rvv_m8);
+
+    auto rvv_vseg = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+        base64::rvv::encode_loadseg(input, bytes, output);
+    };
+
+    validate_encoding("RISC-V Vector (LMUL=4, segmented load)", rvv_vseg);
 #endif
 }
 

@@ -24,7 +24,6 @@ public:
         , reference_time(0.0) {}
 
     void run() {
-        
         initialize();
 
         return run_all();

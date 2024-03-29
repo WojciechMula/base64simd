@@ -142,7 +142,7 @@ speed_arm: $(SPEED_DEPS)
 	$(CXX) $(FLAGS_ARM) $< -o $@
 
 speed_rvv: $(SPEED_DEPS) *.rvv.cpp
-	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE=8912 $< -o $@
+	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE="64 * 1024" $< -o $@
 
 
 CHECK_DEPS=check.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) $(EXT_DEPS)
