@@ -2,6 +2,7 @@
 #include <cstring>
 
 #include "../config.h"
+#include "../ansi.cpp"
 
 #include "all.cpp"
 #include "function_registry.cpp"
@@ -204,16 +205,14 @@ int test() {
         fflush(stdout);
     };
 
-    const int ANSI_GREEN = 32;
-
-#define RUN_PROCEDURE(input_size, output_size, name, function)  \
-    show_name(name);                                            \
-    {   Test test(input_size, output_size);                     \
-        if (test.run(function)) {                               \
-            printf("\033[%dm%s\033[0m\n", ANSI_GREEN, "OK");    \
-        } else {                                                \
-            return 1;                                           \
-        }                                                       \
+#define RUN_PROCEDURE(input_size, output_size, name, function)      \
+    show_name(name);                                                \
+    {   Test test(input_size, output_size);                         \
+        if (test.run(function)) {                                   \
+            printf("%sOK%s\n", ansi::str::GREEN, ansi::str::RESET); \
+        } else {                                                    \
+            return 1;                                               \
+        }                                                           \
     }
 
     RUN_PROCEDURE(4, 3, "scalar",   base64::scalar::decode_lookup1);

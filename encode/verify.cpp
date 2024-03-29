@@ -619,23 +619,37 @@ void validate_encoding() {
 #endif
 
 #ifdef HAVE_RVV_INSTRUCTIONS
-    auto rvv_m1 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
-        base64::rvv::encode(base64::rvv::lookup_pshufb_improved, input, bytes, output);
-    };
+    {
+        auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::rvv::encode(base64::rvv::lookup_pshufb_improved, input, bytes, output);
+        };
 
-    validate_encoding("RISC-V Vector (LMUL=1)", rvv_m1);
+        validate_encoding("RISC-V Vector (LMUL=1, pshufb)", fn);
+    }
 
-    auto rvv_m8 = [](const uint8_t* input, size_t bytes, uint8_t* output) {
-        base64::rvv::encode_m8(base64::rvv::lookup_wide_gather, input, bytes, output);
-    };
+    {
+        auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::rvv::encode_m8(base64::rvv::lookup_wide_gather, input, bytes, output);
+        };
 
-    validate_encoding("RISC-V Vector (LMUL=8)", rvv_m8);
+        validate_encoding("RISC-V Vector (LMUL=8, gather)", fn);
+    }
 
-    auto rvv_vseg = [](const uint8_t* input, size_t bytes, uint8_t* output) {
-        base64::rvv::encode_loadseg(input, bytes, output);
-    };
+    {
+        auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::rvv::encode_loadseg(input, bytes, output);
+        };
 
-    validate_encoding("RISC-V Vector (LMUL=4, segmented load)", rvv_vseg);
+        validate_encoding("RISC-V Vector (LMUL=4, segmented load, gather)", fn);
+    }
+
+    {
+        auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::rvv::encode_strided_load_m8(base64::rvv::lookup_wide_gather, input, bytes, output);
+        };
+
+        validate_encoding("RISC-V Vector (LMUL=8, strided load, gather)", fn);
+    }
 #endif
 }
 

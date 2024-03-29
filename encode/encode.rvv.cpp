@@ -252,6 +252,94 @@ namespace base64 {
             // scalar fallback
             base64::scalar::encode32(input, bytes, out);
         }
+
+        template <typename LOOKUP_FN>
+        void encode_strided_load_m8(LOOKUP_FN lookup, const uint8_t* input, size_t bytes, uint8_t* output) {
+
+            uint8_t* out = output;
+
+            const size_t VLEN = 16;
+            const size_t LMUL = 8;
+            const size_t vl = __riscv_vsetvlmax_e8m8();
+
+            const size_t input_inc  = 3 * (VLEN * LMUL);
+            const size_t output_inc = 4 * (VLEN * LMUL);
+            while (bytes >= input_inc) {
+                // input:  [CCdddddd|bbbbcccc|aaaaaaBB] x VLEN x LMUL
+                //           byte 2   byte 1   byte 0
+                //
+                // output: [00dddddd|00ccccCC|00BBbbbb|00aaaaa]
+                //           byte 3   byte 2   byte 1   byte 0
+
+                // load byte 0
+                const vuint8m8_t byte0 = __riscv_vlse8_v_u8m8(input + 0, 3, vl);
+
+                // load byte 1
+                const vuint8m8_t byte1 = __riscv_vlse8_v_u8m8(input + 1, 3, vl);
+
+                // extract and store field 'a'
+                {
+                    // t0 = [00aaaaaaa]
+                    const vuint8m8_t t0 = __riscv_vsrl_vx_u8m8(byte0, 2, vl);
+                    __riscv_vsse8_v_u8m8(out + 0, 4, lookup(t0, vl), vl);
+                }
+
+                // extract and store field 'b'
+                {
+                    // t0 = [0000bbbbb]
+                    const vuint8m8_t t0 = __riscv_vsrl_vx_u8m8(byte1, 4, vl);
+
+                    // t1 = [0000000BB]
+                    const vuint8m8_t t1 = __riscv_vand_vx_u8m8(byte0, 0x03, vl);
+
+                    // t2 = [00BB00000]
+                    const vuint8m8_t t2 = __riscv_vsll_vx_u8m8(t1, 4, vl);
+
+                    // t3 = [00BBbbbbb]
+                    const vuint8m8_t t3 = __riscv_vor_vv_u8m8(t0, t2, vl);
+
+                    __riscv_vsse8_v_u8m8(out + 1, 4, lookup(t3, vl), vl);
+                }
+
+                // load byte 2
+                const vuint8m8_t byte2 = __riscv_vlse8_v_u8m8(input + 2, 3, vl);
+
+                // extract and store field 'c'
+                {
+                    // t0 = [0000cccc]
+                    const vuint8m8_t t0 = __riscv_vand_vx_u8m8(byte1, 0x0f, vl);
+
+                    // t1 = [00cccc00]
+                    const vuint8m8_t t1 = __riscv_vsll_vx_u8m8(t0, 2, vl);
+
+                    // t2 = [CC000000]
+                    const vuint8m8_t t2 = __riscv_vand_vx_u8m8(byte2, 0xc0, vl);
+
+                    // t3 = [00CC0000]
+                    const vuint8m8_t t3 = __riscv_vsrl_vx_u8m8(t2, 6, vl);
+
+                    // t3 = [00CCccccc]
+                    const vuint8m8_t t4 = __riscv_vor_vv_u8m8(t1, t3, vl);
+
+                    __riscv_vsse8_v_u8m8(out + 2, 4, lookup(t4, vl), vl);
+                }
+
+                // extract and store field 'd'
+                {
+                    // t0 = [00dddddd]
+                    const vuint8m8_t t0 = __riscv_vand_vx_u8m8(byte2, 0x3f, vl);
+
+                    __riscv_vsse8_v_u8m8(out + 3, 4, lookup(t0, vl), vl);
+                }
+
+                input += input_inc;
+                bytes -= input_inc;
+                out   += output_inc;
+            }
+
+            // scalar fallback
+            base64::scalar::encode32(input, bytes, out);
+        }
     } // namespace rvv
 } // namespace base64
 
