@@ -163,8 +163,9 @@ namespace base64 {
             base64::scalar::encode32(input, bytes, out);
         }
 
+        // GCC 13.2.0 lacks support for the lastest intrinsics standard, thus
+        // this inline asm implementation.
         void encode_loadseg(const uint8_t* input, size_t bytes, uint8_t* output) {
-
             uint8_t* out = output;
 
             const size_t VLEN = 16;
@@ -172,14 +173,14 @@ namespace base64 {
 
             asm volatile (
                 // preload 64-byte lookup for conversion from 6-bit values into Base64 ASCII values
-                "vsetvli        t0, zero, e8, m8\n"
+                "vsetvli        t0, zero, e8, m8, ta, ma\n"
                 "vl8re8.v       v24, (%[lookup])\n"
             "1:\n"
                 // while (bytes >= input_inc)
                 "li             t0, %[input_inc]\n"
                 "bltu           %[bytes], t0, 2f\n"
 
-                "vsetvli        t0, zero, e8, m2\n"
+                "vsetvli        t0, zero, e8, m2, ta, ma\n"
                 "vlseg3e8.v     v0, (%[input])\n"
                 // [CCdddddd|bbbbcccc|aaaaaaBB] x VLEN x LMUL
                 //   byte 2   byte 1   byte 0
@@ -221,10 +222,10 @@ namespace base64 {
                                             // byte 3 - already in v6
 
                 // translate 6-bit values => ASCII
-                "vsetvli        t0, zero, e8, m8\n"
+                "vsetvli        t0, zero, e8, m8, ta, ma\n"
                 "vrgather.vv    v8, v24, v0\n"
 
-                "vsetvli        t0, zero, e8, m2\n"
+                "vsetvli        t0, zero, e8, m2, ta, ma\n"
                 "vsseg4e8.v     v8, (%[output])\n"
 
                 "li             t0, %[output_inc]\n"
