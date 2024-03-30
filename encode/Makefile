@@ -175,7 +175,7 @@ check_rvv: $(CHECK_DEPS) *.rvv.cpp
 	$(CXX) $(FLAGS_RVV) -DBUFFER_SIZE=262144 $< -o $@
 
 
-BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) ../benchmark.h
+BENCHMARK_DEPS=benchmark.cpp lookup.sse.cpp encode.*.cpp unpack.*.cpp $(APPLICATION_DEPS) ../benchmark.h ../memcpy.cpp
 
 benchmark: $(BENCHMARK_DEPS)
 	$(CXX) $(FLAGS) $< -o $@

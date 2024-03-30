@@ -48,39 +48,6 @@
 
 #include "../cmdline.cpp"
 
-#if defined(HAVE_AVX512_INSTRUCTIONS)
-#include <immintrin.h>
-void* avx512_memcpy(void *dst, const void * src, size_t n) {
-  if(n >= 64) {
-    size_t i = 0;
-    if(n >= 4*64) {
-      for(; i <= n - 4*64; i+=4*64) {
-        __m512i x0 = _mm512_loadu_si512((const char*)src + i);
-        __m512i x1 = _mm512_loadu_si512((const char*)src + i + 64);
-        __m512i x2 = _mm512_loadu_si512((const char*)src + i + 128);
-        __m512i x3 = _mm512_loadu_si512((const char*)src + i + 192);
-        _mm512_storeu_si512((char*)dst + i, x0);
-        _mm512_storeu_si512((char*)dst + i + 64, x1);
-        _mm512_storeu_si512((char*)dst + i + 128, x2);
-        _mm512_storeu_si512((char*)dst + i + 192, x3);
-     }
-    }
-    if(n>=64) {
-      for(; i <= n - 64; i+=64) {
-        __m512i x0 = _mm512_loadu_si512((const char*)src + i);
-        _mm512_storeu_si512((char*)dst + i, x0);
-      }
-    }
-    size_t leftover = n % 64;
-    ::memcpy((char*)dst + n - leftover, (const char*)src + n - leftover, leftover);
-    return dst;
-  } else {
-    return ::memcpy(dst,src,n);
-  }
-  
-}
-#endif
-
 template <typename Derived>
 class ApplicationBase {
 protected:
@@ -108,17 +75,8 @@ public:
 
         printf("input size: %lu, output size: %lu\n", get_input_size(), get_output_size());
         printf("number of iterations: %lu\n", iterations);
-        printf("We report the time in cycles per input byte.\n");
         fill_input();
-        printf("For reference, we present the time needed to copy %zu bytes.\n", get_input_size());
-        BEST_TIME(/**/, ::memcpy(output.get(), input.get(), get_input_size()), "memcpy", iterations, get_input_size());
-#if defined(HAVE_AVX512_INSTRUCTIONS)
-        size_t inalign = reinterpret_cast<uintptr_t>(input.get()) & 63;
-        size_t outalign = reinterpret_cast<uintptr_t>(output.get()) & 63;
-        if((inalign !=0) || (outalign!=0))
-          printf("warning: your data pointers are unaligned: %zu %zu\n", inalign, outalign);
-        BEST_TIME(/**/, avx512_memcpy(output.get(),input.get(),get_input_size()), "memcpy (avx512)", iterations, get_input_size());
-#endif
+        custom_initialize();
         initialized = true;
     }
 
@@ -141,6 +99,10 @@ protected:
 
     void clear_output() {
         memset(output.get(), 0, get_output_size());
+    }
+
+    virtual void custom_initialize() {
+        // nop
     }
 
 protected:

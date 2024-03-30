@@ -162,7 +162,7 @@ check_ws_rvv: $(CHECK_WS_DEPS)
 	$(CXX) $(FLAGS_RVV) $< -o $@
 
 
-BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h
+BENCHMARK_DEPS=benchmark.cpp $(DEPS) application.cpp ../cmdline.cpp ../benchmark.h ../memcpy.cpp
 
 benchmark: $(BENCHMARK_DEPS)
 	$(CXX) $(FLAGS) $< -o $@

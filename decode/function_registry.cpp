@@ -129,7 +129,6 @@ void FunctionRegistry::build() {
 #endif
     widest_image = 0;
     for (auto& it: registry) {
-
         it.second.image = it.second.render();
         widest_image = std::max(widest_image, static_cast<int>(it.second.image.size()));
     }
