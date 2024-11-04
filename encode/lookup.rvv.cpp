@@ -66,6 +66,7 @@ namespace base64 {
 
         vuint8m4_t lookup_option(vuint8m4_t indices, size_t /*unused*/)
         {
+            const int8_t offsets[68] = {71, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -19, -16, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
             vint8m1_t offset_vec = __riscv_vle8_v_i8m1(offsets, __riscv_vsetvlmax_e8m1());
 

@@ -172,6 +172,8 @@ namespace base64 {
             size_t vlmax_e8m1 = __riscv_vsetvlmax_e8m1();
             size_t vlmax_e32m4 = __riscv_vsetvlmax_e32m4();
 
+            const uint8_t gather_index_lmul4[32] = {1, 0, 2, 1, 4, 3, 5, 4, 7, 6, 8, 7, 10, 9, 11, 10, 13, 12, 14, 13, 16, 15, 17, 16, 19, 18, 20, 19, 22, 21, 23, 22};
+
             const vuint8m1_t vec_index_e8m1 = __riscv_vle8_v_u8m1(gather_index_lmul4, vlmax_e8m1);
 
             size_t input_slice_e8m4 = (vlmax_e8m4 / 4) * 3;
