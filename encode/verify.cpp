@@ -645,6 +645,14 @@ void validate_encoding() {
 
     {
         auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+            base64::rvv::encode_option(base64::rvv::lookup_option, input, bytes, output);
+        };
+
+        validate_encoding("RISC-V Vector (LMUL=4, vmulh shifting, gather)", fn);
+    }
+
+    {
+        auto fn = [](const uint8_t* input, size_t bytes, uint8_t* output) {
             base64::rvv::encode_strided_load_m8(base64::rvv::lookup_wide_gather, input, bytes, output);
         };
 
