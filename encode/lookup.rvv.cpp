@@ -64,13 +64,13 @@ namespace base64 {
             return __riscv_vrgather_vv_u8m8(lookup, indices, vl);
         }
 
-        vuint8m4_t lookup_option(vuint8m4_t indices, size_t /*unused*/)
+        vuint8m4_t lookup_option(vuint8m4_t indices, size_t vl)
         {
             const int8_t offsets[68] = {71, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -19, -16, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-            vint8m1_t offset_vec = __riscv_vle8_v_i8m1(offsets, __riscv_vsetvlmax_e8m1());
+            vint8m1_t offset_vec = __riscv_vle8_v_i8m1(offsets, vl);
 
-            size_t vl = __riscv_vsetvlmax_e8m4();
+            vl = __riscv_vsetvlmax_e8m4();
             // reduce values 0-64 to 0-13
             vuint8m4_t result = __riscv_vssubu_vx_u8m4(indices, 51, vl);
             vbool2_t vec_lt_26 = __riscv_vmsltu_vx_u8m4_b2(indices, 26, vl);

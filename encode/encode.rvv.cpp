@@ -213,8 +213,6 @@ namespace base64 {
 
                 vl = __riscv_vsetvlmax_e32m4();
 
-                // vuint32m4_t vec_lookup_indices = lookup_m4(vec_gather, vl);
-
                 vuint32m4_t input32 = __riscv_vreinterpret_v_u8m4_u32m4(vec_gather);
 
                 // mask out so that only a and c bits remain
@@ -236,8 +234,6 @@ namespace base64 {
 
                 vl = __riscv_vsetvlmax_e8m4();
 
-                // two different ways to calculate the lookup step
-                // vuint8m4_t base64_chars = __riscv_vluxei8_v_u8m4(b64chars, __riscv_vreinterpret_v_u32m4_u8m4(vec_lookup_indices), vl);
                 const vuint8m4_t base64_chars = lookup(__riscv_vreinterpret_v_u32m4_u8m4(vec_lookup_indices), vl);
 
                 __riscv_vse8_v_u8m4((uint8_t *)output, base64_chars, vl);
