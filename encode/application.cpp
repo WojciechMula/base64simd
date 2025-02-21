@@ -427,6 +427,14 @@ protected:
             };
             run_function("RISC-V Vector (LMUL=8, strided load, gather)", fun);
         }
+
+        if (can_run("rvv", "rvv/5")) {
+            auto fun = [](const uint8_t* input, size_t bytes, uint8_t* output) {
+                using namespace base64::rvv;
+                encode_option(lookup_option, input, bytes, output);
+            };
+            run_function("RISC-V Vector (LMUL=4, vmul/h shifting, gather)", fun);
+        }
 #endif
     }
 

@@ -64,6 +64,31 @@ namespace base64 {
             return __riscv_vrgather_vv_u8m8(lookup, indices, vl);
         }
 
+        vuint8m4_t lookup_option(vuint8m4_t indices, size_t vl)
+        {
+            const int8_t offsets[68] = {71, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -19, -16, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+            vint8m1_t offset_vec = __riscv_vle8_v_i8m1(offsets, vl);
+
+            vl = __riscv_vsetvlmax_e8m4();
+            // reduce values 0-64 to 0-13
+            vuint8m4_t result = __riscv_vssubu_vx_u8m4(indices, 51, vl);
+            vbool2_t vec_lt_26 = __riscv_vmsltu_vx_u8m4_b2(indices, 26, vl);
+            const vuint8m4_t vec_lookup = __riscv_vadd_vx_u8m4_mu(vec_lt_26, result, result, 13, vl);
+
+            // shuffle registers one by one
+            vint8m1_t offset_vec_0 = __riscv_vrgather_vv_i8m1(offset_vec, __riscv_vget_v_u8m4_u8m1(vec_lookup, 0), vl);
+            vint8m1_t offset_vec_1 = __riscv_vrgather_vv_i8m1(offset_vec, __riscv_vget_v_u8m4_u8m1(vec_lookup, 1), vl);
+            vint8m1_t offset_vec_2 = __riscv_vrgather_vv_i8m1(offset_vec, __riscv_vget_v_u8m4_u8m1(vec_lookup, 2), vl);
+            vint8m1_t offset_vec_3 = __riscv_vrgather_vv_i8m1(offset_vec, __riscv_vget_v_u8m4_u8m1(vec_lookup, 3), vl);
+
+            vint8m4_t offset_vec_bundle = __riscv_vcreate_v_i8m1_i8m4(offset_vec_0, offset_vec_1, offset_vec_2, offset_vec_3);
+
+            vint8m4_t ascii_vec = __riscv_vadd_vv_i8m4(__riscv_vreinterpret_v_u8m4_i8m4(indices), offset_vec_bundle, vl);
+
+            return __riscv_vreinterpret_v_i8m4_u8m4(ascii_vec);
+        }
+
     } // namespace rvv
 
 } // namespace base64
